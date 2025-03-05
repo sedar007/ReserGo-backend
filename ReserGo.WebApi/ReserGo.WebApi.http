@@ -1,0 +1,6 @@
+@ReserGo.WebApi_HostAddress = http://localhost:5150
+
+GET {{ReserGo.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
