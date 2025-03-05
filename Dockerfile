@@ -13,7 +13,7 @@ COPY ["ReserGo.WebApi/ReserGo.WebApi.csproj", "ReserGo.WebApi/"]
 COPY ["ReserGo.Business/ReserGo.Business.csproj", "ReserGo.Business/"]
 COPY ["ReserGo.Common/ReserGo.Common.csproj", "ReserGo.Common/"]
 COPY ["ReserGo.DataAccess/ReserGo.DataAccess.csproj", "ReserGo.DataAccess/"]
-COPY ["ReserGo.Shared /ReserGo.Shared.csproj", "ReserGo.Shared/"]
+COPY ["ReserGo.Shared/ReserGo.Shared.csproj", "ReserGo.Shared/"]
 COPY ["ReserGo.Tiers/ReserGo.Tiers.csproj", "ReserGo.Tiers/"]
 
 # Si vous avez besoin du projet de test
