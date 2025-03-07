@@ -1,11 +1,11 @@
-using Common.DTO;
-using Common.Entity;
+using ReserGo.Common.DTO;
+using ReserGo.Common.Entity;
 
-namespace Common.Helper;
+namespace ReserGo.Common.Helper;
 
 public static class HotelHelper {
-    public static HotelDTO ToDto(this Hotel hotel) {
-        return new HotelDTO {
+    public static HotelDto ToDto(this Hotel hotel) {
+        return new HotelDto {
             Id = hotel.Id,
             Name = hotel.Name,
             Location = hotel.Location,

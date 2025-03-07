@@ -1,5 +1,5 @@
-namespace Common.DTO;
-public class OccasionDTO {
+namespace ReserGo.Common.DTO;
+public class OccasionDto {
     public int Id { get; set; }
     public string Name { get; set; }
     public DateTime StartDate { get; set; }

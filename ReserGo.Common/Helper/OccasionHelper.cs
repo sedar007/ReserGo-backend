@@ -1,10 +1,10 @@
-using Common.DTO;
-using Common.Entity;
+using ReserGo.Common.DTO;
+using ReserGo.Common.Entity;
 
-namespace Common.Helper;
+namespace ReserGo.Common.Helper;
 public static class OccasionHelper {
-    public static OccasionDTO ToDto(this Occasion occasion) {
-        return new OccasionDTO {
+    public static OccasionDto ToDto(this Occasion occasion) {
+        return new OccasionDto {
             Id = occasion.Id,
             Name = occasion.Name,
             StartDate = occasion.StartDate,

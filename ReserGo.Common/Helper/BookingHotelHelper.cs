@@ -1,16 +1,19 @@
-using Common.DTO;
-using Common.Entity;
+using ReserGo.Common.DTO;
+using ReserGo.Common.Entity;
 
-namespace Common.Helper;
+namespace ReserGo.Common.Helper;
 
-public static class BookingHotelHelper : BookingHelper {
-    public static BookingHotelDTO ToDto(this BookingHotel bookingHotel) {
-        return new BookingHotelDTO {
+public static class BookingHotelHelper {
+    public static BookingHotelDto ToDto(BookingHotel bookingHotel) {
+        return new BookingHotelDto {
+            Id = bookingHotel.Id,
+            UserId = bookingHotel.UserId,
             HotelId = bookingHotel.HotelId,
+            BookingDate = bookingHotel.BookingDate,
+            Status = bookingHotel.Status,
             CheckIn = bookingHotel.CheckIn,
             CheckOut = bookingHotel.CheckOut,
-            NumberOfGuests = bookingHotel.NumberOfGuests,
-            Hotel = bookingHotel.Hotel
+            NumberOfGuests = bookingHotel.NumberOfGuests
         };
     }
 }

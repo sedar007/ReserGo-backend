@@ -1,5 +1,7 @@
-namespace ReserGo.Common.Entity;
-public class BookingRestaurant {
+namespace ReserGo.Common.DTO;
+
+public class BookingRestaurantDto {
+    
     public int Id { get; set; }
     public int UserId { get; set; }
     public int RestaurantId { get; set; }
@@ -9,6 +11,6 @@ public class BookingRestaurant {
     public DateTime ReservationTime { get; set; }
     public int NumberOfPeople { get; set; }
     
-    public User User { get; set; }
-    public Restaurant Restaurant { get; set; }
+    public UserDto UserDto { get; set; }
+    public RestaurantDto RestaurantDto { get; set; }
 }

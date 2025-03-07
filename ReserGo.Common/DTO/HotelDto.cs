@@ -1,5 +1,5 @@
-namespace Common.DTO;
-public class HotelDTO {
+namespace ReserGo.Common.DTO;
+public class HotelDto {
     public int Id { get; set; }
     public string Name { get; set; }
     public string Location { get; set; }

@@ -1,4 +1,4 @@
-namespace Common.Entity;
+namespace ReserGo.Common.Entity;
 public class Occasion {
     public int Id { get; set; }
     public string Name { get; set; }
@@ -6,4 +6,6 @@ public class Occasion {
     public DateTime EndDate { get; set; }
     public string Location { get; set; } 
     public int Capacity { get; set; } 
+    public IEnumerable<BookingOccasion> BookingsOccasion { get; set; }
+
 }

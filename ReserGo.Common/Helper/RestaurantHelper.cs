@@ -1,10 +1,10 @@
-using Common.DTO;
-using Common.Entity;
+using ReserGo.Common.DTO;
+using ReserGo.Common.Entity;
 
-namespace Common.Helper;
+namespace ReserGo.Common.Helper;
 public static class RestaurantHelper {
-    public static RestaurantDTO ToDto(this Restaurant restaurant) {
-        return new RestaurantDTO {
+    public static RestaurantDto ToDto(this Restaurant restaurant) {
+        return new RestaurantDto {
             Id = restaurant.Id,
             Name = restaurant.Name,
             CuisineType = restaurant.CuisineType,

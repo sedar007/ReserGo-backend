@@ -1,5 +1,6 @@
 
 
+using Microsoft.EntityFrameworkCore;
 using NLog;
 using NLog.Web;
 
@@ -54,15 +55,17 @@ public class Program {
 			builder.Host.UseNLog();
 			
 			
+			
+			
 
 			var app = builder.Build();
 
-			/*using (var scope = app.Services.CreateScope()) {
+			using (var scope = app.Services.CreateScope()) {
 				var dbContext = scope.ServiceProvider.GetRequiredService<ReserGoContext>();
 
 				// Here is the migration executed
 				dbContext.Database.Migrate();
-			} */
+			} 
 
 			// Configure the HTTP request pipeline.
 			//if (app.Environment.IsDevelopment()) {
