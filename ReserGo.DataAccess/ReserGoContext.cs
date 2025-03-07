@@ -8,6 +8,7 @@ namespace ReserGo.DataAccess;
     public class ReserGoContext : DbContext {
 	    
 	    public DbSet<User> User { get; set; }
+	    public DbSet<Login> Login { get; set; }
 	    public DbSet<Hotel> Hotel { get; set; }
 	    public DbSet<Occasion> Occasion { get; set; }
 	    public DbSet<Restaurant> Restaurant { get; set; }
@@ -30,6 +31,12 @@ namespace ReserGo.DataAccess;
 			// config user
 			modelBuilder.Entity<User>()
 				.HasKey(u => u.Id);
+			
+			modelBuilder.Entity<User>()
+				.HasOne(u => u.Login)
+				.WithOne(l => l.User)
+				.HasForeignKey<Login>(l => l.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
 
 			modelBuilder.Entity<User>()
 				.HasMany(u => u.BookingsHotel)

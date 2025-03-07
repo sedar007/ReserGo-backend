@@ -8,8 +8,10 @@ public static class UserHelper {
             Id = user.Id,
             FirstName = user.FirstName,
             LastName = user.LastName,
+            Username = user.Username,
             Email = user.Email,
-            Role = user.Role
+            Role = user.Role,
+            CreatedAt = user.CreatedAt,
         };
     }
 }
