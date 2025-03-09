@@ -1,25 +1,33 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <TargetFramework>net9.0</TargetFramework>
+        <NoWarn>$(NoWarn);1591</NoWarn>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>60a2ab9f-70ff-4191-ada1-306a5d2fb473</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="NLog" Version="5.3.2" />
-        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.10" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.4">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+        <PackageReference Include="NLog" Version="5.3.4" />
+        <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
+        <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.2.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="7.2.0" />
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="7.2.0" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\ReserGo.Business\ReserGo.Business.csproj" />
-        <ProjectReference Include="..\ReserGo.Common\ReserGo.Common.csproj" />
+      <ProjectReference Include="..\ReserGo.Business\ReserGo.Business.csproj" />
     </ItemGroup>
+
+
 
 
 </Project>
