@@ -16,10 +16,9 @@ namespace ReserGo.DataAccess;
 	    public DbSet<BookingOccasion> BookingOccasion { get; set; }
 	    public DbSet<BookingRestaurant> BookingRestaurant { get; set; }
 	    
-        private string _sqlConnectionString;
+        private readonly string _sqlConnectionString;
 
-        public ReserGoContext(IOptions<AppSettings> options)
-		{
+        public ReserGoContext(IOptions<AppSettings> options) {
 			_sqlConnectionString = options.Value.SqlConnectionString;
 		}
 
