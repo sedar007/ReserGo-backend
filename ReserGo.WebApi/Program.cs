@@ -1,10 +1,21 @@
-
-
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 using NLog;
-using NLog.Web;
+using NLog.Web; 
+using Microsoft.AspNetCore.Authentication.Cookies;
 
+using ReserGo.DataAccess.Interfaces;
+using ReserGo.DataAccess.Implementations;
+using ReserGo.Shared.Interfaces;
+using ReserGo.Shared.Implementations;
+using ReserGo.Business.Interfaces;
+using ReserGo.Business.Implementations;
 using ReserGo.Common.Security;
+
 using ReserGo.DataAccess;
 namespace ReserGo.WebAPI;
 
@@ -34,30 +45,131 @@ public class Program {
 			builder.Services.AddTransient<ReserGoContext>();
 
 			// Add services to the container.
+			builder.Services.AddScoped<ISecurity, Security>();
+          
+			builder.Services.AddScoped<IUserDataAccess, UserDataAccess>();
+			builder.Services.AddScoped<ILoginDataAccess, LoginDataAccess>();
+			builder.Services.AddScoped<IAuthDataAccess, AuthDataAccess>();
+			builder.Services.AddScoped<IAuthService, AuthService>();
 			
-
-			builder.Services.AddControllers();
-			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-			builder.Services.AddEndpointsApiExplorer();
-			builder.Services.AddSwaggerGen();
+			// Ajouter le service de cache en mémoire
+			builder.Services.AddMemoryCache();
 			
+			// Configure CORS
 			builder.Services.AddCors(options => {
 				options.AddPolicy(name: CORS_POLICY,
 					policy => {
-						policy.AllowAnyOrigin()
+						policy.WithOrigins("http://localhost:5173")
 							.AllowAnyMethod()
-							.AllowAnyHeader();
+							.AllowAnyHeader()
+							.AllowCredentials();
 					});
 			});
+			
+			// Ajout du service d'authentification avec Cookie
+			builder.Services
+				.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+				.AddCookie(options =>
+				{
+					options.LoginPath = "/api/auth/signin"; // Page de connexion
+					options.LogoutPath = "/api/auth/logout"; // Page de déconnexion
+					options.Cookie.HttpOnly = true; // Sécurise contre les scripts malveillants
+					options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Active en HTTPS
+					options.Cookie.SameSite = SameSiteMode.Strict; // Protection contre CSRF
+				});
+			
+			builder.Services.AddAuthorization();
+			
+			builder.Services.AddControllers();
+			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+			builder.Services.AddEndpointsApiExplorer();
+			builder.Services.AddSwaggerGen(opt =>
+			{
+				opt.SwaggerDoc("v1", new OpenApiInfo { Title = "Health", Version = "v1.0.0" });
+				opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+				{
+					In = ParameterLocation.Header,
+					Description = "Please enter token",
+					Name = "Authorization",
+					Type = SecuritySchemeType.Http,
+					BearerFormat = "JWT",
+					Scheme = "bearer"
+				});
+				opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+				{
+					{
+						new OpenApiSecurityScheme
+						{
+							Reference = new OpenApiReference
+							{
+								Type = ReferenceType.SecurityScheme,
+								Id = "Bearer"
+							}
+						},
+						new string[]{}
+					}
+				});
 
+				// Ajoutez ici la configuration pour inclure les commentaires XML
+				var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+				var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+				opt.IncludeXmlComments(xmlPath); 
+			});
+
+			
+			
 			// NLog: Setup NLog for Dependency injection
 			builder.Logging.ClearProviders();
 			builder.Host.UseNLog();
 			
+			var jwtSettings = new JwtSettings {
+				Key = builder.Configuration.GetSection("Key")?.Get<string>() ?? string.Empty,
+				Issuer = builder.Configuration.GetSection("Issuer")?.Value ?? string.Empty,
+				Audience = builder.Configuration.GetSection("Audience")?.Get<string>() ?? string.Empty,
+				ExpireMinutes = builder.Configuration.GetSection("ExpireMinutes")?.Get<int>() ?? 0,
+			};
 			
-			
-			
+				var key = Encoding.ASCII.GetBytes(jwtSettings.Key);
+				builder.Services.AddAuthentication(options =>
+					{
+						options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+						options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+					})
+					.AddJwtBearer(options =>
+					{
+						options.TokenValidationParameters = new TokenValidationParameters
+						{
+							ValidateIssuer = true,
+							ValidateAudience = true,
+							ValidateLifetime = true,
+							ValidateIssuerSigningKey = true,
+							ValidIssuer = jwtSettings.Issuer,
+							ValidAudience = jwtSettings.Audience,
+							IssuerSigningKey = new SymmetricSecurityKey(key),
+							ClockSkew = TimeSpan.Zero
+						};
+						
+						options.Events = new JwtBearerEvents
+						{
+							OnMessageReceived = context =>
+							{
+								if (context.Request.Cookies.ContainsKey("AuthToken"))
+								{
+									context.Token = context.Request.Cookies["AuthToken"];
+								}
+								return Task.CompletedTask;
+							}
+						};
+						
+					});
+				
 
+			// Configuration pour le service keep-alive
+			/*if (builder.Environment.IsProduction())
+				builder.Services.AddHostedService<KeepAliveService>();
+			*/
+			
+			
 			var app = builder.Build();
 
 			using (var scope = app.Services.CreateScope()) {
@@ -75,11 +187,10 @@ public class Program {
 
 			app.UseHttpsRedirection();
 			app.UseCors(CORS_POLICY);
-
+			app.UseAuthentication();
 			app.UseAuthorization();
 
 			app.MapControllers();
-
 			app.Run();
 		} catch (Exception e) {
 			logger.Error(e);
