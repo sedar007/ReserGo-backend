@@ -59,7 +59,7 @@ public class Program {
 			builder.Services.AddCors(options => {
 				options.AddPolicy(name: CORS_POLICY,
 					policy => {
-						policy.WithOrigins("http://localhost:5173", "https://resergo-admin.adjysedar.fr/")
+						policy.WithOrigins("http://localhost:5173", "https://resergo-admin.adjysedar.fr/", "https://resergo-admin.adjysedar.fr")
 							.AllowAnyMethod()
 							.AllowAnyHeader()
 							.AllowCredentials();
