@@ -1,4 +1,4 @@
-﻿using ReserGo.Common.Requests.Security;
+using ReserGo.Common.Requests.Security;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.Security;
 using ReserGo.Shared.Interfaces;
@@ -37,7 +37,7 @@ namespace ReserGo.WebAPI.Controllers.Admin {
 
                 var cookieOptions = new CookieOptions {
                     HttpOnly = true, // Empêche l'accès via JavaScript (XSS protection)
-                    Secure = false, // Active seulement en HTTPS
+                    Secure = true, // Active seulement en HTTPS
                     SameSite = SameSiteMode.Strict, // Évite les attaques CSRF
                     Expires = DateTime.UtcNow.AddMinutes(30) // Durée d'expiration
                 };
