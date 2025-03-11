@@ -36,7 +36,7 @@ namespace ReserGo.WebAPI.Controllers.Admin {
                     return StatusCode(StatusCodes.Status500InternalServerError, "Une erreur interne s'est produite.");
 
                 var cookieOptions = new CookieOptions {
-                    Domain = "resergo-admin.adjysedar.fr",
+                   // Domain = "resergo-admin.adjysedar.fr",
                     HttpOnly = true, // Prevents access via JavaScript (XSS protection)
                     Secure = true, // Only active in HTTPS
                     SameSite = SameSiteMode.None, // Prevents CSRF attacks
@@ -47,7 +47,7 @@ namespace ReserGo.WebAPI.Controllers.Admin {
                 _logger.LogInformation("Token stored in HTTP-only cookie");
 
                 _logger.LogInformation("User logged in");
-                return Ok(new { message = "Login successful", response.Id, response.Role,  response.Username, response.RoleName });
+                return Ok(new { message = "Login successful", response.Id, response.Role,  response.Username, response.RoleName, response.Token });
             }
 
             catch (ArgumentNullException e) {
