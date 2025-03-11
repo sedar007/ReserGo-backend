@@ -56,29 +56,40 @@ public class Program {
 			builder.Services.AddMemoryCache();
 			
 			// Configure CORS
-			builder.Services.AddCors(options => {
-				options.AddPolicy(name: CORS_POLICY,
-					policy => {
-						policy.WithOrigins("http://localhost:5173", "https://resergo-admin.adjysedar.fr/", "https://resergo-admin.adjysedar.fr")
-							.AllowAnyMethod()
-							.AllowAnyHeader()
-							.AllowCredentials();
-					});
-			});
+			builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: CORS_POLICY,
+                    policy =>
+                    {
+                        policy.WithOrigins("http://localhost:5173", "https://resergo-admin.adjysedar.fr")
+                            .AllowCredentials()
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+            });
 			
 			// Ajout du service d'authentification avec Cookie
 			builder.Services
 				.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 				.AddCookie(options =>
 				{
-					options.LoginPath = "/api/auth/signin"; // Page de connexion
-					options.LogoutPath = "/api/auth/logout"; // Page de déconnexion
-					options.Cookie.HttpOnly = true; // Sécurise contre les scripts malveillants
-					options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Active en HTTPS
-					options.Cookie.SameSite = SameSiteMode.Strict; // Protection contre CSRF
+					options.LoginPath = "/api/auth/signin"; 
+					options.LogoutPath = "/api/auth/logout"; 
+					options.Cookie.HttpOnly = true;
+					options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+					options.Cookie.SameSite = SameSiteMode.None;
+					options.Cookie.Domain = "resergo-admin.adjysedar.fr";
 				});
 			
 			builder.Services.AddAuthorization();
+			
+			// Configuration des cookies pour le support cross-origin
+			builder.Services.Configure<CookiePolicyOptions>(options =>
+			{
+				options.MinimumSameSitePolicy = SameSiteMode.None;
+				options.HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always;
+				options.Secure = CookieSecurePolicy.Always;
+			});
 			
 			builder.Services.AddControllers();
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -189,7 +200,6 @@ public class Program {
 			app.UseCors(CORS_POLICY);
 			app.UseAuthentication();
 			app.UseAuthorization();
-
 			app.MapControllers();
 			app.Run();
 		} catch (Exception e) {
