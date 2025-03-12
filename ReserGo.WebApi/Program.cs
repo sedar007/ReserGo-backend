@@ -171,8 +171,8 @@ public class Program {
 								return Task.CompletedTask;
 							}
 						};
-						/*options.RequireHttpsMetadata = true; // Assurez-vous que HTTPS est utilisé
-						options.SaveToken = true; // Sauvegarde le token dans le contexte de la requête */
+						options.RequireHttpsMetadata = true; // Assurez-vous que HTTPS est utilisé
+						options.SaveToken = true; // Sauvegarde le token dans le contexte de la requête 
 					});
 				
 
