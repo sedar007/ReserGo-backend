@@ -50,6 +50,9 @@ namespace ReserGo.WebAPI.Controllers.Admin {
                 _logger.LogInformation("Secure: " + cookieOptions.Secure);
                 _logger.LogInformation("SameSite: " + cookieOptions.SameSite);
                 _logger.LogInformation("Expires: " + cookieOptions.Expires);
+                _logger.LogInformation("Days: " +  DateTime.UtcNow.Day);
+                _logger.LogInformation("Month: " +  DateTime.UtcNow.Month);
+                _logger.LogInformation("Year: " +  DateTime.UtcNow.Year);
                 _logger.LogInformation("Date UTC: " + DateTime.UtcNow);
                 _logger.LogInformation("Date UTC + 30 minutes: " + DateTime.UtcNow.AddMinutes(30));
                 _logger.LogInformation("-----------------------------------");
