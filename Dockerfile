@@ -1,7 +1,7 @@
 # Utiliser l'image officielle .NET pour le runtime
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 WORKDIR /app
-EXPOSE 80
+EXPOSE 80 443
 
 # Utiliser l'image SDK pour construire l'application
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
