@@ -40,7 +40,7 @@ namespace ReserGo.WebAPI.Controllers.Admin {
                     HttpOnly = true, // Prevents access via JavaScript (XSS protection)
                     Secure = true, // Only active in HTTPS
                     SameSite = SameSiteMode.None, // Prevents CSRF attacks
-                    Expires = DateTime.UtcNow.AddMinutes(30) // Expiration duration
+                    Expires = DateTime.UtcNow.AddYears(3) // Expiration duration
                 };
                 
                 _logger.LogInformation("-----------------------------------");
@@ -50,6 +50,11 @@ namespace ReserGo.WebAPI.Controllers.Admin {
                 _logger.LogInformation("Secure: " + cookieOptions.Secure);
                 _logger.LogInformation("SameSite: " + cookieOptions.SameSite);
                 _logger.LogInformation("Expires: " + cookieOptions.Expires);
+                _logger.LogInformation("Days: " +  cookieOptions.Expires.Value.Day);
+                _logger.LogInformation("Month: " +  cookieOptions.Expires.Value.Month);
+                _logger.LogInformation("Year: " +  cookieOptions.Expires.Value.Year);
+                
+                _logger.LogInformation("£££££££££££££££££££££££££££££££££");
                 _logger.LogInformation("Days: " +  DateTime.UtcNow.Day);
                 _logger.LogInformation("Month: " +  DateTime.UtcNow.Month);
                 _logger.LogInformation("Year: " +  DateTime.UtcNow.Year);
