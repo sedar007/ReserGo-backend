@@ -62,7 +62,7 @@ public class Program {
                 options.AddPolicy(name: CORS_POLICY,
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:5174", "https://resergo-admin.adjysedar.fr")
+                        policy.WithOrigins("http://localhost:5174", "https://resergo-admin.adjysedar.fr", "resergo-admin.adjysedar.fr")
                             .AllowCredentials()
                             .AllowAnyHeader()
                             .AllowAnyMethod();
@@ -172,8 +172,8 @@ public class Program {
 								return Task.CompletedTask;
 							}
 						};
-						options.RequireHttpsMetadata = true; // Assurez-vous que HTTPS est utilisé
-						options.SaveToken = true; // Sauvegarde le token dans le contexte de la requête 
+						/*options.RequireHttpsMetadata = true; // Assurez-vous que HTTPS est utilisé
+						options.SaveToken = true; // Sauvegarde le token dans le contexte de la requête */
 					});
 				
 

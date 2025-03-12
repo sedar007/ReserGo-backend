@@ -38,7 +38,7 @@ namespace ReserGo.WebAPI.Controllers.Admin {
                 var cookieOptions = new CookieOptions {
                    // Domain = "resergo-admin.adjysedar.fr",
                     HttpOnly = true, // Prevents access via JavaScript (XSS protection)
-                    Secure = true, // Only active in HTTPS
+                    Secure = false, // Only active in HTTPS
                     SameSite = SameSiteMode.None, // Prevents CSRF attacks
                     Expires = DateTime.UtcNow.AddYears(3) // Expiration duration
                 };
