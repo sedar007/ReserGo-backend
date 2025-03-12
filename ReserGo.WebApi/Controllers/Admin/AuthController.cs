@@ -53,7 +53,6 @@ namespace ReserGo.WebAPI.Controllers.Admin {
                 _logger.LogInformation("Days: " +  cookieOptions.Expires.Value.Day);
                 _logger.LogInformation("Month: " +  cookieOptions.Expires.Value.Month);
                 _logger.LogInformation("Year: " +  cookieOptions.Expires.Value.Year);
-                
                 _logger.LogInformation("£££££££££££££££££££££££££££££££££");
                 _logger.LogInformation("Days: " +  DateTime.UtcNow.Day);
                 _logger.LogInformation("Month: " +  DateTime.UtcNow.Month);

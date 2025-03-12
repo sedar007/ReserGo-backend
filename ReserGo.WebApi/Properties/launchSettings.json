@@ -9,15 +9,6 @@
     }
   },
   "profiles": {
-    "Production": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7031;http://localhost:5290",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Production"
-      }
-    },
     "http": {
       "commandName": "Project",
       "dotnetRunMessages": true,
@@ -35,7 +26,7 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7031;http://localhost:5290",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Production"
       }
     },
     "IIS Express": {
