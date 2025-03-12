@@ -181,14 +181,6 @@ public class Program {
 			/*if (builder.Environment.IsProduction())
 				builder.Services.AddHostedService<KeepAliveService>();
 			*/
-			if (!builder.Environment.IsDevelopment())
-			{
-				builder.Services.AddHttpsRedirection(options =>
-				{
-					options.RedirectStatusCode = Status308PermanentRedirect;
-					options.HttpsPort = 443;
-				});
-			}
 			
 			var app = builder.Build();
 
