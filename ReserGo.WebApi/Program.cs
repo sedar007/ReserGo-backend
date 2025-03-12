@@ -61,7 +61,7 @@ public class Program {
                 options.AddPolicy(name: CORS_POLICY,
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:5173", "https://resergo-admin.adjysedar.fr")
+                        policy.WithOrigins("http://localhost:5174", "https://resergo-admin.adjysedar.fr")
                             .AllowCredentials()
                             .AllowAnyHeader()
                             .AllowAnyMethod();
@@ -69,7 +69,7 @@ public class Program {
             });
 			
 			// Ajout du service d'authentification avec Cookie
-			builder.Services
+			/*builder.Services
 				.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 				.AddCookie(options =>
 				{
@@ -79,7 +79,7 @@ public class Program {
 					options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 					options.Cookie.SameSite = SameSiteMode.None;
 					options.Cookie.Domain = "resergo-admin.adjysedar.fr";
-				});
+				}); 
 			
 			builder.Services.AddAuthorization();
 			
@@ -89,7 +89,7 @@ public class Program {
 				options.MinimumSameSitePolicy = SameSiteMode.None;
 				options.HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always;
 				options.Secure = CookieSecurePolicy.Always;
-			});
+			});*/
 			
 			builder.Services.AddControllers();
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -171,8 +171,8 @@ public class Program {
 								return Task.CompletedTask;
 							}
 						};
-						options.RequireHttpsMetadata = true; // Assurez-vous que HTTPS est utilisé
-						options.SaveToken = true; // Sauvegarde le token dans le contexte de la requête
+						/*options.RequireHttpsMetadata = true; // Assurez-vous que HTTPS est utilisé
+						options.SaveToken = true; // Sauvegarde le token dans le contexte de la requête */
 					});
 				
 
@@ -196,7 +196,7 @@ public class Program {
 				app.UseSwagger();
 				app.UseSwaggerUI();
 		//	}
-
+			app.UseForwardedHeaders();
 			app.UseHttpsRedirection();
 			app.UseCors(CORS_POLICY);
 			app.UseAuthentication();
