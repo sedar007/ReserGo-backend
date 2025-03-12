@@ -6,6 +6,7 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using NLog;
 using NLog.Web; 
+using static Microsoft.AspNetCore.Http.StatusCodes;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 using ReserGo.DataAccess.Interfaces;
@@ -180,7 +181,14 @@ public class Program {
 			/*if (builder.Environment.IsProduction())
 				builder.Services.AddHostedService<KeepAliveService>();
 			*/
-			
+			if (!builder.Environment.IsDevelopment())
+			{
+				builder.Services.AddHttpsRedirection(options =>
+				{
+					options.RedirectStatusCode = Status308PermanentRedirect;
+					options.HttpsPort = 443;
+				});
+			}
 			
 			var app = builder.Build();
 
