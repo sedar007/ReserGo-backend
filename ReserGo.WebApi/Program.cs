@@ -6,8 +6,6 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using NLog;
 using NLog.Web; 
-using static Microsoft.AspNetCore.Http.StatusCodes;
-using Microsoft.AspNetCore.Authentication.Cookies;
 
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.DataAccess.Implementations;
