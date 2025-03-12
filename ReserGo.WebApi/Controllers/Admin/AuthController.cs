@@ -42,6 +42,16 @@ namespace ReserGo.WebAPI.Controllers.Admin {
                     SameSite = SameSiteMode.None, // Prevents CSRF attacks
                     Expires = DateTime.UtcNow.AddMinutes(30) // Expiration duration
                 };
+                
+                _logger.LogInformation("-----------------------------------");
+                _logger.LogInformation("Cookie options: ");
+                _logger.LogInformation("Domain: " + cookieOptions.Domain);
+                _logger.LogInformation("HttpOnly: " + cookieOptions.HttpOnly);
+                _logger.LogInformation("Secure: " + cookieOptions.Secure);
+                _logger.LogInformation("SameSite: " + cookieOptions.SameSite);
+                _logger.LogInformation("Expires: " + cookieOptions.Expires);
+                _logger.LogInformation("-----------------------------------");
+                
 
                 Response.Cookies.Append("AuthToken", response.Token, cookieOptions);
                 _logger.LogInformation("Token stored in HTTP-only cookie");
