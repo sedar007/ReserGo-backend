@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.HttpOverrides;
 using System.Reflection;
 using NLog;
 using NLog.Web; 
@@ -180,14 +181,7 @@ public class Program {
 				builder.Services.AddHostedService<KeepAliveService>();
 			*/
 
-			if (builder.Environment.IsProduction())
-{
-    builder.WebHost.ConfigureKestrel(serverOptions =>
-    {
-        serverOptions.ListenAnyIP(8080); // Port HTTP
-        serverOptions.ListenAnyIP(443, listenOptions => listenOptions.UseHttps()); // Port HTTPS
-    });
-}
+		
 			var app = builder.Build();
 
 			using (var scope = app.Services.CreateScope()) {
@@ -196,6 +190,14 @@ public class Program {
 				// Here is the migration executed
 				dbContext.Database.Migrate();
 			} 
+
+			// Configure https 
+if(app.Environment.IsProduction()) {
+    // Active les headers proxy pour détecter que Render utilise HTTPS
+    app.UseForwardedHeaders(new ForwardedHeadersOptions {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
+}
 
 			// Configure the HTTP request pipeline.
 			//if (app.Environment.IsDevelopment()) {
