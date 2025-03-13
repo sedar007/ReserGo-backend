@@ -179,7 +179,15 @@ public class Program {
 			/*if (builder.Environment.IsProduction())
 				builder.Services.AddHostedService<KeepAliveService>();
 			*/
-			
+
+			if (builder.Environment.IsProduction())
+{
+    builder.WebHost.ConfigureKestrel(serverOptions =>
+    {
+        serverOptions.ListenAnyIP(8080); // Port HTTP
+        serverOptions.ListenAnyIP(443, listenOptions => listenOptions.UseHttps()); // Port HTTPS
+    });
+}
 			var app = builder.Build();
 
 			using (var scope = app.Services.CreateScope()) {
