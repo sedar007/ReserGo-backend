@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\ReserGo.DataAccess\ReserGo.DataAccess.csproj" />
       <ProjectReference Include="..\ReserGo.Shared\ReserGo.Shared.csproj" />
+      <ProjectReference Include="..\ReserGo.Tiers\ReserGo.Tiers.csproj" />
     </ItemGroup>
     
 
