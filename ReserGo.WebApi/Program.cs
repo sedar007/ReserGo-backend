@@ -174,7 +174,10 @@ public class Program {
 			// Configure https 
 if(app.Environment.IsProduction()) {
     // Active les headers proxy pour détecter que Render utilise HTTPS
+    logger.Info("*** Environnement de production ***");
+    
     app.UseForwardedHeaders(new ForwardedHeadersOptions {
+	    
         ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
     });
 }
