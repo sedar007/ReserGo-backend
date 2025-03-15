@@ -22,6 +22,7 @@ namespace ReserGo.WebAPI.Controllers.Admin {
             _security = security;
         }
 
+
         [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -41,6 +42,25 @@ namespace ReserGo.WebAPI.Controllers.Admin {
                     SameSite = SameSiteMode.None, // Prevents CSRF attacks
                     Expires = DateTime.UtcNow.AddYears(3) // Expiration duration
                 };
+                
+                _logger.LogInformation("-----------------------------------");
+                _logger.LogInformation("Cookie options: ");
+                _logger.LogInformation("Domain: " + cookieOptions.Domain);
+                _logger.LogInformation("HttpOnly: " + cookieOptions.HttpOnly);
+                _logger.LogInformation("Secure: " + cookieOptions.Secure);
+                _logger.LogInformation("SameSite: " + cookieOptions.SameSite);
+                _logger.LogInformation("Expires: " + cookieOptions.Expires);
+                _logger.LogInformation("Days: " +  cookieOptions.Expires.Value.Day);
+                _logger.LogInformation("Month: " +  cookieOptions.Expires.Value.Month);
+                _logger.LogInformation("Year: " +  cookieOptions.Expires.Value.Year);
+                _logger.LogInformation("£££££££££££££££££££££££££££££££££");
+                _logger.LogInformation("Days: " +  DateTime.UtcNow.Day);
+                _logger.LogInformation("Month: " +  DateTime.UtcNow.Month);
+                _logger.LogInformation("Year: " +  DateTime.UtcNow.Year);
+                _logger.LogInformation("Date UTC: " + DateTime.UtcNow);
+                _logger.LogInformation("Date UTC + 30 minutes: " + DateTime.UtcNow.AddMinutes(30));
+                _logger.LogInformation("-----------------------------------");
+                
 
                 Response.Cookies.Append("AuthToken", response.Token, cookieOptions);
                 _logger.LogInformation("Token stored in HTTP-only cookie");

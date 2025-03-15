@@ -15,8 +15,6 @@ using ReserGo.Shared.Implementations;
 using ReserGo.Business.Interfaces;
 using ReserGo.Business.Implementations;
 using ReserGo.Common.Security;
-using ReserGo.Tiers.Interfaces;
-using ReserGo.Tiers.Implementations;
 
 using ReserGo.DataAccess;
 namespace ReserGo.WebAPI;
@@ -47,8 +45,6 @@ public class Program {
 			builder.Services.AddTransient<ReserGoContext>();
 
 			// Add services to the container.
-			builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
-			
 			builder.Services.AddScoped<ISecurity, Security>();
           
 			builder.Services.AddScoped<IUserDataAccess, UserDataAccess>();
@@ -65,13 +61,35 @@ public class Program {
                 options.AddPolicy(name: CORS_POLICY,
                     policy =>
                     {
-                        policy.WithOrigins("https://resergo-admin.adjysedar.fr","http://localhost:5173", "https://localhost:5173", "https://resergo-admin.adjysedar.fr", "resergo-admin.adjysedar.fr")
+                        policy.WithOrigins("http://localhost:5174", "https://resergo-admin.adjysedar.fr", "resergo-admin.adjysedar.fr")
                             .AllowCredentials()
                             .AllowAnyHeader()
                             .AllowAnyMethod();
                     });
             });
 			
+			// Ajout du service d'authentification avec Cookie
+			/*builder.Services
+				.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+				.AddCookie(options =>
+				{
+					options.LoginPath = "/api/auth/signin"; 
+					options.LogoutPath = "/api/auth/logout"; 
+					options.Cookie.HttpOnly = true;
+					options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+					options.Cookie.SameSite = SameSiteMode.None;
+					options.Cookie.Domain = "resergo-admin.adjysedar.fr";
+				}); 
+			
+			builder.Services.AddAuthorization();
+			
+			// Configuration des cookies pour le support cross-origin
+			builder.Services.Configure<CookiePolicyOptions>(options =>
+			{
+				options.MinimumSameSitePolicy = SameSiteMode.None;
+				options.HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always;
+				options.Secure = CookieSecurePolicy.Always;
+			});*/
 			
 			builder.Services.AddControllers();
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -153,6 +171,8 @@ public class Program {
 								return Task.CompletedTask;
 							}
 						};
+						/*options.RequireHttpsMetadata = true; // Assurez-vous que HTTPS est utilisé
+						options.SaveToken = true; // Sauvegarde le token dans le contexte de la requête */
 					});
 				
 
@@ -174,10 +194,7 @@ public class Program {
 			// Configure https 
 if(app.Environment.IsProduction()) {
     // Active les headers proxy pour détecter que Render utilise HTTPS
-    logger.Info("*** Environnement de production ***");
-    
     app.UseForwardedHeaders(new ForwardedHeadersOptions {
-	    
         ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
     });
 }
@@ -204,4 +221,3 @@ if(app.Environment.IsProduction()) {
     }
 
 }
-
