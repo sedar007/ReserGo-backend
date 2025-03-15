@@ -65,7 +65,7 @@ public class Program {
                 options.AddPolicy(name: CORS_POLICY,
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:5173", "https://localhost:5173", "https://resergo-admin.adjysedar.fr", "resergo-admin.adjysedar.fr")
+                        policy.WithOrigins("https://resergo-admin.adjysedar.fr","http://localhost:5173", "https://localhost:5173", "https://resergo-admin.adjysedar.fr", "resergo-admin.adjysedar.fr")
                             .AllowCredentials()
                             .AllowAnyHeader()
                             .AllowAnyMethod();
