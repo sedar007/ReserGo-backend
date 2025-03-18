@@ -15,6 +15,9 @@ using ReserGo.Shared.Implementations;
 using ReserGo.Business.Interfaces;
 using ReserGo.Business.Implementations;
 using ReserGo.Common.Security;
+using ReserGo.Tiers.Interfaces;
+using ReserGo.Tiers.Implementations;
+using ReserGo.Tiers.Models;
 
 using ReserGo.DataAccess;
 namespace ReserGo.WebAPI;
@@ -39,18 +42,28 @@ public class Program {
 			var appSettingsSection = rawConfig.GetSection("AppSettings");
 			builder.Services.Configure<AppSettings>(appSettingsSection);
 			builder.Services.Configure<AppSettings>(builder.Configuration);
+			builder.Services.Configure<AppSettingsCloudinary>(appSettingsSection);
+			builder.Services.Configure<AppSettingsCloudinary>(builder.Configuration);
 
 
 			// Context
 			builder.Services.AddTransient<ReserGoContext>();
 
 			// Add services to the container.
+			// Shared
 			builder.Services.AddScoped<ISecurity, Security>();
-          
+			
+			// Tiers
+			builder.Services.AddSingleton<CloudinaryModel>();
+			builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+			
+			// Business
 			builder.Services.AddScoped<IUserDataAccess, UserDataAccess>();
 			builder.Services.AddScoped<ILoginDataAccess, LoginDataAccess>();
 			builder.Services.AddScoped<IAuthDataAccess, AuthDataAccess>();
 			builder.Services.AddScoped<IAuthService, AuthService>();
+			builder.Services.AddScoped<IImageService, ImageService>();
+			
 			
 			// Ajouter le service de cache en mémoire
 			builder.Services.AddMemoryCache();
@@ -67,29 +80,6 @@ public class Program {
                             .AllowAnyMethod();
                     });
             });
-			
-			// Ajout du service d'authentification avec Cookie
-			/*builder.Services
-				.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-				.AddCookie(options =>
-				{
-					options.LoginPath = "/api/auth/signin"; 
-					options.LogoutPath = "/api/auth/logout"; 
-					options.Cookie.HttpOnly = true;
-					options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-					options.Cookie.SameSite = SameSiteMode.None;
-					options.Cookie.Domain = "resergo-admin.adjysedar.fr";
-				}); 
-			
-			builder.Services.AddAuthorization();
-			
-			// Configuration des cookies pour le support cross-origin
-			builder.Services.Configure<CookiePolicyOptions>(options =>
-			{
-				options.MinimumSameSitePolicy = SameSiteMode.None;
-				options.HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always;
-				options.Secure = CookieSecurePolicy.Always;
-			});*/
 			
 			builder.Services.AddControllers();
 			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
