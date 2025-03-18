@@ -7,7 +7,8 @@ using System.Reflection;
 using NLog;
 using NLog.Web; 
 using Microsoft.AspNetCore.Authentication.Cookies;
-
+using Microsoft.AspNetCore.Identity;
+using ReserGo.Common.Entity;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.DataAccess.Implementations;
 using ReserGo.Shared.Interfaces;
@@ -40,19 +41,25 @@ public class Program {
 			builder.Services.Configure<AppSettings>(appSettingsSection);
 			builder.Services.Configure<AppSettings>(builder.Configuration);
 
-
 			// Context
 			builder.Services.AddTransient<ReserGoContext>();
 
 			// Add services to the container.
 			builder.Services.AddScoped<ISecurity, Security>();
-          
-			builder.Services.AddScoped<IUserDataAccess, UserDataAccess>();
-			builder.Services.AddScoped<ILoginDataAccess, LoginDataAccess>();
-			builder.Services.AddScoped<IAuthDataAccess, AuthDataAccess>();
-			builder.Services.AddScoped<IAuthService, AuthService>();
 			
-			// Ajouter le service de cache en mémoire
+				// User
+				builder.Services.AddScoped<IUserDataAccess, UserDataAccess>();
+				builder.Services.AddScoped<IUserService, UserService>();
+				
+				// Login
+				builder.Services.AddScoped<ILoginDataAccess, LoginDataAccess>();
+				builder.Services.AddScoped<ILoginService, LoginService>();
+				
+				// Auth test
+				// builder.Services.AddScoped<IAuthDataAccess, AuthDataAccess>();
+				// builder.Services.AddScoped<IAuthService, AuthService>();
+			
+			// Add services to the cache memory.
 			builder.Services.AddMemoryCache();
 			
 			// Configure CORS
@@ -66,22 +73,20 @@ public class Program {
 					});
 			});
 			
-			// Ajout du service d'authentification avec Cookie
+			// Add services to the authentication with cookie
 			builder.Services
 				.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
 				.AddCookie(options =>
 				{
-					options.LoginPath = "/api/auth/signin"; // Page de connexion
-					options.LogoutPath = "/api/auth/logout"; // Page de déconnexion
-					options.Cookie.HttpOnly = true; // Sécurise contre les scripts malveillants
-					options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Active en HTTPS
-					options.Cookie.SameSite = SameSiteMode.Strict; // Protection contre CSRF
+					options.LoginPath = "/api/auth/signin"; 
+					options.LogoutPath = "/api/auth/logout";
+					options.Cookie.HttpOnly = true; // Secures against malicious scripts
+					options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Active in HTTPS
+					options.Cookie.SameSite = SameSiteMode.Strict; // Protection against CSRF
 				});
 			
 			builder.Services.AddAuthorization();
-			
 			builder.Services.AddControllers();
-			// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen(opt =>
 			{
@@ -110,12 +115,12 @@ public class Program {
 					}
 				});
 
-				// Ajoutez ici la configuration pour inclure les commentaires XML
+				// Add configuration here to include XML comments
 				var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 				var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 				opt.IncludeXmlComments(xmlPath); 
 			});
-
+			
 			
 			
 			// NLog: Setup NLog for Dependency injection
@@ -164,7 +169,7 @@ public class Program {
 					});
 				
 
-			// Configuration pour le service keep-alive
+			// Configuration for keep-alive service
 			/*if (builder.Environment.IsProduction())
 				builder.Services.AddHostedService<KeepAliveService>();
 			*/
@@ -196,7 +201,6 @@ public class Program {
 			logger.Error(e);
 			throw;
 		} finally {
-			// Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
 			NLog.LogManager.Shutdown();
 		}
     }

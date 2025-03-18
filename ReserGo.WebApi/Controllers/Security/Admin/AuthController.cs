@@ -1,4 +1,4 @@
-﻿using ReserGo.Common.Requests.Security;
+﻿/*using ReserGo.Common.Requests.Security;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.Security;
 using ReserGo.Shared.Interfaces;
@@ -97,4 +97,4 @@ namespace ReserGo.WebAPI.Controllers.Admin {
         }
 
     }
-}
+}*/
