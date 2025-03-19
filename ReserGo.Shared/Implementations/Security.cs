@@ -66,10 +66,10 @@ namespace ReserGo.Shared.Implementations {
 
         public CookieOptions GetCookiesOptions() {
             return new CookieOptions {
-                HttpOnly = true, // Empêche l'accès via JavaScript (XSS protection)
-                Secure = false, // Active seulement en HTTPS
-                SameSite = SameSiteMode.None, // Évite les attaques CSRF
-                Expires = DateTime.UtcNow.AddMinutes(30) // Durée d'expiration
+                HttpOnly = true, // Prevents access via JavaScript (XSS protection)
+                Secure = true, // Only active in HTTPS
+                SameSite = SameSiteMode.None, // Prevents CSRF attacks
+                Expires = DateTime.UtcNow.AddMinutes(30) // Expiration duration
             };
         }
 

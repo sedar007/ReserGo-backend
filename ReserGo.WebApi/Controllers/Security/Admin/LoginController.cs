@@ -1,4 +1,4 @@
-﻿using ReserGo.Common.Requests.Security;
+using ReserGo.Common.Requests.Security;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.Security;
 using ReserGo.Shared.Interfaces;
@@ -34,14 +34,12 @@ namespace ReserGo.WebAPI.Controllers.Security.Admin {
 
                 if (response == null)
                     return StatusCode(StatusCodes.Status500InternalServerError, "Une erreur interne s'est produite.");
-
-                var cookieOptions = _security.GetCookiesOptions();
+                CookieOptions cookieOptions = _security.GetCookiesOptions();
                 
                 Response.Cookies.Append("AuthToken", response.Token, cookieOptions);
                 _logger.LogInformation("Token stored in HTTP-only cookie");
-
                 _logger.LogInformation("User logged in");
-                return Ok(new { message = "Login successful", response.Id, response.Role,  response.Username, response.RoleName });
+                return Ok(new { message = "Login successful", response.Id, response.Role,  response.Username, response.RoleName, response.Token });
             }
 
             catch (ArgumentNullException e) {
