@@ -8,4 +8,7 @@ public interface IUserService {
     Task<UserDto?> GetById(int id);
     Task<UserDto> Create(UserCreationRequest request);
     Task<UserDto> UpdateUser(int id, UserUpdateRequest request);
+    Task<UserDto?> GetByEmail(string email);
+    Task<UserDto?> GetByUsername(string username);
+    
 }

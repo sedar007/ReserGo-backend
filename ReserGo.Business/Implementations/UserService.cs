@@ -78,6 +78,42 @@ public class UserService : IUserService {
             throw;
         }
     }
+    
+    public async Task<UserDto?> GetByEmail(string email) {
+        try {
+            User? user = await _userDataAccess.GetByEmail(email);
+            if (user is null) {
+                string errorMessage = "This user does not exist.";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+            
+            _logger.LogInformation("User { id } retrieved successfully", user.Id);
+            return user.ToDto();
+            
+        } catch (Exception e) {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
+    
+    public async Task<UserDto?> GetByUsername(string username) {
+        try {
+            User? user = await _userDataAccess.GetByUsername(username);
+            if (user is null) {
+                string errorMessage = "This user does not exist.";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+            
+            _logger.LogInformation("User { id } retrieved successfully", user.Id);
+            return user.ToDto();
+            
+        } catch (Exception e) {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
 
     public async Task Delete(int id) {
         try {

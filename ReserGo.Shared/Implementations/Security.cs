@@ -64,6 +64,15 @@ namespace ReserGo.Shared.Implementations {
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        public CookieOptions GetCookiesOptions() {
+            return new CookieOptions {
+                HttpOnly = true, // Empêche l'accès via JavaScript (XSS protection)
+                Secure = false, // Active seulement en HTTPS
+                SameSite = SameSiteMode.None, // Évite les attaques CSRF
+                Expires = DateTime.UtcNow.AddMinutes(30) // Durée d'expiration
+            };
+        }
+
         public CurrentUser? GetCurrentUser() {
             var user = _httpContextAccessor.HttpContext?.User;
             var userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;

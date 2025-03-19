@@ -1,6 +1,7 @@
 ﻿
 using ReserGo.Common.Enum;
 using ReserGo.Common.Security;
+using Microsoft.AspNetCore.Http;
 
 namespace ReserGo.Shared.Interfaces {
     public interface ISecurity {
@@ -11,6 +12,7 @@ namespace ReserGo.Shared.Interfaces {
          bool VerifyPassword(string hashedPassword, string providedPassword);
 
         CurrentUser? GetCurrentUser();
+        CookieOptions GetCookiesOptions();
 
     }
     

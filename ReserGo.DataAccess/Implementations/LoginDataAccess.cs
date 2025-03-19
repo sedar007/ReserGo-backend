@@ -21,5 +21,9 @@ public class LoginDataAccess : ILoginDataAccess {
         await _context.SaveChangesAsync();
         return await GetById(newData.Entity.Id) ?? throw new NullReferenceException("Error creating user login.");
     }
+    
+    public async Task<Login?> GetByUserId(int id) {
+        return await _context.Login.FirstOrDefaultAsync(x => x.UserId == id);
+    }
 }
 

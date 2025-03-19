@@ -1,4 +1,4 @@
-﻿/*using ReserGo.Common.Requests.Security;
+﻿using ReserGo.Common.Requests.Security;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.Security;
 using ReserGo.Shared.Interfaces;
@@ -6,18 +6,18 @@ using ReserGo.Shared.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 
-namespace ReserGo.WebAPI.Controllers.Admin {
+namespace ReserGo.WebAPI.Controllers.Security.Admin {
 
     [ApiController]
     [Route("api/auth")]
-    public class AuthController : ControllerBase {
+    public class LoginController : ControllerBase {
 
-        private readonly IAuthService _authService;
+        private readonly ILoginService _loginService;
         private readonly ISecurity _security;
-        private readonly ILogger<AuthController> _logger;
+        private readonly ILogger<LoginController> _logger;
 
-        public AuthController(IAuthService authService, ILogger<AuthController> logger, ISecurity security) {
-            _authService = authService;
+        public LoginController(ILoginService loginService, ILogger<LoginController> logger, ISecurity security) {
+            _loginService = loginService;
             _logger = logger;
             _security = security;
         }
@@ -30,18 +30,13 @@ namespace ReserGo.WebAPI.Controllers.Admin {
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Loging([FromBody] LoginRequest request) {
             try {
-                var response = await _authService.Login(request);
+                var response = await _loginService.Login(request);
 
                 if (response == null)
                     return StatusCode(StatusCodes.Status500InternalServerError, "Une erreur interne s'est produite.");
 
-                var cookieOptions = new CookieOptions {
-                    HttpOnly = true, // Empêche l'accès via JavaScript (XSS protection)
-                    Secure = false, // Active seulement en HTTPS
-                    SameSite = SameSiteMode.Strict, // Évite les attaques CSRF
-                    Expires = DateTime.UtcNow.AddMinutes(30) // Durée d'expiration
-                };
-
+                var cookieOptions = _security.GetCookiesOptions();
+                
                 Response.Cookies.Append("AuthToken", response.Token, cookieOptions);
                 _logger.LogInformation("Token stored in HTTP-only cookie");
 
@@ -97,4 +92,4 @@ namespace ReserGo.WebAPI.Controllers.Admin {
         }
 
     }
-}*/
+}
