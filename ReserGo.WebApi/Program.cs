@@ -15,6 +15,10 @@ using ReserGo.Shared.Implementations;
 using ReserGo.Business.Interfaces;
 using ReserGo.Business.Implementations;
 using ReserGo.Common.Security;
+using ReserGo.Tiers.Interfaces;
+using ReserGo.Tiers.Implementations;
+using ReserGo.Tiers.Models;
+
 using ReserGo.DataAccess;
 using ReserGo.Shared;
 using ReserGo.WebAPI.Services;
@@ -38,26 +42,37 @@ public class Program {
                 .AddJsonFile("appsettings.json")
                 .AddUserSecrets<Program>()
                 .Build();
+            
+			var appSettingsSection = rawConfig.GetSection("AppSettings");
+			builder.Services.Configure<AppSettings>(appSettingsSection);
+			builder.Services.Configure<AppSettings>(builder.Configuration);
+			builder.Services.Configure<AppSettingsCloudinary>(appSettingsSection);
+			builder.Services.Configure<AppSettingsCloudinary>(builder.Configuration);
 
-            var appSettingsSection = rawConfig.GetSection("AppSettings");
-            builder.Services.Configure<AppSettings>(appSettingsSection);
-            builder.Services.Configure<AppSettings>(builder.Configuration);
 
             // Context
             builder.Services.AddTransient<ReserGoContext>();
 
             // Add services to the container.
+            // Shared
             builder.Services.AddScoped<ISecurity, Security>();
-
-            // User
-            builder.Services.AddScoped<IUserDataAccess, UserDataAccess>();
-            builder.Services.AddScoped<IUserService, UserService>();
+            
+			// Tiers
+			builder.Services.AddSingleton<CloudinaryModel>();
+			builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+			
+			// User
+			builder.Services.AddScoped<IUserDataAccess, UserDataAccess>();
+			builder.Services.AddScoped<IUserService, UserService>();
 
             // Login
             builder.Services.AddScoped<ILoginDataAccess, LoginDataAccess>();
             builder.Services.AddScoped<ILoginService, LoginService>();
             builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
             builder.Services.AddScoped<IGoogleService, GoogleService>();
+            
+            //Image
+            builder.Services.AddScoped<IImageService, ImageService>();
 
             // Auth test
             // builder.Services.AddScoped<IAuthDataAccess, AuthDataAccess>();
@@ -68,6 +83,7 @@ public class Program {
 
             // Configure CORS
             builder.Services.AddCors(options =>
+
             {
                 options.AddPolicy(name: Consts.CorsPolicy,
                     policy =>
@@ -79,7 +95,7 @@ public class Program {
                             .AllowAnyMethod();
                     });
             });
-
+            
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(opt => {
