@@ -7,7 +7,7 @@ namespace ReserGo.DataAccess;
 
     public class ReserGoContext : DbContext {
 	    
-	    public DbSet<User> User { get; set; }
+	    public DbSet<User> Users { get; set; }
 	    public DbSet<Login> Login { get; set; }
 	    public DbSet<Hotel> Hotel { get; set; }
 	    public DbSet<Occasion> Occasion { get; set; }
@@ -20,6 +20,10 @@ namespace ReserGo.DataAccess;
 
         public ReserGoContext(IOptions<AppSettings> options) {
 			_sqlConnectionString = options.Value.SqlConnectionString;
+		}
+		// Add this constructor for testing purposes
+		public ReserGoContext(DbContextOptions<ReserGoContext> options) : base(options)
+		{
 		}
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
