@@ -29,7 +29,7 @@ namespace ReserGo.WebAPI.Controllers {
         public async Task<IActionResult> GetImage(string publicId)
         {
             try {
-                var imageUrl = await _imageService.GetPicture(publicId);
+                string imageUrl = await _imageService.GetPicture(publicId);
                 if (string.IsNullOrEmpty(imageUrl)) {
                     _logger.LogWarning("Image not found for publicId: {PublicId}", publicId);
                     return NotFound(new { message = "Image not found" });
@@ -58,7 +58,7 @@ namespace ReserGo.WebAPI.Controllers {
             }
 
             try {
-                var uploadResult = await _imageService.UploadImage(file);
+                string? uploadResult = await _imageService.UploadImage(file);
                 if (string.IsNullOrEmpty(uploadResult)) {
                     _logger.LogWarning("Image upload failed for file: {FileName}", file.FileName);
                     return StatusCode(StatusCodes.Status500InternalServerError, "Image upload failed.");

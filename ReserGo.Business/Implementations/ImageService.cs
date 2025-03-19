@@ -16,19 +16,18 @@ namespace ReserGo.Business.Implementations {
         
         public async Task<string> GetPicture(string publicId) {
             _logger.LogInformation("Getting picture with publicId: {PublicId}", publicId);
-            var url = await _cloudinary.GetPicture(publicId);
+            string url = await _cloudinary.GetPicture(publicId);
             _logger.LogInformation("Retrieved picture URL: {Url}", url);
             return url;
         }
 
-        public async Task<string> UploadImage(IFormFile file) {
+        public async Task<string?> UploadImage(IFormFile file) {
             _logger.LogInformation("Uploading image with file name: {FileName}", file.FileName);
-            var url = await _cloudinary.UploadImage(file);
-            if (url == null) {
+            string? url = await _cloudinary.UploadImage(file);
+            if (url == null)
                 _logger.LogWarning("Image upload failed for file: {FileName}", file.FileName);
-            } else {
+            else 
                 _logger.LogInformation("Image uploaded successfully. URL: {Url}", url);
-            }
             return url;
         }
     }

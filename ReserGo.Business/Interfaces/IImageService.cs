@@ -2,6 +2,6 @@
 namespace ReserGo.Business.Interfaces {
     public interface IImageService{
         Task<string> GetPicture(string publicId);
-        Task<string> UploadImage(IFormFile file);
+        Task<string?> UploadImage(IFormFile file);
     }
 }

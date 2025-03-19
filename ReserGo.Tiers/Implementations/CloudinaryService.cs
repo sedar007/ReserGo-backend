@@ -18,22 +18,22 @@ namespace ReserGo.Tiers.Implementations {
 
         public async Task<string> GetPicture(string publicId) {
             _logger.LogInformation("Getting picture with publicId: {PublicId}", publicId);
-            var url = _cloudinary.Api.UrlImgUp.BuildUrl(publicId);
+            string url = _cloudinary.Api.UrlImgUp.BuildUrl(publicId);
             _logger.LogInformation("Generated URL: {Url}", url);
             return url;
         }
 
-        public async Task<string> UploadImage(IFormFile file) {
+        public async Task<string?> UploadImage(IFormFile file) {
             _logger.LogInformation("Uploading image with file name: {FileName}", file.FileName);
 
-            var uploadParams = new ImageUploadParams {
+            ImageUploadParams uploadParams = new ImageUploadParams {
                 File = new FileDescription(file.FileName, file.OpenReadStream()),
                 PublicId = $"admin/{Guid.NewGuid()}", 
                 Overwrite = true,
                 Transformation = new Transformation().Quality("auto").FetchFormat("auto")
             };
 
-            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+            ImageUploadResult uploadResult = await _cloudinary.UploadAsync(uploadParams);
             if (uploadResult == null) {
                 _logger.LogWarning("Upload result is null");
                 return null;
