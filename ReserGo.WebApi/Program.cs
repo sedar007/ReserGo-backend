@@ -18,6 +18,8 @@ using ReserGo.Common.Security;
 using ReserGo.DataAccess;
 using ReserGo.Shared;
 using ReserGo.WebAPI.Services;
+using ReserGo.Tiers.Implementations;
+using ReserGo.Tiers.Interfaces;
 
 namespace ReserGo.WebAPI;
 
@@ -54,6 +56,8 @@ public class Program {
             // Login
             builder.Services.AddScoped<ILoginDataAccess, LoginDataAccess>();
             builder.Services.AddScoped<ILoginService, LoginService>();
+            builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+            builder.Services.AddScoped<IGoogleService, GoogleService>();
 
             // Auth test
             // builder.Services.AddScoped<IAuthDataAccess, AuthDataAccess>();
@@ -68,7 +72,7 @@ public class Program {
                 options.AddPolicy(name: Consts.CorsPolicy,
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:5174", "https://resergo-admin.adjysedar.fr",
+                        policy.WithOrigins("http://localhost:5174","https://localhost:7031", "https://resergo-admin.adjysedar.fr",
                                 "resergo-admin.adjysedar.fr")
                             .AllowCredentials()
                             .AllowAnyHeader()
