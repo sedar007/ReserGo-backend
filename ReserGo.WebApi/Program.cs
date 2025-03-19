@@ -7,9 +7,7 @@ using Microsoft.AspNetCore.HttpOverrides;
 using System.Reflection;
 using NLog;
 using NLog.Web;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
-using ReserGo.Common.Entity;
+
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.DataAccess.Implementations;
 using ReserGo.Shared.Interfaces;
@@ -18,11 +16,12 @@ using ReserGo.Business.Interfaces;
 using ReserGo.Business.Implementations;
 using ReserGo.Common.Security;
 using ReserGo.DataAccess;
+using ReserGo.Shared;
+using ReserGo.WebAPI.Services;
 
 namespace ReserGo.WebAPI;
 
 public class Program {
-    private const string CorsPolicy = "CORS_POLICY";
 
     public static void Main(string[] args) {
         var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
@@ -66,7 +65,7 @@ public class Program {
             // Configure CORS
             builder.Services.AddCors(options =>
             {
-                options.AddPolicy(name: CorsPolicy,
+                options.AddPolicy(name: Consts.CorsPolicy,
                     policy =>
                     {
                         policy.WithOrigins("http://localhost:5174", "https://resergo-admin.adjysedar.fr",
@@ -79,29 +78,8 @@ public class Program {
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(opt =>
-            {
-                opt.SwaggerDoc("v1", new OpenApiInfo { Title = "Health", Version = "v1.0.0" });
-                opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme {
-                    In = ParameterLocation.Header,
-                    Description = "Please enter token",
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
-                    BearerFormat = "JWT",
-                    Scheme = "bearer"
-                });
-                opt.AddSecurityRequirement(new OpenApiSecurityRequirement {
-                    {
-                        new OpenApiSecurityScheme {
-                            Reference = new OpenApiReference {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        new string[] { }
-                    }
-                });
-
+            builder.Services.AddSwaggerGen(opt => {
+                opt.SwaggerDoc("v1", new OpenApiInfo { Title = "ReserGo", Version = "v1.0.0" });
                 // Add configuration here to include XML comments
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -142,23 +120,19 @@ public class Program {
                     options.Events = new JwtBearerEvents {
                         OnMessageReceived = context =>
                         {
-                            if (context.Request.Cookies.ContainsKey("AuthToken")) {
-                                context.Token = context.Request.Cookies["AuthToken"];
+                            if (context.Request.Cookies.ContainsKey(Consts.AuthToken)) {
+                                context.Token = context.Request.Cookies[Consts.AuthToken];
                             }
 
                             return Task.CompletedTask;
                         }
                     };
-                    /*options.RequireHttpsMetadata = true; // Assurez-vous que HTTPS est utilisé
-                    options.SaveToken = true; // Sauvegarde le token dans le contexte de la requête */
                 });
 
 
             // Configuration for keep-alive service
-            /*if (builder.Environment.IsProduction())
+            if (builder.Environment.IsProduction())
                 builder.Services.AddHostedService<KeepAliveService>();
-            */
-
 
             var app = builder.Build();
 
@@ -184,7 +158,7 @@ public class Program {
             //	}
             app.UseForwardedHeaders();
             app.UseHttpsRedirection();
-            app.UseCors(CorsPolicy);
+            app.UseCors(Consts.CorsPolicy);
             app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();

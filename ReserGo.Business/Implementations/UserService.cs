@@ -117,7 +117,7 @@ public class UserService : IUserService {
 
     public async Task Delete(int id) {
         try {
-            var user = await _userDataAccess.GetById(id);
+            User? user = await _userDataAccess.GetById(id);
             if (user is null) {
                 string errorMessage = "User not found";
                 _logger.LogError(errorMessage);
@@ -135,17 +135,17 @@ public class UserService : IUserService {
     
     public async Task<UserDto> UpdateUser(int id, UserUpdateRequest request) {
         try {
-            var user = await _userDataAccess.GetById(id);
+            User? user = await _userDataAccess.GetById(id);
             if (user is null) throw new Exception("User not found");
             
-            var existingEmailUser = await _userDataAccess.GetByEmail(request.Email);
+            User? existingEmailUser = await _userDataAccess.GetByEmail(request.Email);
             if (existingEmailUser is not null && existingEmailUser.Id != id) {
                 string errorMessage = "This email address is already in use.";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
 
-            var existingUsernameUser = await _userDataAccess.GetByUsername(request.Username);
+            User? existingUsernameUser = await _userDataAccess.GetByUsername(request.Username);
             if (existingUsernameUser is not null && existingUsernameUser.Id != id) {
                 string errorMessage = "This username is already in use.";
                 _logger.LogError(errorMessage);

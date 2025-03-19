@@ -79,7 +79,7 @@ public class UserController : ControllerBase {
     /// <response code="204">User removed successfully.</response>
     /// <response code="404">User not found.</response>
     /// <response code="500">An unexpected error occurred.</response>
-    [HttpDelete("delete/{id}")]
+    [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -106,7 +106,7 @@ public class UserController : ControllerBase {
     /// <response code="200">User updated successfully.</response>
     /// <response code="400">Invalid request data.</response>
     /// <response code="404">User not found.</response>
-    [HttpPut("update/{id}")]
+    [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
