@@ -29,9 +29,9 @@ namespace ReserGo.WebAPI.Controllers.Security.Admin {
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Auth(string token) {
+        public async Task<IActionResult> Auth([FromBody] string credential) {
             try {
-                AuthenticateResponse? auth = await _googleService.Auth(token);
+                AuthenticateResponse? auth = await _googleService.Auth(credential);
 
                 if (auth == null)
                     return StatusCode(StatusCodes.Status500InternalServerError, "Une erreur interne s'est produite.");
