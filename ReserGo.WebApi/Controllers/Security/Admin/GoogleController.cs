@@ -11,7 +11,7 @@ using ReserGo.Common.Response;
 namespace ReserGo.WebAPI.Controllers.Security.Admin {
 
     [ApiController]
-    [Route("api/google")]
+    [Route("api/auth/google")]
     public class GoogleController : ControllerBase {
 
         private readonly IGoogleService _googleService;
@@ -24,7 +24,7 @@ namespace ReserGo.WebAPI.Controllers.Security.Admin {
             _security = security;
         }
 
-        [HttpPost("auth")]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
