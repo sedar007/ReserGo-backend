@@ -1,27 +1,28 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+
 using ReserGo.Common.Requests.Security;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.Security;
 using ReserGo.Shared.Interfaces;
+using ReserGo.Shared;
+using ReserGo.Common.Response;
 
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-
-namespace ReserGo.WebAPI.Controllers.Admin {
+namespace ReserGo.WebAPI.Controllers.Security.Admin {
 
     [ApiController]
     [Route("api/auth")]
-    public class AuthController : ControllerBase {
+    public class LoginController : ControllerBase {
 
-        private readonly IAuthService _authService;
+        private readonly ILoginService _loginService;
         private readonly ISecurity _security;
-        private readonly ILogger<AuthController> _logger;
+        private readonly ILogger<LoginController> _logger;
 
-        public AuthController(IAuthService authService, ILogger<AuthController> logger, ISecurity security) {
-            _authService = authService;
+        public LoginController(ILoginService loginService, ILogger<LoginController> logger, ISecurity security) {
+            _loginService = loginService;
             _logger = logger;
             _security = security;
         }
-
 
         [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -30,24 +31,23 @@ namespace ReserGo.WebAPI.Controllers.Admin {
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Loging([FromBody] LoginRequest request) {
             try {
-                var response = await _authService.Login(request);
+                AuthenticateResponse? auth = await _loginService.Login(request);
 
-                if (response == null)
+                if (auth == null)
                     return StatusCode(StatusCodes.Status500InternalServerError, "Une erreur interne s'est produite.");
-
-                var cookieOptions = new CookieOptions {
-                   // Domain = "resergo-admin.adjysedar.fr",
-                    HttpOnly = true, // Prevents access via JavaScript (XSS protection)
-                    Secure = true, // Only active in HTTPS
-                    SameSite = SameSiteMode.None, // Prevents CSRF attacks
-                    Expires = DateTime.UtcNow.AddYears(3) // Expiration duration
-                };
+                CookieOptions cookieOptions = _security.GetCookiesOptions();
                 
-                Response.Cookies.Append("AuthToken", response.Token, cookieOptions);
+                Response.Cookies.Append(Consts.AuthToken, auth.Token, cookieOptions);
                 _logger.LogInformation("Token stored in HTTP-only cookie");
-
                 _logger.LogInformation("User logged in");
-                return Ok(new { message = "Login successful", response.Id, response.Role,  response.Username, response.RoleName, response.Token });
+                LoginResponse response = new LoginResponse {
+                    Message = "Login successful",
+                    Id = auth.Id,
+                    Role = auth.Role,
+                    Username = auth.Username,
+                    RoleName = auth.RoleName
+                };
+                return Ok(response);
             }
 
             catch (ArgumentNullException e) {
@@ -57,6 +57,7 @@ namespace ReserGo.WebAPI.Controllers.Admin {
             }
             catch (KeyNotFoundException e) {
                 _logger.LogWarning("User not unauthorized");
+                _logger.LogError(e, e.Message);
                 return Unauthorized($"The user: {request.Login} or the password is Incorrect");
             }
             catch (Exception e) {
@@ -79,7 +80,6 @@ namespace ReserGo.WebAPI.Controllers.Admin {
             if (currentUser == null) {
                 return Unauthorized(new { message = "User not authenticated" });
             }
-
             return Ok(currentUser);
         }
 
@@ -91,8 +91,7 @@ namespace ReserGo.WebAPI.Controllers.Admin {
         [Authorize] // Ensure only authenticated users can log out
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult Logout() {
-            Console.WriteLine("Logout");
-            Response.Cookies.Delete("AuthToken");
+            Response.Cookies.Delete(Consts.AuthToken);
             _logger.LogInformation("User logged out");
             return Ok(new { message = "Logout successful" });
         }
