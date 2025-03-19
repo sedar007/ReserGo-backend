@@ -25,9 +25,11 @@ public class UserController : ControllerBase {
     /// <returns>The created user object.</returns>
     /// <response code="201">User created successfully.</response>
     /// <response code="400">Invalid request data.</response>
+    /// <response code="500">An unexpected error occurred.</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Create(UserCreationRequest request) {
         try {
             UserDto data = await _userService.Create(request);
@@ -36,6 +38,11 @@ public class UserController : ControllerBase {
         catch (InvalidDataException ex) {
             return BadRequest(ex.Message);
         }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while retrieving the user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+        }
+        
     }
     
     /// <summary>
@@ -45,9 +52,11 @@ public class UserController : ControllerBase {
     /// <returns>The user object.</returns>
     /// <response code="200">User found and returned.</response>
     /// <response code="404">User not found.</response>
+    /// <response code="500">An unexpected error occurred.</response>
     [HttpGet("getById/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<UserDto?>> GetById(int id) {
         try {
             var user = await _userService.GetById(id);
@@ -55,6 +64,10 @@ public class UserController : ControllerBase {
         }
         catch (InvalidDataException ex) {
             return NotFound(ex.Message);
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while retrieving the user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
     
@@ -65,9 +78,11 @@ public class UserController : ControllerBase {
     /// <returns>No content if successful.</returns>
     /// <response code="204">User removed successfully.</response>
     /// <response code="404">User not found.</response>
+    /// <response code="500">An unexpected error occurred.</response>
     [HttpDelete("delete/{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Delete(int id) {
         try {
             await _userService.Delete(id);
@@ -75,6 +90,10 @@ public class UserController : ControllerBase {
         }
         catch (InvalidDataException ex) {
             return NotFound(ex.Message);
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while retrieving the user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
     
