@@ -11,7 +11,7 @@ using ReserGo.Common.Response;
 namespace ReserGo.WebAPI.Controllers.Security.Admin {
 
     [ApiController]
-    [Route("api/google")]
+    [Route("api/auth/google")]
     public class GoogleController : ControllerBase {
 
         private readonly IGoogleService _googleService;
@@ -24,14 +24,14 @@ namespace ReserGo.WebAPI.Controllers.Security.Admin {
             _security = security;
         }
 
-        [HttpPost("auth")]
+        [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> Auth(string token) {
+        public async Task<IActionResult> Auth([FromBody] string credential) {
             try {
-                AuthenticateResponse? auth = await _googleService.Auth(token);
+                AuthenticateResponse? auth = await _googleService.Auth(credential);
 
                 if (auth == null)
                     return StatusCode(StatusCodes.Status500InternalServerError, "Une erreur interne s'est produite.");
