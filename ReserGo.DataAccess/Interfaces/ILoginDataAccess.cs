@@ -6,5 +6,7 @@ public interface ILoginDataAccess {
     Task<Login?> GetById(int id);
     Task<Login> Create(Login login);
     Task<Login?> GetByUserId(int id);
+    
+    Task Update(Login login);
 }
 

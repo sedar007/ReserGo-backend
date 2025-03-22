@@ -25,5 +25,10 @@ public class LoginDataAccess : ILoginDataAccess {
     public async Task<Login?> GetByUserId(int id) {
         return await _context.Login.FirstOrDefaultAsync(x => x.UserId == id);
     }
+    
+    public async Task Update(Login login) {
+        _context.Login.Update(login);
+        await _context.SaveChangesAsync();
+    }
 }
 
