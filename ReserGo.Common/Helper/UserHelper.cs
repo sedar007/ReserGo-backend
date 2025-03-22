@@ -10,8 +10,12 @@ public static class UserHelper {
             LastName = user.LastName,
             Username = user.Username,
             Email = user.Email,
+            PhoneNumber = user.PhoneNumber,
+            Bio = user.Bio,
             Role = user.Role,
-            CreatedAt = user.CreatedAt,
+            ProfilePicture =  user.ProfilePicture,
+            Address = user.Address?.ToDto(),
+            RoleString = user.Role.ToString(),
         };
     }
 }

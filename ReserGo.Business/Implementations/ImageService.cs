@@ -21,9 +21,9 @@ namespace ReserGo.Business.Implementations {
             return url;
         }
 
-        public async Task<string?> UploadImage(IFormFile file) {
+        public async Task<string?> UploadImage(IFormFile file, int userId) {
             _logger.LogInformation("Uploading image with file name: {FileName}", file.FileName);
-            string? url = await _cloudinary.UploadImage(file);
+            string? url = await _cloudinary.UploadImage(file, userId);
             if (url == null)
                 _logger.LogWarning("Image upload failed for file: {FileName}", file.FileName);
             else 

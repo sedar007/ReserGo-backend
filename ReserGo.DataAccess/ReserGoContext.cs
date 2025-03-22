@@ -15,6 +15,7 @@ namespace ReserGo.DataAccess;
 	    public DbSet<BookingHotel> BookingHotel { get; set; }
 	    public DbSet<BookingOccasion> BookingOccasion { get; set; }
 	    public DbSet<BookingRestaurant> BookingRestaurant { get; set; }
+	    public DbSet<Address> Addresses { get; set; }
 	    
         private readonly string _sqlConnectionString;
 
@@ -30,7 +31,6 @@ namespace ReserGo.DataAccess;
 			=> optionsBuilder.UseNpgsql(_sqlConnectionString);
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder) {
-			
 			// config user
 			modelBuilder.Entity<User>()
 				.HasKey(u => u.Id);
@@ -57,6 +57,12 @@ namespace ReserGo.DataAccess;
 				.HasMany(u => u.BookingsRestaurant)
 				.WithOne(w => w.User)
 				.HasForeignKey(w => w.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
+			
+			modelBuilder.Entity<User>()
+				.HasOne(u => u.Address)
+				.WithOne(a => a.User) // Relation One-to-One avec Address
+				.HasForeignKey<User>(u => u.AddressId)
 				.OnDelete(DeleteBehavior.Cascade);
 
 			// Config Hotel, Occasion, Restaurant

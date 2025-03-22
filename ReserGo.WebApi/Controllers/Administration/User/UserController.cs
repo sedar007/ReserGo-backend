@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Mvc;
+
 using ReserGo.Business.Interfaces;
 using ReserGo.Shared.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.User;
+using ReserGo.Common.Security;
 
 namespace ReserGo.WebAPI.Controllers.Administration.User;
    
@@ -12,10 +14,12 @@ public class UserController : ControllerBase {
     
     private readonly ILogger<UserController> _logger;
     private readonly IUserService _userService;
+    private readonly ISecurity _security;
 
     public UserController(ILogger<UserController> logger, ISecurity security, IUserService userService) {
         _logger = logger;
         _userService = userService;
+        _security = security;
     }
     
     /// <summary>
@@ -121,6 +125,74 @@ public class UserController : ControllerBase {
         }
         catch (Exception ex) {
             return NotFound(ex.Message);
+        }
+    }
+    
+    /// <summary>
+    /// Retrieve the information of the connected user.
+    /// </summary>
+    /// <returns>The connected user object.</returns>
+    /// <response code="200">User information retrieved successfully.</response>
+    /// <response code="401">User is not authenticated.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("getConnectedUser")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<UserDto?>> GetConnectedUser() {
+        try {
+            _logger.LogInformation("Attempting to retrieve the connected user.");
+
+            ConnectedUser? connectedUser = _security.GetCurrentUser();
+            if (connectedUser is null) {
+                string errorMessage = "User is not authenticated.";
+                _logger.LogError(errorMessage);
+                return Unauthorized(errorMessage);
+            }
+
+            UserDto? user = await _userService.GetById(connectedUser.UserId);
+            if (user is null) {
+                string errorMessage = "This user does not exist.";
+                _logger.LogError(errorMessage);
+                return Unauthorized(errorMessage);
+            }
+
+            _logger.LogInformation("User {id} retrieved successfully", user.Id);
+            return Ok(user);
+        } catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while retrieving the connected user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+        }
+    }
+    
+    /// <summary>
+    /// Retrieve the profile picture of the connected user.
+    /// </summary>
+    /// <returns>The profile picture URL of the connected user.</returns>
+    /// <response code="200">Profile picture retrieved successfully.</response>
+    /// <response code="401">User is not authenticated.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("ProfilePicture")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string?>> GetConnectedUserProfilePicture() {
+        try {
+            _logger.LogInformation("Attempting to retrieve the profile picture of the connected user.");
+
+            ConnectedUser? connectedUser = _security.GetCurrentUser();
+            if (connectedUser is null) {
+                string errorMessage = "User is not authenticated.";
+                _logger.LogError(errorMessage);
+                return Unauthorized(errorMessage);
+            }
+            
+            string profilePicture = await _userService.GetProfilePicture(connectedUser.UserId);
+            _logger.LogInformation("Profile picture of user {id} retrieved successfully", connectedUser.UserId);
+            return Ok(profilePicture);
+        } catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while retrieving the profile picture of the connected user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
 }

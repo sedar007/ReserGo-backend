@@ -73,7 +73,7 @@ namespace ReserGo.Shared.Implementations {
             };
         }
 
-        public CurrentUser? GetCurrentUser() {
+        public ConnectedUser? GetCurrentUser() {
             var user = _httpContextAccessor.HttpContext?.User;
             var userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var userRole = user?.FindFirst("UserRole")?.Value;
@@ -83,10 +83,11 @@ namespace ReserGo.Shared.Implementations {
                 _logger.LogWarning("User not found");
                 return null;
             }
-            return new CurrentUser {
+            return new ConnectedUser {
                 UserId = int.Parse(userId),
                 Username = username,
-                Role = userRole == UserRole.Admin.ToString() ? UserRole.Admin : UserRole.Client
+                Role = userRole == UserRole.Admin.ToString() ? UserRole.Admin : UserRole.Client,
+                RoleString = userRole
             };
         }
 

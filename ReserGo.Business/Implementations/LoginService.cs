@@ -41,11 +41,23 @@ public class LoginService : ILoginService {
             _logger.LogWarning("User not Found");
             throw new KeyNotFoundException($"The user: {request.Login} or the password is Incorrect");
         }
+        
+        if (login.IsLocked) {
+            _logger.LogWarning("Account is locked for user: {Username}", login.Username);
+            throw new UnauthorizedAccessException("Account is locked due to multiple failed login attempts");
+        }
             
         if (!_security.VerifyPassword(login.Password, request.Password)) {
+            login.FailedAttempts++;
+            if (login.FailedAttempts >= 3) {
+                login.IsLocked = true;
+                _logger.LogWarning("Account locked due to multiple failed login attempts for user: {Username}", login.Username);
+            }
+            await _loginDataAccess.Update(login);
             _logger.LogWarning("Invalid Password");
-            throw new KeyNotFoundException($"The user: {request.Login} or the password is Incorrect");
+            throw new UnauthorizedAccessException($"The user: {request.Login} or the password is Incorrect");
         }
+        
         return new AuthenticateResponse(user, _security.GenerateJwtToken(user.Username, user.Id, user.Role), user.Role);
     }
     
