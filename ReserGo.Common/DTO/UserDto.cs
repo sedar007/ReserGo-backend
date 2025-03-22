@@ -9,6 +9,8 @@ public class UserDto {
     public string? Bio { get; set; }
     public string Email { get; set; } = null!;
     public UserRole Role { get; set; }
+    public string? RoleString { get; set; }
+    public string? ProfilePicture { get; set; }
     public IEnumerable<BookingHotelDto> BookingsHotel { get; set; } = null!;
     public IEnumerable<BookingOccasionDto> BookingsOccasion { get; set; } = null!;
     public IEnumerable<BookingRestaurantDto> BookingsRestaurant { get; set; } = null!;

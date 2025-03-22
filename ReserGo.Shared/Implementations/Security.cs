@@ -86,7 +86,8 @@ namespace ReserGo.Shared.Implementations {
             return new ConnectedUser {
                 UserId = int.Parse(userId),
                 Username = username,
-                Role = userRole == UserRole.Admin.ToString() ? UserRole.Admin : UserRole.Client
+                Role = userRole == UserRole.Admin.ToString() ? UserRole.Admin : UserRole.Client,
+                RoleString = userRole
             };
         }
 

@@ -6,6 +6,7 @@ using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
 using ReserGo.Common.Requests.User;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared;
 
 namespace ReserGo.Business.Implementations;
 public class UserService : IUserService {
@@ -13,11 +14,14 @@ public class UserService : IUserService {
     private readonly ILogger<UserService> _logger;
     private readonly ILoginService _loginService;
     private readonly IUserDataAccess _userDataAccess;
+    private readonly IImageService _imageService;
 	
-    public UserService(ILogger<UserService> logger, IUserDataAccess userDataAccess, ILoginService loginService) {
+    public UserService(ILogger<UserService> logger, IUserDataAccess userDataAccess, 
+        ILoginService loginService, IImageService imageService) {
         _logger = logger;
         _loginService = loginService;
         _userDataAccess = userDataAccess;
+        _imageService = imageService;
     }
     
     public async Task<UserDto> Create(UserCreationRequest request) {
@@ -78,6 +82,23 @@ public class UserService : IUserService {
             throw;
         }
     }
+    
+    public async Task<string> GetProfilePicture(int userId) {
+        UserDto? user = await GetById(userId);
+        if (user is null) {
+            string errorMessage = "This user does not exist.";
+            _logger.LogError(errorMessage);
+            throw new InvalidDataException(errorMessage);
+        }
+        string publicId = user.ProfilePicture ?? Consts.DefaultProfile ;
+       
+        _logger.LogInformation("Getting picture with publicId: {PublicId}", publicId);
+        string url = await _imageService.GetPicture(publicId);
+        _logger.LogInformation("Retrieved picture URL: {Url}", url);
+        return url;
+    }
+    
+    
     
     public async Task<UserDto?> GetByEmail(string email) {
         try {

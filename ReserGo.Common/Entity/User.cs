@@ -9,6 +9,7 @@ public class User {
     public string? Bio { get; set; }
     public string Username { get; set; } = null!;
     public int? AddressId { get; set; }
+    public string? ProfilePicture { get; set; }
     public UserRole Role { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public IEnumerable<BookingHotel> BookingsHotel { get; set; } = null!;

@@ -23,24 +23,34 @@ namespace ReserGo.Tiers.Implementations {
             return url;
         }
 
-        public async Task<string?> UploadImage(IFormFile file) {
+        public async Task<string?> UploadImage(IFormFile file, int userId) {
             _logger.LogInformation("Uploading image with file name: {FileName}", file.FileName);
+            
+            
+            var folderPath = $"admin/{userId}";
+            var createFolderResult = await _cloudinary.CreateFolderAsync(folderPath);
 
+            if (createFolderResult.StatusCode != System.Net.HttpStatusCode.OK) {
+                _logger.LogWarning("Failed to create folder: {Folder}", folderPath);
+                return null;
+            }
+            
             ImageUploadParams uploadParams = new ImageUploadParams {
                 File = new FileDescription(file.FileName, file.OpenReadStream()),
-                PublicId = $"admin/{Guid.NewGuid()}", 
+                AssetFolder = folderPath,
+                PublicId = $"{folderPath}/{Guid.NewGuid()}",
                 Overwrite = true,
                 Transformation = new Transformation().Quality("auto").FetchFormat("auto")
             };
-
+            
             ImageUploadResult uploadResult = await _cloudinary.UploadAsync(uploadParams);
             if (uploadResult == null) {
                 _logger.LogWarning("Upload result is null");
                 return null;
             }
 
-            _logger.LogInformation("Upload successful. Secure URL: {SecureUrl}", uploadResult.SecureUrl);
-            return uploadResult.SecureUrl.ToString();
+            _logger.LogInformation("Upload successful. PublicId : {PublicId}", uploadResult.PublicId);
+            return uploadResult.PublicId;
         }
     }
 }

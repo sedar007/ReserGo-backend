@@ -45,12 +45,13 @@ namespace ReserGo.WebAPI.Controllers {
         /// Uploads an image and returns its URL.
         /// </summary>
         /// <param name="file">The image file to upload.</param>
+        /// <param name="userId">The ID of the user uploading the image.</param>
         /// <returns>The URL of the uploaded image.</returns>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> UploadImage(IFormFile? file)
+        public async Task<IActionResult> UploadImage(IFormFile? file, int userId)
         {
             if (file == null || file.Length == 0) {
                 _logger.LogWarning("No file sent for upload.");
@@ -58,12 +59,12 @@ namespace ReserGo.WebAPI.Controllers {
             }
 
             try {
-                string? uploadResult = await _imageService.UploadImage(file);
+                string? uploadResult = await _imageService.UploadImage(file, userId);
                 if (string.IsNullOrEmpty(uploadResult)) {
                     _logger.LogWarning("Image upload failed for file: {FileName}", file.FileName);
                     return StatusCode(StatusCodes.Status500InternalServerError, "Image upload failed.");
                 }
-                return Ok(new { url = uploadResult });
+                return Ok(new { publicId = uploadResult });
             } catch (Exception e) {
                 _logger.LogError(e, "Error uploading image for file: {FileName}", file.FileName);
                 return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
