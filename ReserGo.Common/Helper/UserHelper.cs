@@ -13,7 +13,9 @@ public static class UserHelper {
             PhoneNumber = user.PhoneNumber,
             Bio = user.Bio,
             Role = user.Role,
-            Address = user.Address?.ToDto()
+            ProfilePicture =  user.ProfilePicture,
+            Address = user.Address?.ToDto(),
+            RoleString = user.Role.ToString(),
         };
     }
 }

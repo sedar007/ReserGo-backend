@@ -11,4 +11,6 @@ public interface IUserService {
     Task<UserDto?> GetByEmail(string email);
     Task<UserDto?> GetByUsername(string username);
     
+    Task<string> GetProfilePicture(int userId);
+    
 }

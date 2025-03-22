@@ -164,5 +164,36 @@ public class UserController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
+    
+    /// <summary>
+    /// Retrieve the profile picture of the connected user.
+    /// </summary>
+    /// <returns>The profile picture URL of the connected user.</returns>
+    /// <response code="200">Profile picture retrieved successfully.</response>
+    /// <response code="401">User is not authenticated.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("ProfilePicture")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<string?>> GetConnectedUserProfilePicture() {
+        try {
+            _logger.LogInformation("Attempting to retrieve the profile picture of the connected user.");
+
+            ConnectedUser? connectedUser = _security.GetCurrentUser();
+            if (connectedUser is null) {
+                string errorMessage = "User is not authenticated.";
+                _logger.LogError(errorMessage);
+                return Unauthorized(errorMessage);
+            }
+            
+            string profilePicture = await _userService.GetProfilePicture(connectedUser.UserId);
+            _logger.LogInformation("Profile picture of user {id} retrieved successfully", connectedUser.UserId);
+            return Ok(profilePicture);
+        } catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while retrieving the profile picture of the connected user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+        }
+    }
 }
 
