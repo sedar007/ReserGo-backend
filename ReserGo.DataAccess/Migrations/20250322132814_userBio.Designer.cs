@@ -12,18 +12,48 @@ using ReserGo.DataAccess;
 namespace ReserGo.DataAccess.Migrations
 {
     [DbContext(typeof(ReserGoContext))]
-    [Migration("20250307211709_init")]
-    partial class init
+    [Migration("20250322132814_userBio")]
+    partial class userBio
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.4")
+                .HasAnnotation("ProductVersion", "9.0.1")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("ReserGo.Common.Entity.Address", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("City")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("State")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Street")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Addresses");
+                });
 
             modelBuilder.Entity("ReserGo.Common.Entity.BookingHotel", b =>
                 {
@@ -255,6 +285,12 @@ namespace ReserGo.DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -270,6 +306,9 @@ namespace ReserGo.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("text");
+
                     b.Property<int>("Role")
                         .HasColumnType("integer");
 
@@ -279,7 +318,10 @@ namespace ReserGo.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.HasIndex("AddressId")
+                        .IsUnique();
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("ReserGo.Common.Entity.BookingHotel", b =>
@@ -348,6 +390,22 @@ namespace ReserGo.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("ReserGo.Common.Entity.User", b =>
+                {
+                    b.HasOne("ReserGo.Common.Entity.Address", "Address")
+                        .WithOne("User")
+                        .HasForeignKey("ReserGo.Common.Entity.User", "AddressId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("Address");
+                });
+
+            modelBuilder.Entity("ReserGo.Common.Entity.Address", b =>
+                {
+                    b.Navigation("User")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ReserGo.Common.Entity.Hotel", b =>

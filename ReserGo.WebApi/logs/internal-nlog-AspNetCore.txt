@@ -1,0 +1,10 @@
+2025-03-11 22:51:37.9328 Info Registered target NLog.Targets.FileTarget(Name=allfile)
+2025-03-11 22:51:37.9527 Info Registered target NLog.Targets.FileTarget(Name=ownFile-web)
+2025-03-11 22:51:37.9529 Info Registered target NLog.Targets.ConsoleTarget(Name=lifetimeConsole)
+2025-03-11 22:51:37.9555 Info NLog, Version=5.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c. File version: 5.3.4.2778. Product version: 5.3.4+73d83d3161d31288ca5c554cc50d27b6bed5f28b. GlobalAssemblyCache: False
+2025-03-11 22:51:38.0880 Info Validating config: TargetNames=allfile, lifetimeConsole, ownFile-web, ConfigItems=54, FilePath=/Users/adjysedardesir/Documents/Dev/ReserGo/ReserGo-backend/ReserGo.WebApi/bin/Debug/net9.0/nlog.config
+2025-03-11 22:51:38.0969 Info Configuration initialized.
+2025-03-11 22:51:38.3005 Info Validating config: TargetNames=allfile, lifetimeConsole, ownFile-web, ConfigItems=54, FilePath=/Users/adjysedardesir/Documents/Dev/ReserGo/ReserGo-backend/ReserGo.WebApi/bin/Debug/net9.0/nlog.config
+2025-03-11 22:56:14.8926 Info Shutdown() called. Logger closing...
+2025-03-11 22:56:14.8972 Info Closing old configuration.
+2025-03-11 22:56:14.9078 Info Logger has been closed down.

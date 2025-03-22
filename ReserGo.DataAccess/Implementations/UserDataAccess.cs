@@ -14,7 +14,9 @@ public class UserDataAccess : IUserDataAccess {
     }
     
     public async Task<User?> GetById(int id) {
-        return await _context.Users.FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Users.
+            Include(u => u.Address).
+            FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<User?> GetByEmail(string email) {
