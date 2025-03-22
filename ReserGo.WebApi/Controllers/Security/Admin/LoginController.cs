@@ -76,7 +76,7 @@ namespace ReserGo.WebAPI.Controllers.Security.Admin {
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult GetCurrentUser() {
-            CurrentUser? currentUser = _security.GetCurrentUser();
+            ConnectedUser? currentUser = _security.GetCurrentUser();
             if (currentUser == null) {
                 return Unauthorized(new { message = "User not authenticated" });
             }

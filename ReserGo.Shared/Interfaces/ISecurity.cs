@@ -11,7 +11,7 @@ namespace ReserGo.Shared.Interfaces {
 
          bool VerifyPassword(string hashedPassword, string providedPassword);
 
-        CurrentUser? GetCurrentUser();
+        ConnectedUser? GetCurrentUser();
         CookieOptions GetCookiesOptions();
 
     }
