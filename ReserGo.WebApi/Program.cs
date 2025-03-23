@@ -18,12 +18,9 @@ using ReserGo.Common.Security;
 using ReserGo.Tiers.Interfaces;
 using ReserGo.Tiers.Implementations;
 using ReserGo.Tiers.Models;
-
 using ReserGo.DataAccess;
 using ReserGo.Shared;
 using ReserGo.WebAPI.Services;
-using ReserGo.Tiers.Implementations;
-using ReserGo.Tiers.Interfaces;
 
 namespace ReserGo.WebAPI;
 
@@ -46,8 +43,6 @@ public class Program {
 			var appSettingsSection = rawConfig.GetSection("AppSettings");
 			builder.Services.Configure<AppSettings>(appSettingsSection);
 			builder.Services.Configure<AppSettings>(builder.Configuration);
-			builder.Services.Configure<AppSettingsCloudinary>(appSettingsSection);
-			builder.Services.Configure<AppSettingsCloudinary>(builder.Configuration);
 
 
             // Context
