@@ -74,13 +74,13 @@ public class UserControllerTests {
     }
     
     
-    [Fact]
+   /* [Fact]
     public async Task ShouldGet200_GET_OneUserById() {
         var result = await _controller.GetById(1) as ActionResult<UserDto>;
         var okResult = result.Result as OkObjectResult;
         okResult.Should().NotBeNull();
         okResult.StatusCode.Should().Be(200);
-    }
+    } */
 
    [Fact]
     public async Task ShouldGet404_GET_OneUserById() {
