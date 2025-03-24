@@ -4,6 +4,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using Microsoft.Extensions.Caching.Memory;
 
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
@@ -35,7 +36,7 @@ public class UserControllerTests {
         context.Users.Add(new User { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com", Username = "johndoe" });
         context.SaveChanges();
 
-        _userService = new UserService(new Mock<ILogger<UserService>>().Object, new UserDataAccess(context), new Mock<ILoginService>().Object, new Mock<IImageService>().Object);
+        _userService = new UserService(new Mock<ILogger<UserService>>().Object, new UserDataAccess(context), new Mock<ILoginService>().Object, new Mock<IImageService>().Object, new Mock<IMemoryCache>().Object );
         _loggerMock = new Mock<ILogger<UserController>>();
         _controller = new UserController(_loggerMock.Object, null, _userService);
     }
