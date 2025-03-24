@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Caching.Memory;
+
 using ReserGo.Business.Interfaces;
 using ReserGo.Business.Validator;
 using ReserGo.Common.DTO;
@@ -15,13 +17,15 @@ public class UserService : IUserService {
     private readonly ILoginService _loginService;
     private readonly IUserDataAccess _userDataAccess;
     private readonly IImageService _imageService;
-	
+    private readonly IMemoryCache _cache;
+    
     public UserService(ILogger<UserService> logger, IUserDataAccess userDataAccess, 
-        ILoginService loginService, IImageService imageService) {
+        ILoginService loginService, IImageService imageService, IMemoryCache cache) {
         _logger = logger;
         _loginService = loginService;
         _userDataAccess = userDataAccess;
         _imageService = imageService;
+        _cache = cache;
     }
     
     public async Task<UserDto> Create(UserCreationRequest request) {
@@ -67,6 +71,13 @@ public class UserService : IUserService {
     
     public async Task<UserDto?> GetById(int id) {
         try {
+            string cacheKey = $"GetById_{id}";
+            
+           if (_cache.TryGetValue(cacheKey, out UserDto? cachedUser)) {
+                _logger.LogInformation("Returning cached user for ID: {Id}", id);
+                return cachedUser;
+            } 
+            
             User? user = await _userDataAccess.GetById(id);
             if (user is null) {
                 string errorMessage = "This user does not exist.";
@@ -75,7 +86,9 @@ public class UserService : IUserService {
             }
             
             _logger.LogInformation("User { id } retrieved successfully", user.Id);
-            return user.ToDto();
+            UserDto userDto = user.ToDto();
+            _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(30));
+            return userDto;
             
         } catch (Exception e) {
             _logger.LogError(e, e.Message);
@@ -102,6 +115,12 @@ public class UserService : IUserService {
     
     public async Task<UserDto?> GetByEmail(string email) {
         try {
+            string cacheKey = $"GetByEmail_{email}";
+            
+            if (_cache.TryGetValue(cacheKey, out UserDto? cachedUser)) {
+                _logger.LogInformation("Returning cached user for email: {Email}", email);
+                return cachedUser;
+            }
             User? user = await _userDataAccess.GetByEmail(email);
             if (user is null) {
                 string errorMessage = "This user does not exist.";
@@ -110,7 +129,10 @@ public class UserService : IUserService {
             }
             
             _logger.LogInformation("User { id } retrieved successfully", user.Id);
-            return user.ToDto();
+            UserDto userDto = user.ToDto();
+            _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(30));
+
+            return userDto;
             
         } catch (Exception e) {
             _logger.LogError(e, e.Message);
@@ -118,8 +140,16 @@ public class UserService : IUserService {
         }
     }
     
+   
+    
     public async Task<UserDto?> GetByUsername(string username) {
         try {
+            string cacheKey = $"GetByUsername_{username}";
+            
+            if (_cache.TryGetValue(cacheKey, out UserDto? cachedUser)) {
+                _logger.LogInformation("Returning cached user for username: {Username}", username);
+                return cachedUser;
+            }
             User? user = await _userDataAccess.GetByUsername(username);
             if (user is null) {
                 string errorMessage = "This user does not exist.";
@@ -128,7 +158,11 @@ public class UserService : IUserService {
             }
             
             _logger.LogInformation("User { id } retrieved successfully", user.Id);
-            return user.ToDto();
+            
+            UserDto userDto = user.ToDto();
+            _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(30));
+
+            return userDto;
             
         } catch (Exception e) {
             _logger.LogError(e, e.Message);
@@ -145,7 +179,10 @@ public class UserService : IUserService {
                 throw new InvalidDataException(errorMessage);
             }
             int userId = user.Id;
+            string email = user.Email;
+            string username = user.Username;
             await _userDataAccess.Delete(user);
+            RemoveCache(id, email, username);
             _logger.LogInformation("User { id } deleted successfully", userId);
             
         } catch (Exception e) {
@@ -193,5 +230,11 @@ public class UserService : IUserService {
             _logger.LogError(e, e.Message);
             throw;
         }
+    }
+    
+    private void RemoveCache(int id, string email, string username) {
+        _cache.Remove($"GetById_{id}");
+        _cache.Remove($"GetByEmail_{email}");
+        _cache.Remove($"GetByUsername_{username}");
     }
 }
