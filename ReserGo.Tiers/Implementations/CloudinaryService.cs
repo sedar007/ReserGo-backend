@@ -18,7 +18,7 @@ namespace ReserGo.Tiers.Implementations {
 
         public async Task<string> GetPicture(string publicId) {
             _logger.LogInformation("Getting picture with publicId: {PublicId}", publicId);
-            string url = _cloudinary.Api.UrlImgUp.BuildUrl(publicId);
+            string url = _cloudinary.Api.UrlImgUp.Secure(true).BuildUrl(publicId);
             _logger.LogInformation("Generated URL: {Url}", url);
             return url;
         }
