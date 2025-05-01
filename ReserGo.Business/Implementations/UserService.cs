@@ -219,9 +219,29 @@ public class UserService : IUserService {
             user.LastName = request.LastName;
             user.Email = request.Email;
             user.Username = request.Username;
+            user.Bio = request.Bio;
+            user.PhoneNumber = request.PhoneNumber;
+            if (user.Address == null) {
+                user.Address = new Address
+                {
+                    Street = request.Address?.Street,
+                    City = request.Address?.City,
+                    State = request.Address?.State,
+                    PostalCode = request.Address?.PostalCode,
+                    Country = request.Address?.Country
+                };
+            }
+            else {
+                user.Address.Street = request.Address?.Street;
+                user.Address.City = request.Address?.City;
+                user.Address.State = request.Address?.State;
+                user.Address.PostalCode = request.Address?.PostalCode;
+                user.Address.Country = request.Address?.Country;
+            }
 
             _logger.LogInformation("User { id } updated successfully", user.Id);
             await _userDataAccess.Update(user);
+            RemoveCache(user.Id, user.Email, user.Username);
             return user.ToDto();
         }
         catch (Exception e)

@@ -5,7 +5,7 @@ public class User {
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public string Email { get; set; } = null!;
-    public string? PhoneNumber { get; set; } = null!;
+    public string? PhoneNumber { get; set; }
     public string? Bio { get; set; }
     public string Username { get; set; } = null!;
     public int? AddressId { get; set; }
@@ -19,5 +19,5 @@ public class User {
     // Relation avec Login (One-to-One)
     public virtual Login Login { get; set; } = null!;
     // Relation with Address (One-to-One)
-    public virtual Address Address { get; set; } = null!;
+    public virtual Address? Address { get; set; } = null!;
 }
