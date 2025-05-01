@@ -9,5 +9,6 @@ public interface IUserDataAccess {
     Task<User?> GetById(int id);
     Task Delete(User user);
     Task<User> Update(User user);
+    
 }
 

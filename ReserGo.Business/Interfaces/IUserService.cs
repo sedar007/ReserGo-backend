@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.User;
 
@@ -12,5 +14,6 @@ public interface IUserService {
     Task<UserDto?> GetByUsername(string username);
     
     Task<string> GetProfilePicture(int userId);
+    Task<string> UpdateProfilePicture(int userId, IFormFile file);
     
 }

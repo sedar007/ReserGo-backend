@@ -22,6 +22,25 @@ namespace ReserGo.Tiers.Implementations {
             _logger.LogInformation("Generated URL: {Url}", url);
             return url;
         }
+        
+        public async Task<bool> DeleteImage(string publicId) {
+            _logger.LogInformation("Deleting image with publicId: {PublicId}", publicId);
+
+            var deleteParams = new DeletionParams(publicId) {
+                Type = "upload",
+                ResourceType = ResourceType.Image,
+                Invalidate = true
+            };
+
+            var result = await _cloudinary.DestroyAsync(deleteParams);
+            if (result.StatusCode != System.Net.HttpStatusCode.OK) {
+                _logger.LogWarning("Failed to delete image with publicId: {PublicId}", publicId);
+                return false;
+            } 
+            
+            _logger.LogInformation("Image with publicId: {PublicId} deleted successfully", publicId);
+            return true;
+        }
 
         public async Task<string?> UploadImage(IFormFile file, int userId) {
             _logger.LogInformation("Uploading image with file name: {FileName}", file.FileName);

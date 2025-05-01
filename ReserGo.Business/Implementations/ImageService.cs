@@ -42,5 +42,15 @@ namespace ReserGo.Business.Implementations {
             }
             return url;
         }
+        public async Task<bool> DeleteImage(string publicId) {
+            _logger.LogInformation("Deleting image with publicId: {PublicId}", publicId);
+            bool result = await _cloudinary.DeleteImage(publicId);
+            if (!result) {
+                _logger.LogWarning("Failed to delete image with publicId: {PublicId}", publicId);
+            } else {
+                _logger.LogInformation("Image with publicId: {PublicId} deleted successfully", publicId);
+            }
+            return result;
+        }
     }
 }

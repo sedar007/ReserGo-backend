@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.AspNetCore.Http;
 
 using ReserGo.Business.Interfaces;
 using ReserGo.Business.Validator;
@@ -140,8 +141,6 @@ public class UserService : IUserService {
         }
     }
     
-   
-    
     public async Task<UserDto?> GetByUsername(string username) {
         try {
             string cacheKey = $"GetByUsername_{username}";
@@ -230,6 +229,39 @@ public class UserService : IUserService {
             _logger.LogError(e, e.Message);
             throw;
         }
+    }
+    
+    public async Task<string> UpdateProfilePicture(int userId, IFormFile file) {
+        _logger.LogInformation("Uploading image with file name: {FileName}", file.FileName);
+        
+        User? user = await _userDataAccess.GetById(userId);
+        if (user is null) {
+            string errorMessage = "This user does not exist.";
+            _logger.LogError(errorMessage);
+            throw new InvalidDataException(errorMessage);
+        }
+        
+        string? oldPublicId = user.ProfilePicture;
+        
+        string? publicId = await _imageService.UploadImage(file, userId);
+        if(string.IsNullOrEmpty(publicId)) {
+            _logger.LogWarning("Image upload failed for file: {FileName}", file.FileName);
+            throw new InvalidDataException("Image upload failed.");
+        }
+        
+        if (oldPublicId is not null) {
+            bool deleteResult = await _imageService.DeleteImage(oldPublicId);
+            if (deleteResult == false) {
+                _logger.LogWarning("Failed to delete old image with publicId: {PublicId}", oldPublicId);
+            }
+        }
+        
+        user.ProfilePicture = publicId;
+        await _userDataAccess.Update(user);
+        
+        _logger.LogInformation("Image uploaded successfully. URL: {Url}", publicId);
+        RemoveCache(userId, user.Email, user.Username);
+        return publicId;
     }
     
     private void RemoveCache(int id, string email, string username) {

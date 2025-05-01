@@ -195,5 +195,49 @@ public class UserController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
+    
+    /// <summary>
+/// Update the profile picture of the connected user.
+/// </summary>
+/// <param name="file">The new profile picture file.</param>
+/// <returns>The URL of the updated profile picture.</returns>
+/// <response code="200">Profile picture updated successfully.</response>
+/// <response code="400">Invalid file or request data.</response>
+/// <response code="401">User is not authenticated.</response>
+/// <response code="500">An unexpected error occurred.</response>
+[HttpPut("UpdateProfilePicture")]
+[ProducesResponseType(StatusCodes.Status200OK)]
+[ProducesResponseType(StatusCodes.Status400BadRequest)]
+[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+[ProducesResponseType(StatusCodes.Status500InternalServerError)]
+public async Task<ActionResult<string?>> UpdateProfilePicture(IFormFile? file) {
+    try {
+        _logger.LogInformation("Attempting to update the profile picture of the connected user.");
+
+        ConnectedUser? connectedUser = _security.GetCurrentUser();
+        if (connectedUser is null) {
+            string errorMessage = "User is not authenticated.";
+            _logger.LogError(errorMessage);
+            return Unauthorized(errorMessage);
+        }
+
+        if (file == null || file.Length == 0) {
+            _logger.LogWarning("No file sent for upload.");
+            return BadRequest("No file sent.");
+        }
+
+        string? newProfilePictureUrl = await _userService.UpdateProfilePicture(connectedUser.UserId, file);
+        if (string.IsNullOrEmpty(newProfilePictureUrl)) {
+            _logger.LogWarning("Profile picture update failed for user ID: {UserId}", connectedUser.UserId);
+            return StatusCode(StatusCodes.Status500InternalServerError, "Profile picture update failed.");
+        }
+
+        _logger.LogInformation("Profile picture of user {id} updated successfully", connectedUser.UserId);
+        return Ok(newProfilePictureUrl);
+    } catch (Exception ex) {
+        _logger.LogError(ex, "An error occurred while updating the profile picture of the connected user.");
+        return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+    }
+}
 }
 

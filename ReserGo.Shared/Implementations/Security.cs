@@ -98,6 +98,8 @@ namespace ReserGo.Shared.Implementations {
         }
 
         public bool VerifyPassword(string hashedPassword, string providedPassword) {
+            Console.WriteLine("password: " + HashPassword("SedarString123!"));
+            
             PasswordHasher<IdentityUser> hasher = new PasswordHasher<IdentityUser>();
             return hasher.VerifyHashedPassword(new IdentityUser(),
                 hashedPassword, providedPassword) == PasswordVerificationResult.Success;
