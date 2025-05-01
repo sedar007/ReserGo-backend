@@ -69,10 +69,6 @@ public class Program {
             //Image
             builder.Services.AddScoped<IImageService, ImageService>();
 
-            // Auth test
-            // builder.Services.AddScoped<IAuthDataAccess, AuthDataAccess>();
-            // builder.Services.AddScoped<IAuthService, AuthService>();
-
             // Add services to the cache memory.
             builder.Services.AddMemoryCache();
 
@@ -167,10 +163,10 @@ public class Program {
             }
 
             // Configure the HTTP request pipeline.
-            //if (app.Environment.IsDevelopment()) {
-            app.UseSwagger();
-            app.UseSwaggerUI();
-            //	}
+            if (app.Environment.IsDevelopment()) {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
             app.UseForwardedHeaders();
             app.UseHttpsRedirection();
             app.UseCors(Consts.CorsPolicy);
@@ -180,7 +176,7 @@ public class Program {
             app.Run();
         }
         catch (Exception e) {
-            logger.Error(e);
+            logger.Error(e.Message);
             throw;
         }
         finally {
