@@ -88,7 +88,7 @@ public class UserService : IUserService {
             
             _logger.LogInformation("User { id } retrieved successfully", user.Id);
             UserDto userDto = user.ToDto();
-            _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(30));
+            _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
             return userDto;
             
         } catch (Exception e) {
@@ -129,9 +129,9 @@ public class UserService : IUserService {
                 throw new InvalidDataException(errorMessage);
             }
             
-            _logger.LogInformation("User { id } retrieved successfully", user.Id);
+            _logger.LogInformation("User {id} retrieved successfully", user.Id);
             UserDto userDto = user.ToDto();
-            _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(30));
+            _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
             return userDto;
             
@@ -159,7 +159,7 @@ public class UserService : IUserService {
             _logger.LogInformation("User { id } retrieved successfully", user.Id);
             
             UserDto userDto = user.ToDto();
-            _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(30));
+            _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
             return userDto;
             
@@ -271,7 +271,7 @@ public class UserService : IUserService {
         
         if (oldPublicId is not null) {
             bool deleteResult = await _imageService.DeleteImage(oldPublicId);
-            if (deleteResult == false) {
+            if (!deleteResult) {
                 _logger.LogWarning("Failed to delete old image with publicId: {PublicId}", oldPublicId);
             }
         }
