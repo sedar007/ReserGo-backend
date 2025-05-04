@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
-using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.Common.Requests.Products;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
@@ -53,7 +53,7 @@ public class HotelController : ControllerBase {
     /// <response code="200">Hotel found and returned.</response>
     /// <response code="404">Hotel not found.</response>
     /// <response code="500">An unexpected error occurred.</response>
-    [HttpGet("getById/{id}")]
+    [HttpGet("getById/{Id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -61,6 +61,84 @@ public class HotelController : ControllerBase {
         try {
             var hotel = await _hotelService.GetById(id);
             return Ok(hotel);
+        }
+        catch (InvalidDataException ex) {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while retrieving the hotel.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+        }
+    }
+    
+    /// <summary>
+    /// Retrieve a hotel by their StayId.
+    /// </summary>
+    /// <param name="stayId">The StayId of the hotel.</param>
+    /// <returns>The hotel object.</returns>
+    /// <response code="200">Hotel found and returned.</response>
+    /// <response code="404">Hotel not found.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("getByStayId/{stayId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<HotelDto?>> GetByStayId(long stayId) {
+        try {
+            var hotel = await _hotelService.GetByStayId(stayId);
+            return Ok(hotel);
+        }
+        catch (InvalidDataException ex) {
+            return NotFound(ex.Message);
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while retrieving the hotel.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+        }
+    }
+    
+    /// <summary>
+    /// Update an existing hotel.
+    /// </summary>
+    /// <param name="request">The hotel update request.</param>
+    /// <returns>The updated hotel object.</returns>
+    /// <response code="200">Hotel updated successfully.</response>
+    /// <response code="400">Invalid request data.</response>
+    /// <response code="404">User not found.</response>
+    [HttpPut("{stayId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<UserDto>> Update(long stayId, HotelUpdateRequest request)
+    {
+        try {
+            var updatedUser = await _hotelService.Update(stayId, request);
+            return Ok(updatedUser);
+        }
+        catch (InvalidDataException ex) {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex) {
+            return NotFound(ex.Message);
+        }
+    }
+    
+    /// <summary>
+    /// Remove an hotel by their ID.
+    /// </summary>
+    /// <param name="id">The ID of the hotel to remove.</param>
+    /// <returns>No content if successful.</returns>
+    /// <response code="204">Hotel removed successfully.</response>
+    /// <response code="404">Hotel not found.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult> Delete(int id) {
+        try {
+            await _hotelService.Delete(id);
+            return NoContent();
         }
         catch (InvalidDataException ex) {
             return NotFound(ex.Message);
