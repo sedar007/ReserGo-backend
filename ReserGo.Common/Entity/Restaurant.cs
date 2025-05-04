@@ -5,8 +5,9 @@ public class Restaurant {
     public string Name { get; set; }
     public string CuisineType { get; set; }
     public int Capacity { get; set; } 
+    public string? Picture { get; set; }
     public IEnumerable<BookingRestaurant> BookingRestaurant { get; set; }
-    
     public int UserId { get; set; }
     public User User { get; set; } = null!;
+    public DateTime? LastUpdated { get; set; }
 }

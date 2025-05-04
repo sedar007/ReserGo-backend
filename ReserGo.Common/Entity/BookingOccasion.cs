@@ -10,4 +10,6 @@ public class BookingOccasion {
     
     public User User { get; set; }
     public Occasion Occasion { get; set; }
+    
+    public DateTime? LastUpdated { get; set; }
 }

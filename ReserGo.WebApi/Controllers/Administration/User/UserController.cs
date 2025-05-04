@@ -5,6 +5,7 @@ using ReserGo.Shared.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.User;
 using ReserGo.Common.Security;
+using ReserGo.WebAPI.Attributes;
 
 namespace ReserGo.WebAPI.Controllers.Administration.User;
    
@@ -57,6 +58,7 @@ public class UserController : ControllerBase {
     /// <response code="200">User found and returned.</response>
     /// <response code="404">User not found.</response>
     /// <response code="500">An unexpected error occurred.</response>
+    [AdminOnly]
     [HttpGet("getById/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -83,6 +85,7 @@ public class UserController : ControllerBase {
     /// <response code="204">User removed successfully.</response>
     /// <response code="404">User not found.</response>
     /// <response code="500">An unexpected error occurred.</response>
+    [AdminOnly]
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

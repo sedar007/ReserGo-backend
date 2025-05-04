@@ -11,4 +11,6 @@ public class BookingRestaurant {
     
     public User User { get; set; }
     public Restaurant Restaurant { get; set; }
+    
+    public DateTime? LastUpdated { get; set; }
 }
