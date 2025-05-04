@@ -9,7 +9,9 @@ public static class HotelHelper {
             Id = hotel.Id,
             Name = hotel.Name,
             Location = hotel.Location,
-            Capacity = hotel.Capacity
+            Capacity = hotel.Capacity,
+            Picture =  hotel.Picture,
+            LastUpdated = hotel.LastUpdated
         };
     }
 }
