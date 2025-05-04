@@ -1,12 +1,15 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products;
+using ReserGo.WebAPI.Attributes;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
 [ApiController]
 [Tags("Products | Hotel")] 
+[AdminOnly]
 [Route("api/administration/products/hotels/")]
 public class HotelController : ControllerBase {
     
