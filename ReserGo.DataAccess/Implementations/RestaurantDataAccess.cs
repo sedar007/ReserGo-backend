@@ -1,0 +1,30 @@
+﻿using Microsoft.EntityFrameworkCore;
+using ReserGo.Common.Entity;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using ReserGo.DataAccess.Interfaces;
+
+namespace ReserGo.DataAccess.Implementations;
+
+public class RestaurantDataAccess : IRestaurantDataAccess {
+    
+    private readonly ReserGoContext _context;
+    
+    public RestaurantDataAccess(ReserGoContext context) {
+        _context = context;
+    }
+
+    public async Task<Restaurant?> GetById(int id) {
+        return await _context.Restaurant.FirstOrDefaultAsync(x => x.Id ==  id);
+    }
+    
+    public async Task<Restaurant?> GetByStayId(long stayId) {
+        return await _context.Restaurant.FirstOrDefaultAsync(x => x.StayId ==  stayId);
+    }
+    
+    public async Task<Restaurant> Create(Restaurant restaurant) {
+        EntityEntry<Restaurant> newData = _context.Restaurant.Add(restaurant);
+        await _context.SaveChangesAsync();
+        return await GetByStayId(newData.Entity.StayId) ?? throw new NullReferenceException("Error creating new Restaurant.");
+    }
+}
+

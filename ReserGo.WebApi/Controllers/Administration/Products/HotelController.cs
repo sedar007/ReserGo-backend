@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products;
+using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.WebAPI.Attributes;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;

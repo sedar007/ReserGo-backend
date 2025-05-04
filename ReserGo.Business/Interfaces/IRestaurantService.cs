@@ -1,0 +1,10 @@
+using ReserGo.Common.DTO;
+using ReserGo.Common.Requests.Products.Restaurant;
+
+namespace ReserGo.Business.Interfaces;
+
+public interface IRestaurantService {
+    Task<RestaurantDto?> GetById(int id);
+    Task<RestaurantDto?> GetByStayId(long stayId);
+    Task<RestaurantDto> Create(RestaurantCreationRequest request);
+}

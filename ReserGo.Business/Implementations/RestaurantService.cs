@@ -5,37 +5,36 @@ using ReserGo.Business.Validator;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
-using ReserGo.Common.Requests.Products;
-using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.Common.Requests.Products.Restaurant;
 using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared.Interfaces;
 
 namespace ReserGo.Business.Implementations;
-public class HotelService : IHotelService {
+public class RestaurantService : IRestaurantService {
     
     private readonly ILogger<UserService> _logger;
     private readonly ISecurity _security;
     private readonly IImageService _imageService;
-    private readonly IHotelDataAccess _hotelDataAccess;
+    private readonly IRestaurantDataAccess _restaurantDataAccess;
     
-    public HotelService(ILogger<UserService> logger, IHotelDataAccess hotelDataAccess, ISecurity security, IImageService imageService) {
+    public RestaurantService(ILogger<UserService> logger, IRestaurantDataAccess restaurantDataAccess, ISecurity security, IImageService imageService) {
         _logger = logger;
         _security = security;
         _imageService = imageService;
-        _hotelDataAccess = hotelDataAccess;
+        _restaurantDataAccess = restaurantDataAccess;
     }
     
-    public async Task<HotelDto> Create(HotelCreationRequest request) {
+    public async Task<RestaurantDto> Create(RestaurantCreationRequest request) {
         try {
-            Hotel? hotel = await _hotelDataAccess.GetByStayId(request.StayId);
-            if (hotel is not null) {
-                string errorMessage = "This hotel already exists.";
+            Restaurant? restaurant = await _restaurantDataAccess.GetByStayId(request.StayId);
+            if (restaurant is not null) {
+                string errorMessage = "This restaurant already exists.";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
             
-            string error = HotelValidator.GetError(request);
+            string error = RestaurantValidator.GetError(request);
             if (string.IsNullOrEmpty(error) == false) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
@@ -44,38 +43,18 @@ public class HotelService : IHotelService {
             ConnectedUser connectedUser = _security.GetCurrentUser();
             if(connectedUser == null) throw new UnauthorizedAccessException("User not connected");
             
-            Hotel newHotel = new Hotel {
-                Name = request.Name,
-                Location = request.Location,
-                Capacity = request.Capacity,
-                StayId = request.StayId,
-                Picture = (request.File != null) ? await _imageService.UploadImage(request.File, connectedUser.UserId):  null,
-                UserId = connectedUser.UserId
+            Restaurant newRestaurant = new Restaurant {
+               Name = request.Name,
+               Capacity = request.Capacity,
+               CuisineType = request.CuisineType,
+               StayId = request.StayId,
+               Picture = (request.File != null) ? await _imageService.UploadImage(request.File, connectedUser.UserId):  null
             };
             
-            newHotel = await _hotelDataAccess.Create(newHotel);
+            newRestaurant = await _restaurantDataAccess.Create(newRestaurant);
             
-            _logger.LogInformation("Hotel { id } created", newHotel.Id);
-            return newHotel.ToDto();
-            
-        } catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
-    }
-    
-    public async Task<HotelDto?> GetById(int id) {
-        try {
-            Hotel? hotel = await _hotelDataAccess.GetById(id);
-            if (hotel is null) {
-                string errorMessage = "This hotel does not exist.";
-                _logger.LogError(errorMessage);
-                throw new InvalidDataException(errorMessage);
-            }
-            
-            _logger.LogInformation("Hotel { Id } retrieved successfully", hotel.Id);
-            HotelDto hotelDto = hotel.ToDto();
-            return hotelDto;
+            _logger.LogInformation("Restaurant { id } created", newRestaurant.Id);
+            return newRestaurant.ToDto();
             
         } catch (Exception e) {
             _logger.LogError(e, e.Message);
@@ -83,18 +62,37 @@ public class HotelService : IHotelService {
         }
     }
     
-    public async Task<HotelDto?> GetByStayId(long stayId) {
+    public async Task<RestaurantDto?> GetById(int id) {
         try {
-            Hotel? hotel = await _hotelDataAccess.GetByStayId(stayId);
-            if (hotel is null) {
-                string errorMessage = "This hotel does not exist.";
+            Restaurant? restaurant = await _restaurantDataAccess.GetById(id);
+            if (restaurant is null) {
+                string errorMessage = "This restaurant does not exist.";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
             
-            _logger.LogInformation("Hotel { stayId } retrieved successfully", hotel.StayId);
-            HotelDto hotelDto = hotel.ToDto();
-            return hotelDto;
+            _logger.LogInformation("Restaurant { Id } retrieved successfully", restaurant.Id);
+            RestaurantDto restaurantDto = restaurant.ToDto();
+            return restaurantDto;
+            
+        } catch (Exception e) {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
+    
+    public async Task<RestaurantDto?> GetByStayId(long stayId) {
+        try {
+            Restaurant? restaurant = await _restaurantDataAccess.GetByStayId(stayId);
+            if (restaurant is null) {
+                string errorMessage = "This restaurant does not exist.";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+            
+            _logger.LogInformation("Restaurant { stayId } retrieved successfully", restaurant.StayId);
+            RestaurantDto restaurantDto = restaurant.ToDto();
+            return restaurantDto;
             
         } catch (Exception e) {
             _logger.LogError(e, e.Message);
@@ -102,7 +100,7 @@ public class HotelService : IHotelService {
         }
     }
 
-    public async Task<HotelDto> Update(long stayId, HotelUpdateRequest request) {
+    /*public async Task<HotelDto> Update(long stayId, HotelUpdateRequest request) {
         try {
             Hotel? hotel = await _hotelDataAccess.GetByStayId(stayId);
             if (hotel is null) throw new Exception("Hotel not found");
@@ -160,5 +158,5 @@ public class HotelService : IHotelService {
             _logger.LogError(e, e.Message);
             throw;
         }
-    }
+    }*/
 }

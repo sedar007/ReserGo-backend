@@ -1,0 +1,11 @@
+using Microsoft.AspNetCore.Http;
+
+namespace ReserGo.Common.Requests.Products.Hotel;
+
+public class HotelCreationRequest {
+    public string Name { get; init; }
+    public string Location { get; init; }
+    public IFormFile? File { get; init; }
+    public int Capacity { get; init; }
+    public long StayId { get; init; }
+}
