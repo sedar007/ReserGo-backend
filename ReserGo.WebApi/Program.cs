@@ -80,6 +80,10 @@ public class Program {
             
             //Image
             builder.Services.AddScoped<IImageService, ImageService>();
+            
+            // Hotel Offer
+            builder.Services.AddScoped<IHotelOfferDataAccess, HotelOfferDataAccess>();
+            builder.Services.AddScoped<IHotelOfferService, HotelOfferService>();
 
             // Add services to the cache memory.
             builder.Services.AddMemoryCache();
