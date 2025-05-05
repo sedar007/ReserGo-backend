@@ -6,6 +6,7 @@ using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
 using ReserGo.Common.Requests.Products;
+using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared.Interfaces;
