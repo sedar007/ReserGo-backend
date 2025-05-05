@@ -48,7 +48,7 @@ public class HotelService : IHotelService {
                 Location = request.Location,
                 Capacity = request.Capacity,
                 StayId = request.StayId,
-                Picture = (request.File != null) ? await _imageService.UploadImage(request.File, connectedUser.UserId):  null,
+                Picture = (request.Picture != null) ? await _imageService.UploadImage(request.Picture, connectedUser.UserId):  null,
                 UserId = connectedUser.UserId
             };
             
@@ -117,12 +117,12 @@ public class HotelService : IHotelService {
             hotel.Capacity = request.Capacity;
             hotel.LastUpdated = DateTime.UtcNow;
 
-            if (request.File != null) {
+            if (request.Picture != null) {
                 string? oldPublicId = hotel.Picture;
             
-                string? publicId = await _imageService.UploadImage(request.File, hotel.UserId);
+                string? publicId = await _imageService.UploadImage(request.Picture, hotel.UserId);
                 if(string.IsNullOrEmpty(publicId)) {
-                    _logger.LogWarning("Image upload failed for file: {FileName}", request.File.FileName);
+                    _logger.LogWarning("Image upload failed for file: {FileName}", request.Picture.FileName);
                     throw new InvalidDataException("Image upload failed.");
                 }
                 if (oldPublicId is not null) {
