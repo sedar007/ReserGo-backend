@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Security;
 
@@ -13,6 +14,7 @@ namespace ReserGo.DataAccess;
 	    public DbSet<Occasion> Occasion { get; set; }
 	    public DbSet<Restaurant> Restaurant { get; set; }
 	    public DbSet<HotelOffer> HotelOffer { get; set; }
+	    public DbSet<RestaurantOffer> RestaurantOffer { get; set; }
 	    public DbSet<BookingHotel> BookingHotel { get; set; }
 	    public DbSet<BookingOccasion> BookingOccasion { get; set; }
 	    public DbSet<BookingRestaurant> BookingRestaurant { get; set; }
@@ -93,6 +95,13 @@ namespace ReserGo.DataAccess;
 				.WithOne(ho => ho.User)
 				.HasForeignKey(ho => ho.UserId)
 				.OnDelete(DeleteBehavior.Cascade);
+			
+			// Config relation User-RestaurantOffer
+			modelBuilder.Entity<User>()
+				.HasMany(u => u.RestaurantOffers)
+				.WithOne(ro => ro.User)
+				.HasForeignKey(ro => ro.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
 
 			// Config Hotel, Occasion, Restaurant
 			modelBuilder.Entity<Hotel>()
@@ -136,6 +145,15 @@ namespace ReserGo.DataAccess;
 				.HasOne(ho => ho.Hotel)
 				.WithMany(h => h.HotelOffers)
 				.HasForeignKey(ho => ho.HotelId)
+				.OnDelete(DeleteBehavior.Cascade);
+			
+			// Config RestaurantOffer
+			modelBuilder.Entity<RestaurantOffer>()
+				.HasKey(ro => ro.Id);
+			modelBuilder.Entity<RestaurantOffer>()
+				.HasOne(ro => ro.Restaurant)
+				.WithMany(r => r.RestaurantOffers)
+				.HasForeignKey(ro => ro.RestaurantId)
 				.OnDelete(DeleteBehavior.Cascade);
 			
 			// BookingOccasion

@@ -378,6 +378,51 @@ namespace ReserGo.DataAccess.Migrations
                     b.ToTable("Restaurant");
                 });
 
+            modelBuilder.Entity("ReserGo.Common.Entity.RestaurantOffer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("NumberOfGuests")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("OfferEndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("OfferStartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OfferTitle")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<double?>("PricePerPerson")
+                        .HasColumnType("double precision");
+
+                    b.Property<int>("RestaurantId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RestaurantId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RestaurantOffer");
+                });
+
             modelBuilder.Entity("ReserGo.Common.Entity.User", b =>
                 {
                     b.Property<int>("Id")
@@ -548,6 +593,25 @@ namespace ReserGo.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ReserGo.Common.Entity.RestaurantOffer", b =>
+                {
+                    b.HasOne("ReserGo.Common.Entity.Restaurant", "Restaurant")
+                        .WithMany("RestaurantOffers")
+                        .HasForeignKey("RestaurantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ReserGo.Common.Entity.User", "User")
+                        .WithMany("RestaurantOffers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Restaurant");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("ReserGo.Common.Entity.User", b =>
                 {
                     b.HasOne("ReserGo.Common.Entity.Address", "Address")
@@ -579,6 +643,8 @@ namespace ReserGo.DataAccess.Migrations
             modelBuilder.Entity("ReserGo.Common.Entity.Restaurant", b =>
                 {
                     b.Navigation("BookingRestaurant");
+
+                    b.Navigation("RestaurantOffers");
                 });
 
             modelBuilder.Entity("ReserGo.Common.Entity.User", b =>
@@ -597,6 +663,8 @@ namespace ReserGo.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Occasions");
+
+                    b.Navigation("RestaurantOffers");
 
                     b.Navigation("Restaurants");
                 });
