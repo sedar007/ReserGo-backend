@@ -19,14 +19,16 @@ public class HotelOfferService : IHotelOfferService {
     private readonly ILogger<UserService> _logger;
     private readonly ISecurity _security;
     private readonly IImageService _imageService;
+    private readonly IHotelService _hotelService;
     private readonly IHotelOfferDataAccess _hotelOfferDataAccess;
     private readonly IMemoryCache _cache;
 
-    public HotelOfferService(ILogger<UserService> logger, IHotelOfferDataAccess hotelOfferDataAccess, ISecurity security, IImageService imageService, IMemoryCache cache) {
+    public HotelOfferService(ILogger<UserService> logger, IHotelOfferDataAccess hotelOfferDataAccess, IHotelService hotelService, ISecurity security, IImageService imageService, IMemoryCache cache) {
         _logger = logger;
         _security = security;
         _imageService = imageService;
         _hotelOfferDataAccess = hotelOfferDataAccess;
+        _hotelService = hotelService;
         _cache = cache;
     }
     
@@ -42,6 +44,13 @@ public class HotelOfferService : IHotelOfferService {
             ConnectedUser? connectedUser = _security.GetCurrentUser();
             if(connectedUser == null) throw new UnauthorizedAccessException("User not connected");
             
+            HotelDto? hotel = await _hotelService.GetById(request.HotelId);
+            if (hotel == null) {
+                string errorMessage = "Hotel not found";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+            
             HotelOffer newHotelOffer = new HotelOffer {
                 OfferTitle = request.OfferTitle,
                 Description = request.Description,
@@ -51,7 +60,7 @@ public class HotelOfferService : IHotelOfferService {
                 OfferStartDate = request.OfferStartDate,
                 OfferEndDate = request.OfferEndDate,
                 IsActive = request.IsActive,
-                HotelId = request.HotelId,
+                HotelId = hotel.Id,
                 UserId = connectedUser.UserId
             };
             

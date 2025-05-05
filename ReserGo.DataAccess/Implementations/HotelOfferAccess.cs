@@ -14,11 +14,15 @@ public class HotelOfferDataAccess : IHotelOfferDataAccess {
     }
 
     public async Task<HotelOffer?> GetById(int id) {
-        return await _context.HotelOffer.FirstOrDefaultAsync(x => x.Id ==  id);
+        return await _context.HotelOffer.
+            Include(h => h.Hotel).
+            FirstOrDefaultAsync(x => x.Id ==  id);
     }
     
     public async Task<IEnumerable<HotelOffer>> GetHotelsOfferByUserId(int userId) {
-        return await _context.HotelOffer.Where(x => x.UserId ==  userId).ToListAsync();
+        return await _context.HotelOffer.Where(x => x.UserId ==  userId).
+            Include(h => h.Hotel).
+            ToListAsync();
     }
     
     public async Task<HotelOffer> Create(HotelOffer user) {
