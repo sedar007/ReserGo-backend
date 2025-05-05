@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 using ReserGo.Business.Interfaces;
@@ -8,17 +9,21 @@ using ReserGo.Common.Helper;
 using ReserGo.Common.Requests.Products.Restaurant;
 using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared;
 using ReserGo.Shared.Interfaces;
 
 namespace ReserGo.Business.Implementations;
+
 public class RestaurantService : IRestaurantService {
     
-    private readonly ILogger<UserService> _logger;
     private readonly ISecurity _security;
+    private readonly IMemoryCache _cache;
+    private readonly ILogger<UserService> _logger;
     private readonly IImageService _imageService;
     private readonly IRestaurantDataAccess _restaurantDataAccess;
     
-    public RestaurantService(ILogger<UserService> logger, IRestaurantDataAccess restaurantDataAccess, ISecurity security, IImageService imageService) {
+    public RestaurantService(IMemoryCache cache, ILogger<UserService> logger, IRestaurantDataAccess restaurantDataAccess, ISecurity security, IImageService imageService) {
+        _cache = cache;
         _logger = logger;
         _security = security;
         _imageService = imageService;
@@ -35,21 +40,21 @@ public class RestaurantService : IRestaurantService {
             }
             
             string error = RestaurantValidator.GetError(request);
-            if (string.IsNullOrEmpty(error) == false) {
+            if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
 
             ConnectedUser connectedUser = _security.GetCurrentUser();
-            if(connectedUser == null) throw new UnauthorizedAccessException("User not connected");
+            if (connectedUser == null) throw new UnauthorizedAccessException("User not connected");
             
             Restaurant newRestaurant = new Restaurant {
-               Name = request.Name,
-               Capacity = request.Capacity,
-               CuisineType = request.CuisineType,
-               StayId = request.StayId,
-               UserId = connectedUser.UserId,
-               Picture = (request.File != null) ? await _imageService.UploadImage(request.File, connectedUser.UserId):  null
+                Name = request.Name,
+                Capacity = request.Capacity,
+                CuisineType = request.CuisineType,
+                StayId = request.StayId,
+                UserId = connectedUser.UserId,
+                Picture = request.File != null ? await _imageService.UploadImage(request.File, connectedUser.UserId) : null
             };
             
             newRestaurant = await _restaurantDataAccess.Create(newRestaurant);
@@ -64,17 +69,24 @@ public class RestaurantService : IRestaurantService {
     
     public async Task<RestaurantDto?> GetById(int id) {
         try {
+            string cacheKey = $"Restaurant_GetById_{id}";
+
+            if (_cache.TryGetValue(cacheKey, out RestaurantDto? cachedRestaurant)) {
+                _logger.LogInformation("Returning cached restaurant for ID: {Id}", id);
+                return cachedRestaurant;
+            }
+
             Restaurant? restaurant = await _restaurantDataAccess.GetById(id);
             if (restaurant is null) {
                 string errorMessage = "This restaurant does not exist.";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
-            
-            _logger.LogInformation("Restaurant { Id } retrieved successfully", restaurant.Id);
+
+            _logger.LogInformation("Restaurant {Id} retrieved successfully", restaurant.Id);
             RestaurantDto restaurantDto = restaurant.ToDto();
+            _cache.Set(cacheKey, restaurantDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
             return restaurantDto;
-            
         } catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
@@ -83,17 +95,24 @@ public class RestaurantService : IRestaurantService {
     
     public async Task<RestaurantDto?> GetByStayId(long stayId) {
         try {
+            string cacheKey = $"Restaurant_GetByStayId_{stayId}";
+
+            if (_cache.TryGetValue(cacheKey, out RestaurantDto? cachedRestaurant)) {
+                _logger.LogInformation("Returning cached restaurant for StayId: {StayId}", stayId);
+                return cachedRestaurant;
+            }
+
             Restaurant? restaurant = await _restaurantDataAccess.GetByStayId(stayId);
             if (restaurant is null) {
                 string errorMessage = "This restaurant does not exist.";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
-            
-            _logger.LogInformation("Restaurant { stayId } retrieved successfully", restaurant.StayId);
+
+            _logger.LogInformation("Restaurant {StayId} retrieved successfully", restaurant.StayId);
             RestaurantDto restaurantDto = restaurant.ToDto();
+            _cache.Set(cacheKey, restaurantDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
             return restaurantDto;
-            
         } catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
@@ -106,7 +125,7 @@ public class RestaurantService : IRestaurantService {
             if (restaurant is null) throw new Exception("Restaurant not found");
 
             string error = RestaurantValidator.GetError(request);
-            if (string.IsNullOrEmpty(error) == false) {
+            if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
@@ -118,31 +137,46 @@ public class RestaurantService : IRestaurantService {
 
             if (request.File != null) {
                 string? oldPublicId = restaurant.Picture;
-            
+
                 string? publicId = await _imageService.UploadImage(request.File, restaurant.UserId);
-                if(string.IsNullOrEmpty(publicId)) {
+                if (string.IsNullOrEmpty(publicId)) {
                     _logger.LogWarning("Image upload failed for file: {FileName}", request.File.FileName);
                     throw new InvalidDataException("Image upload failed.");
                 }
+
                 if (oldPublicId is not null) {
                     bool deleteResult = await _imageService.DeleteImage(oldPublicId);
                     if (!deleteResult) {
                         _logger.LogWarning("Failed to delete old image with publicId: {PublicId}", oldPublicId);
                     }
                 }
+
                 restaurant.Picture = publicId;
             }
-            
-            _logger.LogInformation("Restaurant { stayId } updated successfully", restaurant.StayId);
+
+            _logger.LogInformation("Restaurant {StayId} updated successfully", restaurant.StayId);
             await _restaurantDataAccess.Update(restaurant);
+
+            // Invalidate cache
+            RemoveCache(restaurant.Id, restaurant.StayId);
+
             return restaurant.ToDto();
-            
-        }catch (Exception e) {
+        } catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
         }
     }
-    
+
+    public async Task<IEnumerable<RestaurantDto>> GetRestaurantsByUserId(int userId) {
+        try {
+            IEnumerable<Restaurant> restaurants = await _restaurantDataAccess.GetRestaurantsByUserId(userId);
+            return restaurants.Select(hotel => hotel.ToDto());
+        } catch (Exception e) {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
+
     public async Task Delete(int id) {
         try {
             Restaurant? restaurant = await _restaurantDataAccess.GetById(id);
@@ -151,12 +185,21 @@ public class RestaurantService : IRestaurantService {
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
+
             await _restaurantDataAccess.Delete(restaurant);
-            _logger.LogInformation("Restaurant { id } deleted successfully", restaurant.Id);
-            
+
+            // Invalidate cache
+            RemoveCache(restaurant.Id, restaurant.StayId);
+
+            _logger.LogInformation("Restaurant {Id} deleted successfully", restaurant.Id);
         } catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
         }
+    }
+
+    private void RemoveCache(int id, long stayId) {
+        _cache.Remove($"Restaurant_GetById_{id}");
+        _cache.Remove($"Restaurant_GetByStayId_{stayId}");
     }
 }
