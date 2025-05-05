@@ -11,7 +11,7 @@ public static class StayIdValidator {
             _ => ""
         };
         if (String.IsNullOrEmpty(prefix)) return "Product unknown";
-        if(!stayIdRef.StartsWith(prefix))  return $"StayId must not start with {prefix}.";
+        if(!stayIdRef.StartsWith(prefix))  return $"StayId must start with {prefix}.";
         return "";
     }
 }

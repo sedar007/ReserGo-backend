@@ -48,11 +48,11 @@ public class RestaurantService : IRestaurantService {
                Capacity = request.Capacity,
                CuisineType = request.CuisineType,
                StayId = request.StayId,
+               UserId = connectedUser.UserId,
                Picture = (request.File != null) ? await _imageService.UploadImage(request.File, connectedUser.UserId):  null
             };
             
             newRestaurant = await _restaurantDataAccess.Create(newRestaurant);
-            
             _logger.LogInformation("Restaurant { id } created", newRestaurant.Id);
             return newRestaurant.ToDto();
             
@@ -100,26 +100,26 @@ public class RestaurantService : IRestaurantService {
         }
     }
 
-    /*public async Task<HotelDto> Update(long stayId, HotelUpdateRequest request) {
+    public async Task<RestaurantDto> Update(long stayId, RestaurantUpdateRequest request) {
         try {
-            Hotel? hotel = await _hotelDataAccess.GetByStayId(stayId);
-            if (hotel is null) throw new Exception("Hotel not found");
+            Restaurant? restaurant = await _restaurantDataAccess.GetByStayId(stayId);
+            if (restaurant is null) throw new Exception("Restaurant not found");
 
-            string error = HotelValidator.GetError(request);
+            string error = RestaurantValidator.GetError(request);
             if (string.IsNullOrEmpty(error) == false) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
 
-            hotel.Name = request.Name;
-            hotel.Location = request.Location;
-            hotel.Capacity = request.Capacity;
-            hotel.LastUpdated = DateTime.UtcNow;
+            restaurant.Name = request.Name;
+            restaurant.Capacity = request.Capacity;
+            restaurant.CuisineType = request.CuisineType;
+            restaurant.LastUpdated = DateTime.UtcNow;
 
             if (request.File != null) {
-                string? oldPublicId = hotel.Picture;
+                string? oldPublicId = restaurant.Picture;
             
-                string? publicId = await _imageService.UploadImage(request.File, hotel.UserId);
+                string? publicId = await _imageService.UploadImage(request.File, restaurant.UserId);
                 if(string.IsNullOrEmpty(publicId)) {
                     _logger.LogWarning("Image upload failed for file: {FileName}", request.File.FileName);
                     throw new InvalidDataException("Image upload failed.");
@@ -130,12 +130,12 @@ public class RestaurantService : IRestaurantService {
                         _logger.LogWarning("Failed to delete old image with publicId: {PublicId}", oldPublicId);
                     }
                 }
-                hotel.Picture = publicId;
+                restaurant.Picture = publicId;
             }
             
-            _logger.LogInformation("Hotel { stayId } updated successfully", hotel.StayId);
-            await _hotelDataAccess.Update(hotel);
-            return hotel.ToDto();
+            _logger.LogInformation("Restaurant { stayId } updated successfully", restaurant.StayId);
+            await _restaurantDataAccess.Update(restaurant);
+            return restaurant.ToDto();
             
         }catch (Exception e) {
             _logger.LogError(e, e.Message);
@@ -145,18 +145,18 @@ public class RestaurantService : IRestaurantService {
     
     public async Task Delete(int id) {
         try {
-            Hotel? hotel = await _hotelDataAccess.GetById(id);
-            if (hotel is null) {
-                string errorMessage = "Hotel not found";
+            Restaurant? restaurant = await _restaurantDataAccess.GetById(id);
+            if (restaurant is null) {
+                string errorMessage = "Restaurant not found";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
-            await _hotelDataAccess.Delete(hotel);
-            _logger.LogInformation("Hotel { id } deleted successfully", hotel.Id);
+            await _restaurantDataAccess.Delete(restaurant);
+            _logger.LogInformation("Restaurant { id } deleted successfully", restaurant.Id);
             
         } catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
         }
-    }*/
+    }
 }

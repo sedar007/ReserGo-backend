@@ -70,6 +70,10 @@ public class Program {
             builder.Services.AddScoped<IHotelDataAccess, HotelDataAccess>();
             builder.Services.AddScoped<IHotelService, HotelService>();
             
+            // Restaurant
+            builder.Services.AddScoped<IRestaurantDataAccess, RestaurantDataAccess>();
+            builder.Services.AddScoped<IRestaurantService, RestaurantService>();
+            
             //Image
             builder.Services.AddScoped<IImageService, ImageService>();
 

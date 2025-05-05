@@ -6,5 +6,6 @@ public class RestaurantUpdateRequest {
     public string Name { get; init; }
     public string Location { get; init; }
     public int Capacity { get; init; }
+    public string CuisineType { get; init; }
     public IFormFile? File { get; init; }
 }

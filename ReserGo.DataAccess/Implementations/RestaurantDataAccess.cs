@@ -26,5 +26,16 @@ public class RestaurantDataAccess : IRestaurantDataAccess {
         await _context.SaveChangesAsync();
         return await GetByStayId(newData.Entity.StayId) ?? throw new NullReferenceException("Error creating new Restaurant.");
     }
+    
+    public async Task<Restaurant> Update(Restaurant restaurant) {
+        _context.Restaurant.Update(restaurant);
+        await _context.SaveChangesAsync();
+        return restaurant;
+    }
+    
+    public async Task Delete(Restaurant restaurant) {
+        _context.Restaurant.Remove(restaurant);
+        await _context.SaveChangesAsync();
+    }
 }
 
