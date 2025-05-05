@@ -6,5 +6,5 @@ public class HotelUpdateRequest {
     public string Name { get; init; }
     public string Location { get; init; }
     public int Capacity { get; init; }
-    public IFormFile? File { get; init; }
+    public IFormFile? Picture { get; init; }
 }
