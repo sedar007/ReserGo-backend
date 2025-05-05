@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products.Restaurant;
+using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
@@ -13,10 +14,12 @@ namespace ReserGo.WebAPI.Controllers.Administration.Products;
 [Route("api/administration/products/restaurants/")]
 public class RestaurantController : ControllerBase {
     
+    private readonly ISecurity _security;
     private readonly ILogger<RestaurantController> _logger;
     private readonly IRestaurantService _restaurantService;
     
-    public RestaurantController(ILogger<RestaurantController> logger, IRestaurantService restaurantService) {
+    public RestaurantController(ISecurity security, ILogger<RestaurantController> logger, IRestaurantService restaurantService) {
+        _security = security;
         _logger = logger;
         _restaurantService = restaurantService;
     }
@@ -96,6 +99,33 @@ public class RestaurantController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving the Restaurant.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+        }
+    }
+    
+    /// <summary>
+    /// Retrieve restaurants for the connected user.
+    /// </summary>
+    /// <returns>A list of restaurants associated with the connected user.</returns>
+    /// <response code="200">Restaurants retrieved successfully.</response>
+    /// <response code="401">User not authenticated.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("my-restaurants")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<IEnumerable<HotelDto>>> GetRestaurantsForConnectedUser() {
+        try {
+            var connectedUser = _security.GetCurrentUser();
+            if (connectedUser == null) {
+                return Unauthorized("User not authenticated");
+            }
+
+            var hotels = await _restaurantService.GetRestaurantsByUserId(connectedUser.UserId);
+            return Ok(hotels);
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while retrieving restaurants for the connected user.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }

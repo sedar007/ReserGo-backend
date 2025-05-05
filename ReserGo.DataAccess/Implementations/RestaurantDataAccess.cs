@@ -20,6 +20,10 @@ public class RestaurantDataAccess : IRestaurantDataAccess {
     public async Task<Restaurant?> GetByStayId(long stayId) {
         return await _context.Restaurant.FirstOrDefaultAsync(x => x.StayId ==  stayId);
     }
+
+    public async Task<IEnumerable<Restaurant>> GetRestaurantsByUserId(int userId) {
+        return await _context.Restaurant.Where(x => x.UserId ==  userId).ToListAsync();
+    }
     
     public async Task<Restaurant> Create(Restaurant restaurant) {
         EntityEntry<Restaurant> newData = _context.Restaurant.Add(restaurant);

@@ -9,5 +9,6 @@ public interface IHotelService {
     Task<HotelDto?> GetByStayId(long stayId);
     Task<HotelDto> Create(HotelCreationRequest request);
     Task<HotelDto> Update(long stayId, HotelUpdateRequest request);
+    Task<IEnumerable<HotelDto>> GetHotelsByUserId(int userId);
     Task Delete(int id);
 }
