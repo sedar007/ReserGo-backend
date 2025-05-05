@@ -55,7 +55,8 @@ public class RestaurantService : IRestaurantService {
                 StayId = request.StayId,
                 UserId = connectedUser.UserId,
                 Location = request.Location,
-                Picture = request.File != null ? await _imageService.UploadImage(request.File, connectedUser.UserId) : null
+                LastUpdated = DateTime.UtcNow,
+                Picture = request.Picture != null ? await _imageService.UploadImage(request.Picture, connectedUser.UserId) : null
             };
             
             newRestaurant = await _restaurantDataAccess.Create(newRestaurant);
@@ -137,12 +138,12 @@ public class RestaurantService : IRestaurantService {
             restaurant.Location = request.Location;
             restaurant.LastUpdated = DateTime.UtcNow;
 
-            if (request.File != null) {
+            if (request.Picture != null) {
                 string? oldPublicId = restaurant.Picture;
 
-                string? publicId = await _imageService.UploadImage(request.File, restaurant.UserId);
+                string? publicId = await _imageService.UploadImage(request.Picture, restaurant.UserId);
                 if (string.IsNullOrEmpty(publicId)) {
-                    _logger.LogWarning("Image upload failed for file: {FileName}", request.File.FileName);
+                    _logger.LogWarning("Image upload failed for file: {FileName}", request.Picture.FileName);
                     throw new InvalidDataException("Image upload failed.");
                 }
 
@@ -187,8 +188,14 @@ public class RestaurantService : IRestaurantService {
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
-
+            string? oldPublicId = restaurant.Picture;
             await _restaurantDataAccess.Delete(restaurant);
+            if (oldPublicId is not null) {
+                bool deleteResult = await _imageService.DeleteImage(oldPublicId);
+                if (!deleteResult) {
+                    _logger.LogWarning("Failed to delete image with publicId: {PublicId}", oldPublicId);
+                }
+            }
 
             // Invalidate cache
             RemoveCache(restaurant.Id, restaurant.StayId);

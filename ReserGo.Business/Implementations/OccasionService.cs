@@ -54,7 +54,8 @@ public class OccasionService : IOccasionService {
                 Capacity = request.Capacity,
                 StayId = request.StayId,
                 Picture = request.Picture != null ? await _imageService.UploadImage(request.Picture, connectedUser.UserId) : null,
-                UserId = connectedUser.UserId
+                UserId = connectedUser.UserId,
+                LastUpdated = DateTime.UtcNow
             };
 
             newOccasion = await _occasionDataAccess.Create(newOccasion);
@@ -193,8 +194,14 @@ public class OccasionService : IOccasionService {
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
-
+            string? oldPublicId = occasion.Picture;
             await _occasionDataAccess.Delete(occasion);
+            if (oldPublicId is not null) {
+                bool deleteResult = await _imageService.DeleteImage(oldPublicId);
+                if (!deleteResult) {
+                    _logger.LogWarning("Failed to delete image with publicId: {PublicId}", oldPublicId);
+                }
+            }
 
             // Invalidate cache
             RemoveCache(occasion.Id, occasion.StayId);
