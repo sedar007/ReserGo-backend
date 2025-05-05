@@ -1,12 +1,12 @@
 namespace ReserGo.Common.Requests.Products.Occasion;
 
 public class OccasionOfferUpdateRequest {
-    public string OfferTitle { get; set; } = null!;
-    public string? Description { get; set; }
-    public double Price { get; set; }
-    public int NumberOfGuests { get; set; }
-    public DateTime OfferStartDate { get; set; }
-    public DateTime OfferEndDate { get; set; }
-    public bool IsActive { get; set; }
+    public String OfferTitle { get; init; } = null!;
+    public String? Description { get; init; }
+    public double Price { get; init; }
+    public int NumberOfGuests { get; init; }
+    public DateTime OfferStartDate { get; init; }
+    public DateTime OfferEndDate { get; init; }
+    public bool IsActive { get; init; }
    
 }
