@@ -8,7 +8,10 @@ public static class OccasionHelper {
             Id = occasion.Id,
             Name = occasion.Name,
             Capacity = occasion.Capacity,
-            Location = occasion.Location
+            Location = occasion.Location,
+            StayId = occasion.StayId,
+            Picture = occasion.Picture,
+            LastUpdated = occasion.LastUpdated
         };
     }
 }

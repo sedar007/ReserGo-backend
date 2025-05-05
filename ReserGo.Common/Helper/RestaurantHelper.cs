@@ -8,7 +8,10 @@ public static class RestaurantHelper {
             Id = restaurant.Id,
             Name = restaurant.Name,
             CuisineType = restaurant.CuisineType,
-            Capacity = restaurant.Capacity
+            Capacity = restaurant.Capacity,
+            StayId = restaurant.StayId,
+            Picture = restaurant.Picture,
+            LastUpdated = restaurant.LastUpdated
         };
     }
 }
