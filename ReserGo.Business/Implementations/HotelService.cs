@@ -82,6 +82,17 @@ public class HotelService : IHotelService {
             throw;
         }
     }
+
+    public async Task<IEnumerable<HotelDto>> GetHotelsByUserId(int userId) {
+        try {
+            IEnumerable<Hotel> hotels = await _hotelDataAccess.GetHotelsByUserId(userId);
+            return hotels.Select(hotel => hotel.ToDto());
+        }
+        catch (Exception e) {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
     
     public async Task<HotelDto?> GetByStayId(long stayId) {
         try {

@@ -20,6 +20,9 @@ public class HotelDataAccess : IHotelDataAccess {
     public async Task<Hotel?> GetByStayId(long stayId) {
         return await _context.Hotel.FirstOrDefaultAsync(x => x.StayId ==  stayId);
     }
+    public async Task<IEnumerable<Hotel>> GetHotelsByUserId(int userId) {
+        return await _context.Hotel.Where(x => x.UserId ==  userId).ToListAsync();
+    }
     
     public async Task<Hotel> Create(Hotel user) {
         EntityEntry<Hotel> newData = _context.Hotel.Add(user);

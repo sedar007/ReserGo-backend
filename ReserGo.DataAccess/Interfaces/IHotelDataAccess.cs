@@ -7,6 +7,7 @@ public interface IHotelDataAccess {
     Task<Hotel?> GetByStayId(long stayId);
     Task<Hotel> Create(Hotel hotel);
     Task<Hotel> Update(Hotel hotel);
+    Task<IEnumerable<Hotel>> GetHotelsByUserId(int userId);
     Task Delete(Hotel hotel);
 }
 

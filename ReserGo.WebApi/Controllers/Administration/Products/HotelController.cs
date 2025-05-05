@@ -3,6 +3,7 @@ using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.WebAPI.Attributes;
+using ReserGo.Shared.Interfaces;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
@@ -14,10 +15,12 @@ public class HotelController : ControllerBase {
     
     private readonly ILogger<HotelController> _logger;
     private readonly IHotelService _hotelService;
+    private readonly ISecurity _security;
 
-    public HotelController(ILogger<HotelController> logger, IHotelService hotelService) {
+    public HotelController(ILogger<HotelController> logger, IHotelService hotelService, ISecurity security) {
         _logger = logger;
         _hotelService = hotelService;
+        _security = security;
     }
     
     /// <summary>
@@ -97,6 +100,37 @@ public class HotelController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
+    
+    /// <summary>
+    /// Retrieve hotels for the connected user.
+    /// </summary>
+    /// <returns>A list of hotels associated with the connected user.</returns>
+    /// <response code="200">Hotels retrieved successfully.</response>
+    /// <response code="401">User not authenticated.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("my-hotels")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<IEnumerable<HotelDto>>> GetHotelsForConnectedUser() {
+        try {
+            var connectedUser = _security.GetCurrentUser();
+            if (connectedUser == null) {
+                return Unauthorized("User not authenticated");
+            }
+
+            var hotels = await _hotelService.GetHotelsByUserId(connectedUser.UserId);
+            return Ok(hotels);
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while retrieving hotels for the connected user.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+        }
+    }
+    
+ 
+    
+    
     
     /// <summary>
     /// Update an existing hotel.

@@ -11,7 +11,8 @@ public static class HotelHelper {
             Location = hotel.Location,
             Capacity = hotel.Capacity,
             Picture =  hotel.Picture,
-            LastUpdated = hotel.LastUpdated
+            LastUpdated = hotel.LastUpdated,
+            StayId = hotel.StayId
         };
     }
 }
