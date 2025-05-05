@@ -7,8 +7,6 @@ public static class OccasionHelper {
         return new OccasionDto {
             Id = occasion.Id,
             Name = occasion.Name,
-            StartDate = occasion.StartDate,
-            EndDate = occasion.EndDate,
             Capacity = occasion.Capacity,
             Location = occasion.Location
         };
