@@ -26,5 +26,6 @@ public class User {
     public virtual ICollection<Occasion> Occasions { get; set; } = new List<Occasion>();
     public virtual ICollection<HotelOffer> HotelOffers { get; set; } = new List<HotelOffer>();
     public virtual ICollection<RestaurantOffer> RestaurantOffers { get; set; } = new List<RestaurantOffer>();
+    public virtual ICollection<OccasionOffer> OccasionOffers { get; set; } = new List<OccasionOffer>();
     
 }

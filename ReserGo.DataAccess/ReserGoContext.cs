@@ -15,6 +15,8 @@ namespace ReserGo.DataAccess;
 	    public DbSet<Restaurant> Restaurant { get; set; }
 	    public DbSet<HotelOffer> HotelOffer { get; set; }
 	    public DbSet<RestaurantOffer> RestaurantOffer { get; set; }
+	    public DbSet<OccasionOffer> OccasionOffer { get; set; }
+	    
 	    public DbSet<BookingHotel> BookingHotel { get; set; }
 	    public DbSet<BookingOccasion> BookingOccasion { get; set; }
 	    public DbSet<BookingRestaurant> BookingRestaurant { get; set; }
@@ -102,6 +104,13 @@ namespace ReserGo.DataAccess;
 				.WithOne(ro => ro.User)
 				.HasForeignKey(ro => ro.UserId)
 				.OnDelete(DeleteBehavior.Cascade);
+			
+			// Config relation User-OccasionOffer
+			modelBuilder.Entity<User>()
+				.HasMany(u => u.OccasionOffers)
+				.WithOne(oo => oo.User)
+				.HasForeignKey(oo => oo.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
 
 			// Config Hotel, Occasion, Restaurant
 			modelBuilder.Entity<Hotel>()
@@ -154,6 +163,15 @@ namespace ReserGo.DataAccess;
 				.HasOne(ro => ro.Restaurant)
 				.WithMany(r => r.RestaurantOffers)
 				.HasForeignKey(ro => ro.RestaurantId)
+				.OnDelete(DeleteBehavior.Cascade);
+			
+			// Config OccasionOffer
+			modelBuilder.Entity<OccasionOffer>()
+				.HasKey(oo => oo.Id);
+			modelBuilder.Entity<OccasionOffer>()
+				.HasOne(oo => oo.Occasion)
+				.WithMany(o => o.OccasionOffers)
+				.HasForeignKey(oo => oo.OccasionId)
 				.OnDelete(DeleteBehavior.Cascade);
 			
 			// BookingOccasion

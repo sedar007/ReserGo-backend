@@ -1,15 +1,15 @@
 namespace ReserGo.Common.DTO;
 
-public class RestaurantOfferDto {
+public class OccasionOfferDto {
     public int Id { get; set; }
     public string OfferTitle { get; set; } = null!;
     public string? Description { get; set; }
-    public double? PricePerPerson { get; set; }
+    public double Price { get; set; }
     public int NumberOfGuests { get; set; }
     public DateTime OfferStartDate { get; set; }
     public DateTime OfferEndDate { get; set; }
     public bool IsActive { get; set; }
-    public int RestaurantId { get; set; }
-    public RestaurantDto Restaurant { get; set; } = null!;
+    public int OccasionId { get; set; }
+    public OccasionDto Occasion { get; set; } = null!;
    
 }
