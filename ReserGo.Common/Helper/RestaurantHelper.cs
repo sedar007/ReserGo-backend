@@ -7,6 +7,7 @@ public static class RestaurantHelper {
         return new RestaurantDto {
             Id = restaurant.Id,
             Name = restaurant.Name,
+            Location = restaurant.Location,
             CuisineType = restaurant.CuisineType,
             Capacity = restaurant.Capacity,
             StayId = restaurant.StayId,

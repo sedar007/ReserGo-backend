@@ -54,6 +54,7 @@ public class RestaurantService : IRestaurantService {
                 CuisineType = request.CuisineType,
                 StayId = request.StayId,
                 UserId = connectedUser.UserId,
+                Location = request.Location,
                 Picture = request.File != null ? await _imageService.UploadImage(request.File, connectedUser.UserId) : null
             };
             
@@ -133,6 +134,7 @@ public class RestaurantService : IRestaurantService {
             restaurant.Name = request.Name;
             restaurant.Capacity = request.Capacity;
             restaurant.CuisineType = request.CuisineType;
+            restaurant.Location = request.Location;
             restaurant.LastUpdated = DateTime.UtcNow;
 
             if (request.File != null) {
