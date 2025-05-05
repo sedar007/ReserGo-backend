@@ -64,16 +64,46 @@ namespace ReserGo.DataAccess;
 				.WithOne(a => a.User) // Relation One-to-One avec Address
 				.HasForeignKey<User>(u => u.AddressId)
 				.OnDelete(DeleteBehavior.Cascade);
+			
+			// Config relation User-Hotel
+			modelBuilder.Entity<User>()
+				.HasMany(u => u.Hotels)
+				.WithOne(h => h.User)
+				.HasForeignKey(h => h.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
+			
+			// Config relation User-Restaurant
+			modelBuilder.Entity<User>()
+				.HasMany(u => u.Restaurants)
+				.WithOne(r => r.User)
+				.HasForeignKey(r => r.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
+			
+			// Config relation User-Events
+			modelBuilder.Entity<User>()
+				.HasMany(u => u.Occasions)
+				.WithOne(r => r.User)
+				.HasForeignKey(r => r.UserId)
+				.OnDelete(DeleteBehavior.Cascade);
 
 			// Config Hotel, Occasion, Restaurant
 			modelBuilder.Entity<Hotel>()
 				.HasKey(h => h.Id);
+			modelBuilder.Entity<Hotel>()
+				.HasIndex(h => h.StayId)
+				.IsUnique(); 
 			
 			modelBuilder.Entity<Occasion>()
 				.HasKey(o => o.Id);
+			modelBuilder.Entity<Occasion>()
+				.HasIndex(o => o.StayId)
+				.IsUnique();
 			
 			modelBuilder.Entity<Restaurant>()
 				.HasKey(r => r.Id);
+			modelBuilder.Entity<Restaurant>()
+				.HasIndex(r => r.StayId)
+				.IsUnique();
 			
 			// Config Bookings 
 			

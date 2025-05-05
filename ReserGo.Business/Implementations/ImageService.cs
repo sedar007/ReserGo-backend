@@ -34,13 +34,13 @@ namespace ReserGo.Business.Implementations {
 
         public async Task<string?> UploadImage(IFormFile file, int userId) {
             _logger.LogInformation("Uploading image with file name: {FileName}", file.FileName);
-            string? url = await _cloudinary.UploadImage(file, userId);
-            if (url == null) {
+            string? publicId = await _cloudinary.UploadImage(file, userId);
+            if (publicId == null) {
                 _logger.LogWarning("Image upload failed for file: {FileName}", file.FileName);
             } else {
-                _logger.LogInformation("Image uploaded successfully. URL: {Url}", url);
+                _logger.LogInformation("Image uploaded successfully. URL: {Url}", publicId);
             }
-            return url;
+            return await _cloudinary.GetPicture(publicId);
         }
         public async Task<bool> DeleteImage(string publicId) {
             _logger.LogInformation("Deleting image with publicId: {PublicId}", publicId);

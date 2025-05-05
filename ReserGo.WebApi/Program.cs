@@ -66,6 +66,18 @@ public class Program {
             builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
             builder.Services.AddScoped<IGoogleService, GoogleService>();
             
+            // Hotel
+            builder.Services.AddScoped<IHotelDataAccess, HotelDataAccess>();
+            builder.Services.AddScoped<IHotelService, HotelService>();
+            
+            // Restaurant
+            builder.Services.AddScoped<IRestaurantDataAccess, RestaurantDataAccess>();
+            builder.Services.AddScoped<IRestaurantService, RestaurantService>();
+            
+            // Occasion
+            builder.Services.AddScoped<IOccasionDataAccess, OccasionDataAccess>();
+            builder.Services.AddScoped<IOccasionService, OccasionService>();
+            
             //Image
             builder.Services.AddScoped<IImageService, ImageService>();
 

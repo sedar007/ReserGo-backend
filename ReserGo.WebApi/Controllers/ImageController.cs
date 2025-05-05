@@ -1,8 +1,10 @@
 using ReserGo.Business.Interfaces;
 using ReserGo.Shared.Interfaces;
+using ReserGo.Common.Security;
 
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+
 
 namespace ReserGo.WebAPI.Controllers {
 
@@ -12,10 +14,12 @@ namespace ReserGo.WebAPI.Controllers {
 
         private readonly IImageService _imageService;
         private readonly ILogger<ImageController> _logger;
+        private readonly ISecurity _security;
 
-        public ImageController(ILogger<ImageController> logger, IImageService imageService) {
+        public ImageController(ILogger<ImageController> logger, IImageService imageService, ISecurity security) {
             _logger = logger;
             _imageService = imageService;
+            _security = security;
         }
 
         /// <summary>
@@ -64,7 +68,52 @@ namespace ReserGo.WebAPI.Controllers {
                     _logger.LogWarning("Image upload failed for file: {FileName}", file.FileName);
                     return StatusCode(StatusCodes.Status500InternalServerError, "Image upload failed.");
                 }
-                return Ok(new { publicId = uploadResult });
+                return Ok(new { url = uploadResult });
+            } catch (Exception e) {
+                _logger.LogError(e, "Error uploading image for file: {FileName}", file.FileName);
+                return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
+            }
+        }
+        
+        /// <summary>
+        /// Uploads an image and returns its URL.
+        /// </summary>
+        /// <param name="file">The image file to upload.</param>
+        /// <returns>The URL of the uploaded image.</returns>
+        [HttpPost ("upload")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> UploadImage(IFormFile? file)
+        {
+            if (file == null || file.Length == 0) {
+                _logger.LogWarning("No file sent for upload.");
+                return BadRequest("No file sent.");
+            }
+            
+            var allowedContentTypes = new[] { "image/jpeg", "image/png", "image/gif" };
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+
+            if (!allowedContentTypes.Contains(file.ContentType.ToLower()) || 
+                !allowedExtensions.Contains(Path.GetExtension(file.FileName).ToLower())) {
+                _logger.LogWarning("Invalid file type: {FileName}", file.FileName);
+                return BadRequest("Only image files (JPEG, PNG, GIF) are allowed.");
+            }
+            
+
+            try {
+                ConnectedUser? currentUser = _security.GetCurrentUser();
+                if (currentUser == null) {
+                    _logger.LogWarning("Unauthorized access attempt.");
+                    return Unauthorized("User not authenticated.");
+                }
+                string? uploadResult = await _imageService.UploadImage(file, currentUser.UserId);
+                if (string.IsNullOrEmpty(uploadResult)) {
+                    _logger.LogWarning("Image upload failed for file: {FileName}", file.FileName);
+                    return StatusCode(StatusCodes.Status500InternalServerError, "Image upload failed.");
+                }
+                return Ok(new { url = uploadResult });
             } catch (Exception e) {
                 _logger.LogError(e, "Error uploading image for file: {FileName}", file.FileName);
                 return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");

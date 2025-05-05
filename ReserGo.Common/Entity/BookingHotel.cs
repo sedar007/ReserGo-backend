@@ -11,4 +11,6 @@ public class BookingHotel {
     public int NumberOfGuests { get; set; }
     public Hotel Hotel { get; set; }
     public User User { get; set; }
+    
+    public DateTime? LastUpdated { get; set; }
 }
