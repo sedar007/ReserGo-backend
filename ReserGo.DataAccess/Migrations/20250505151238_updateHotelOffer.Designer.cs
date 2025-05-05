@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReserGo.DataAccess;
@@ -11,9 +12,11 @@ using ReserGo.DataAccess;
 namespace ReserGo.DataAccess.Migrations
 {
     [DbContext(typeof(ReserGoContext))]
-    partial class ReserGoContextModelSnapshot : ModelSnapshot
+    [Migration("20250505151238_updateHotelOffer")]
+    partial class updateHotelOffer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,7 +222,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
-                    b.Property<int>("HotelId")
+                    b.Property<int>("HotelStayId")
                         .HasColumnType("integer");
 
                     b.Property<bool>("IsActive")
@@ -249,7 +252,7 @@ namespace ReserGo.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("HotelId");
+                    b.HasIndex("HotelStayId");
 
                     b.HasIndex("UserId");
 
@@ -500,7 +503,7 @@ namespace ReserGo.DataAccess.Migrations
                 {
                     b.HasOne("ReserGo.Common.Entity.Hotel", "Hotel")
                         .WithMany("HotelOffers")
-                        .HasForeignKey("HotelId")
+                        .HasForeignKey("HotelStayId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
