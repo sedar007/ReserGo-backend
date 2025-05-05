@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products.Occasion;
+using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
@@ -14,9 +15,11 @@ public class OccasionController : ControllerBase {
     
     private readonly ILogger<OccasionController> _logger;
     private readonly IOccasionService _occasionService;
+    private readonly ISecurity _security;
 
-    public OccasionController(ILogger<OccasionController> logger, IOccasionService occasionService) {
+    public OccasionController(ILogger<OccasionController> logger, IOccasionService occasionService, ISecurity security) {
         _logger = logger;
+        _security = security;
         _occasionService = occasionService;
     }
     
@@ -94,6 +97,33 @@ public class OccasionController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving the occasion.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+        }
+    }
+    
+    /// <summary>
+    /// Retrieve occasions for the connected user.
+    /// </summary>
+    /// <returns>A list of occasions associated with the connected user.</returns>
+    /// <response code="200">Occasions retrieved successfully.</response>
+    /// <response code="401">User not authenticated.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("my-occasions")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<IEnumerable<OccasionDto>>> GetOccasionsForConnectedUser() {
+        try {
+            var connectedUser = _security.GetCurrentUser();
+            if (connectedUser == null) {
+                return Unauthorized("User not authenticated");
+            }
+
+            var hotels = await _occasionService.GetOccasionsByUserId(connectedUser.UserId);
+            return Ok(hotels);
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while retrieving occasions for the connected user.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }

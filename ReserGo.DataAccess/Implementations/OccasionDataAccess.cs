@@ -21,6 +21,10 @@ public class OccasionDataAccess : IOccasionDataAccess {
         return await _context.Occasion.FirstOrDefaultAsync(x => x.StayId ==  stayId);
     }
     
+    public async Task<IEnumerable<Occasion>> GetOccasionsByUserId(int userId) {
+        return await _context.Occasion.Where(x => x.UserId ==  userId).ToListAsync();
+    }
+    
     public async Task<Occasion> Create(Occasion user) {
         EntityEntry<Occasion> newData = _context.Occasion.Add(user);
         await _context.SaveChangesAsync();
