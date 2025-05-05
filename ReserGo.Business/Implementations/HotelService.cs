@@ -53,7 +53,8 @@ public class HotelService : IHotelService {
                 Capacity = request.Capacity,
                 StayId = request.StayId,
                 Picture = (request.Picture != null) ? await _imageService.UploadImage(request.Picture, connectedUser.UserId):  null,
-                UserId = connectedUser.UserId
+                UserId = connectedUser.UserId,
+                LastUpdated = DateTime.UtcNow
             };
             
             newHotel = await _hotelDataAccess.Create(newHotel);
@@ -187,7 +188,15 @@ public class HotelService : IHotelService {
                 throw new InvalidDataException(errorMessage);
             }
 
+            // Delete image if it exists
+            string? publicId = hotel.Picture;
             await _hotelDataAccess.Delete(hotel);
+            if (publicId is not null) {
+                bool deleteResult = await _imageService.DeleteImage(publicId);
+                if (!deleteResult) {
+                    _logger.LogWarning("Failed to delete image with publicId: {PublicId}", publicId);
+                }
+            }
 
             // Remove from cache
             _cache.Remove($"hotel_{hotel.Id}");

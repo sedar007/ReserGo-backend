@@ -40,7 +40,7 @@ namespace ReserGo.Business.Implementations {
             } else {
                 _logger.LogInformation("Image uploaded successfully. URL: {Url}", publicId);
             }
-            return await _cloudinary.GetPicture(publicId);
+            return publicId;
         }
         public async Task<bool> DeleteImage(string publicId) {
             _logger.LogInformation("Deleting image with publicId: {PublicId}", publicId);

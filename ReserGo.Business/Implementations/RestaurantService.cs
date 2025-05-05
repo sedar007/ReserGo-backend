@@ -55,6 +55,7 @@ public class RestaurantService : IRestaurantService {
                 StayId = request.StayId,
                 UserId = connectedUser.UserId,
                 Location = request.Location,
+                LastUpdated = DateTime.UtcNow,
                 Picture = request.Picture != null ? await _imageService.UploadImage(request.Picture, connectedUser.UserId) : null
             };
             
@@ -187,8 +188,14 @@ public class RestaurantService : IRestaurantService {
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
-
+            string? oldPublicId = restaurant.Picture;
             await _restaurantDataAccess.Delete(restaurant);
+            if (oldPublicId is not null) {
+                bool deleteResult = await _imageService.DeleteImage(oldPublicId);
+                if (!deleteResult) {
+                    _logger.LogWarning("Failed to delete image with publicId: {PublicId}", oldPublicId);
+                }
+            }
 
             // Invalidate cache
             RemoveCache(restaurant.Id, restaurant.StayId);

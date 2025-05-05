@@ -53,6 +53,7 @@ public class LoginService : ILoginService {
                 login.IsLocked = true;
                 _logger.LogWarning("Account locked due to multiple failed login attempts for user: {Username}", login.Username);
             }
+            login.LastLogin = DateTime.UtcNow;
             await _loginDataAccess.Update(login);
             _logger.LogWarning("Invalid Password");
             throw new UnauthorizedAccessException($"The user: {request.Login} or the password is Incorrect");

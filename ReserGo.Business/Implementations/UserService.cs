@@ -182,7 +182,14 @@ public class UserService : IUserService {
             int userId = user.Id;
             string email = user.Email;
             string username = user.Username;
+            string? publicId = user.ProfilePicture;
             await _userDataAccess.Delete(user);
+            if (publicId is not null) {
+                bool deleteResult = await _imageService.DeleteImage(publicId);
+                if (!deleteResult) {
+                    _logger.LogWarning("Failed to delete image with publicId: {PublicId}", publicId);
+                }
+            }
             RemoveCache(id, email, username);
             _logger.LogInformation("User { id } deleted successfully", userId);
             
