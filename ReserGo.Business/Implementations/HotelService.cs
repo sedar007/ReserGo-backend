@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
 using ReserGo.Business.Interfaces;
@@ -18,12 +19,14 @@ public class HotelService : IHotelService {
     private readonly ISecurity _security;
     private readonly IImageService _imageService;
     private readonly IHotelDataAccess _hotelDataAccess;
-    
-    public HotelService(ILogger<UserService> logger, IHotelDataAccess hotelDataAccess, ISecurity security, IImageService imageService) {
+    private readonly IMemoryCache _cache;
+
+    public HotelService(ILogger<UserService> logger, IHotelDataAccess hotelDataAccess, ISecurity security, IImageService imageService, IMemoryCache cache) {
         _logger = logger;
         _security = security;
         _imageService = imageService;
         _hotelDataAccess = hotelDataAccess;
+        _cache = cache;
     }
     
     public async Task<HotelDto> Create(HotelCreationRequest request) {
@@ -54,6 +57,10 @@ public class HotelService : IHotelService {
             };
             
             newHotel = await _hotelDataAccess.Create(newHotel);
+
+            // Cache the created hotel
+            _cache.Set($"hotel_{newHotel.Id}", newHotel, TimeSpan.FromMinutes(10));
+            _cache.Set($"hotel_stay_{newHotel.StayId}", newHotel, TimeSpan.FromMinutes(10));
             
             _logger.LogInformation("Hotel { id } created", newHotel.Id);
             return newHotel.ToDto();
@@ -66,16 +73,21 @@ public class HotelService : IHotelService {
     
     public async Task<HotelDto?> GetById(int id) {
         try {
+            if (_cache.TryGetValue($"hotel_{id}", out Hotel cachedHotel)) {
+                return cachedHotel.ToDto();
+            }
+
             Hotel? hotel = await _hotelDataAccess.GetById(id);
             if (hotel is null) {
                 string errorMessage = "This hotel does not exist.";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
+
+            _cache.Set($"hotel_{id}", hotel, TimeSpan.FromMinutes(10));
             
             _logger.LogInformation("Hotel { Id } retrieved successfully", hotel.Id);
-            HotelDto hotelDto = hotel.ToDto();
-            return hotelDto;
+            return hotel.ToDto();
             
         } catch (Exception e) {
             _logger.LogError(e, e.Message);
@@ -96,16 +108,21 @@ public class HotelService : IHotelService {
     
     public async Task<HotelDto?> GetByStayId(long stayId) {
         try {
+            if (_cache.TryGetValue($"hotel_stay_{stayId}", out Hotel cachedHotel)) {
+                return cachedHotel.ToDto();
+            }
+
             Hotel? hotel = await _hotelDataAccess.GetByStayId(stayId);
             if (hotel is null) {
                 string errorMessage = "This hotel does not exist.";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
+
+            _cache.Set($"hotel_stay_{stayId}", hotel, TimeSpan.FromMinutes(10));
             
             _logger.LogInformation("Hotel { stayId } retrieved successfully", hotel.StayId);
-            HotelDto hotelDto = hotel.ToDto();
-            return hotelDto;
+            return hotel.ToDto();
             
         } catch (Exception e) {
             _logger.LogError(e, e.Message);
@@ -145,12 +162,17 @@ public class HotelService : IHotelService {
                 }
                 hotel.Picture = publicId;
             }
+
+            await _hotelDataAccess.Update(hotel);
+
+            // Update cache
+            _cache.Set($"hotel_{hotel.Id}", hotel, TimeSpan.FromMinutes(10));
+            _cache.Set($"hotel_stay_{hotel.StayId}", hotel, TimeSpan.FromMinutes(10));
             
             _logger.LogInformation("Hotel { stayId } updated successfully", hotel.StayId);
-            await _hotelDataAccess.Update(hotel);
             return hotel.ToDto();
             
-        }catch (Exception e) {
+        } catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
         }
@@ -164,7 +186,13 @@ public class HotelService : IHotelService {
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
+
             await _hotelDataAccess.Delete(hotel);
+
+            // Remove from cache
+            _cache.Remove($"hotel_{hotel.Id}");
+            _cache.Remove($"hotel_stay_{hotel.StayId}");
+            
             _logger.LogInformation("Hotel { id } deleted successfully", hotel.Id);
             
         } catch (Exception e) {
