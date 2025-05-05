@@ -74,6 +74,10 @@ public class Program {
             builder.Services.AddScoped<IRestaurantDataAccess, RestaurantDataAccess>();
             builder.Services.AddScoped<IRestaurantService, RestaurantService>();
             
+            // Occasion
+            builder.Services.AddScoped<IOccasionDataAccess, OccasionDataAccess>();
+            builder.Services.AddScoped<IOccasionService, OccasionService>();
+            
             //Image
             builder.Services.AddScoped<IImageService, ImageService>();
 
