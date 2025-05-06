@@ -1,4 +1,6 @@
-namespace ReserGo.Common.Enum; 
+namespace ReserGo.Common.Enum;
+
 public enum UserRole {
-    Admin, Client
+    Admin,
+    Client
 }

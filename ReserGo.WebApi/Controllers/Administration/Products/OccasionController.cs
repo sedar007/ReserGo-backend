@@ -4,25 +4,26 @@ using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products.Occasion;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
+using ReserGo.Common.Models;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
 [AdminOnly]
 [ApiController]
-[Tags("Products | Occasion")] 
+[Tags("Products | Occasion")]
 [Route("api/administration/products/occasions/")]
 public class OccasionController : ControllerBase {
-    
     private readonly ILogger<OccasionController> _logger;
     private readonly IOccasionService _occasionService;
     private readonly ISecurity _security;
 
-    public OccasionController(ILogger<OccasionController> logger, IOccasionService occasionService, ISecurity security) {
+    public OccasionController(ILogger<OccasionController> logger, IOccasionService occasionService,
+        ISecurity security) {
         _logger = logger;
         _security = security;
         _occasionService = occasionService;
     }
-    
+
     /// <summary>
     /// Create a new occasion.
     /// </summary>
@@ -37,18 +38,35 @@ public class OccasionController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Create(OccasionCreationRequest request) {
         try {
-            OccasionDto data = await _occasionService.Create(request);
-            return Created("create", data);
+            var data = await _occasionService.Create(request);
+
+            var resource = new Resource<OccasionDto> {
+                Data = data,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetById), new { id = data.Id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Update), new { id = data.Id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            };
+
+            return Created("create", resource);
         }
         catch (InvalidDataException ex) {
             return BadRequest(ex.Message);
         }
         catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while retrieving the occasion.");
+            _logger.LogError(ex, "An error occurred while creating the occasion.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve an occasion by their ID.
     /// </summary>
@@ -61,10 +79,28 @@ public class OccasionController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<OccasionDto?>> GetById(int id) {
+    public async Task<ActionResult<Resource<OccasionDto>>> GetById(int id) {
         try {
             var occasion = await _occasionService.GetById(id);
-            return Ok(occasion);
+            if (occasion == null) return NotFound($"Occasion with ID {id} not found.");
+
+            var resource = new Resource<OccasionDto> {
+                Data = occasion,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetById), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Update), new { id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            };
+
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return NotFound(ex.Message);
@@ -74,7 +110,7 @@ public class OccasionController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve an occasion by their StayId.
     /// </summary>
@@ -87,10 +123,28 @@ public class OccasionController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<OccasionDto?>> GetByStayId(long id) {
+    public async Task<ActionResult<Resource<OccasionDto>>> GetByStayId(long id) {
         try {
             var occasion = await _occasionService.GetByStayId(id);
-            return Ok(occasion);
+            if (occasion == null) return NotFound($"Occasion with StayId {id} not found.");
+
+            var resource = new Resource<OccasionDto> {
+                Data = occasion,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetByStayId), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Update), new { id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            };
+
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return NotFound(ex.Message);
@@ -100,7 +154,7 @@ public class OccasionController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve occasions for the connected user.
     /// </summary>
@@ -112,22 +166,48 @@ public class OccasionController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<IEnumerable<OccasionDto>>> GetOccasionsForConnectedUser() {
+    public async Task<ActionResult<Resource<IEnumerable<Resource<OccasionDto>>>>> GetOccasionsForConnectedUser() {
         try {
             var connectedUser = _security.GetCurrentUser();
-            if (connectedUser == null) {
-                return Unauthorized("User not authenticated");
-            }
+            if (connectedUser == null) return Unauthorized("User not authenticated");
 
-            var hotels = await _occasionService.GetOccasionsByUserId(connectedUser.UserId);
-            return Ok(hotels);
+            var occasions = await _occasionService.GetOccasionsByUserId(connectedUser.UserId);
+
+            var resources = occasions.Select(occasion => new Resource<OccasionDto> {
+                Data = occasion,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetById), new { id = occasion.Id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Update), new { id = occasion.Id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            });
+
+            var resourceCollection = new Resource<IEnumerable<Resource<OccasionDto>>> {
+                Data = resources,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetOccasionsForConnectedUser)),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            };
+
+            return Ok(resourceCollection);
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving occasions for the connected user.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Update an existing occasion.
     /// </summary>
@@ -141,11 +221,22 @@ public class OccasionController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserDto>> Update(long id, OccasionUpdateRequest request)
-    {
+    public async Task<ActionResult<Resource<OccasionDto>>> Update(long id, OccasionUpdateRequest request) {
         try {
-            var updatedUser = await _occasionService.Update(id, request);
-            return Ok(updatedUser);
+            var updatedOccasion = await _occasionService.Update(id, request);
+
+            var resource = new Resource<OccasionDto> {
+                Data = updatedOccasion,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetById), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            };
+
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return BadRequest(ex.Message);
@@ -154,7 +245,7 @@ public class OccasionController : ControllerBase {
             return NotFound(ex.Message);
         }
     }
-    
+
     /// <summary>
     /// Remove an Occasion by their ID.
     /// </summary>

@@ -2,6 +2,7 @@ using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 
 namespace ReserGo.Common.Helper;
+
 public static class RestaurantHelper {
     public static RestaurantDto ToDto(this Restaurant restaurant) {
         return new RestaurantDto {

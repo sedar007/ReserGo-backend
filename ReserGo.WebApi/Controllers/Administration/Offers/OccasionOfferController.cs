@@ -4,25 +4,26 @@ using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products.Occasion;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.Shared.Interfaces;
+using ReserGo.Common.Models;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
 [ApiController]
-[Tags("Offers | Occasion")] 
+[Tags("Offers | Occasion")]
 [AdminOnly]
 [Route("api/administration/offers/occasions/")]
 public class OccasionOfferController : ControllerBase {
-    
     private readonly ILogger<OccasionController> _logger;
     private readonly IOccasionOfferService _occasionOfferService;
     private readonly ISecurity _security;
 
-    public OccasionOfferController(ILogger<OccasionController> logger, IOccasionOfferService occasionOfferService, ISecurity security) {
+    public OccasionOfferController(ILogger<OccasionController> logger, IOccasionOfferService occasionOfferService,
+        ISecurity security) {
         _logger = logger;
         _occasionOfferService = occasionOfferService;
         _security = security;
     }
-    
+
     /// <summary>
     /// Create a new occasion offer.
     /// </summary>
@@ -35,10 +36,36 @@ public class OccasionOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Create(OccasionOfferCreationRequest request) {
         try {
-            OccasionOfferDto data = await _occasionOfferService.Create(request);
-            return Created("create", data);
+            var data = await _occasionOfferService.Create(request);
+
+            var resource = new Resource<OccasionOfferDto> {
+                Data = data,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetById), new { id = data.Id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Update), new { id = data.Id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Delete), new { id = data.Id }),
+                        Rel = "delete",
+                        Method = "DELETE"
+                    }
+                }
+            };
+
+            return Created("create", resource);
         }
         catch (InvalidDataException ex) {
             return BadRequest(ex.Message);
@@ -48,7 +75,7 @@ public class OccasionOfferController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
 
     /// <summary>
     /// Retrieve a occasion offer by its ID.
@@ -62,10 +89,33 @@ public class OccasionOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<OccasionOfferDto?>> GetById(int id) {
+    public async Task<ActionResult<Resource<OccasionOfferDto>>> GetById(int id) {
         try {
             var occasionOffer = await _occasionOfferService.GetById(id);
-            return Ok(occasionOffer);
+            if (occasionOffer == null) return NotFound($"Occasion offer with ID {id} not found.");
+
+            var resource = new Resource<OccasionOfferDto> {
+                Data = occasionOffer,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetById), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Update), new { id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Delete), new { id }),
+                        Rel = "delete",
+                        Method = "DELETE"
+                    }
+                }
+            };
+
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return NotFound(ex.Message);
@@ -87,15 +137,46 @@ public class OccasionOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<IEnumerable<OccasionOfferDto>>> GetOffersForConnectedUser() {
+    public async Task<ActionResult<Resource<IEnumerable<Resource<OccasionOfferDto>>>>> GetOffersForConnectedUser() {
         try {
             var connectedUser = _security.GetCurrentUser();
-            if (connectedUser == null) {
-                return Unauthorized("User not authenticated");
-            }
+            if (connectedUser == null) return Unauthorized("User not authenticated");
 
             var occasionOffers = await _occasionOfferService.GetOccasionsByUserId(connectedUser.UserId);
-            return Ok(occasionOffers);
+
+            var resources = occasionOffers.Select(offer => new Resource<OccasionOfferDto> {
+                Data = offer,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetById), new { id = offer.Id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Update), new { id = offer.Id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Delete), new { id = offer.Id }),
+                        Rel = "delete",
+                        Method = "DELETE"
+                    }
+                }
+            });
+
+            var resourceCollection = new Resource<IEnumerable<Resource<OccasionOfferDto>>> {
+                Data = resources,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetOffersForConnectedUser)),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            };
+
+            return Ok(resourceCollection);
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving occasion offers for the connected user.");
@@ -116,10 +197,27 @@ public class OccasionOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<OccasionOfferDto>> Update(int id, OccasionOfferUpdateRequest request) {
+    public async Task<ActionResult<Resource<OccasionOfferDto>>> Update(int id, OccasionOfferUpdateRequest request) {
         try {
             var updatedOffer = await _occasionOfferService.Update(id, request);
-            return Ok(updatedOffer);
+
+            var resource = new Resource<OccasionOfferDto> {
+                Data = updatedOffer,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetById), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Delete), new { id }),
+                        Rel = "delete",
+                        Method = "DELETE"
+                    }
+                }
+            };
+
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return BadRequest(ex.Message);

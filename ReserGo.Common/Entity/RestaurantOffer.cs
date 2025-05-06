@@ -2,8 +2,8 @@ namespace ReserGo.Common.Entity;
 
 public class RestaurantOffer {
     public int Id { get; set; }
-    public String OfferTitle { get; set; } = null!;
-    public String Description { get; set; } = null!;
+    public string OfferTitle { get; set; } = null!;
+    public string Description { get; set; } = null!;
     public double? PricePerPerson { get; set; }
     public int NumberOfGuests { get; set; }
     public DateTime OfferStartDate { get; set; }

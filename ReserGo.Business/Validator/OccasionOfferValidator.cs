@@ -16,9 +16,8 @@ public static class OccasionOfferValidator {
         if (request.OccasionId <= 0) return "Occasion ID must be greater than zero.";
         if (request.IsActive == null) return "IsActive cannot be null.";
         return string.Empty;
-        
     }
-    
+
     public static string GetError(OccasionOfferUpdateRequest? request) {
         if (request == null) return "Invalid request.";
         if (string.IsNullOrWhiteSpace(request.OfferTitle)) return "Offer title cannot be empty.";
@@ -30,7 +29,5 @@ public static class OccasionOfferValidator {
         if (request.OfferStartDate >= request.OfferEndDate) return "Offer start date must be before end date.";
         if (request.IsActive == null) return "IsActive cannot be null.";
         return string.Empty;
-        
     }
 }
-  

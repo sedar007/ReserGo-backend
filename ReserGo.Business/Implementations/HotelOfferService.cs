@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-
 using ReserGo.Business.Interfaces;
 using ReserGo.Business.Validator;
 using ReserGo.Common.DTO;
@@ -14,8 +13,8 @@ using ReserGo.Shared.Interfaces;
 using ReserGo.Shared;
 
 namespace ReserGo.Business.Implementations;
+
 public class HotelOfferService : IHotelOfferService {
-    
     private readonly ILogger<UserService> _logger;
     private readonly ISecurity _security;
     private readonly IImageService _imageService;
@@ -23,7 +22,8 @@ public class HotelOfferService : IHotelOfferService {
     private readonly IHotelOfferDataAccess _hotelOfferDataAccess;
     private readonly IMemoryCache _cache;
 
-    public HotelOfferService(ILogger<UserService> logger, IHotelOfferDataAccess hotelOfferDataAccess, IHotelService hotelService, ISecurity security, IImageService imageService, IMemoryCache cache) {
+    public HotelOfferService(ILogger<UserService> logger, IHotelOfferDataAccess hotelOfferDataAccess,
+        IHotelService hotelService, ISecurity security, IImageService imageService, IMemoryCache cache) {
         _logger = logger;
         _security = security;
         _imageService = imageService;
@@ -31,27 +31,26 @@ public class HotelOfferService : IHotelOfferService {
         _hotelService = hotelService;
         _cache = cache;
     }
-    
+
     public async Task<HotelOfferDto> Create(HotelOfferCreationRequest request) {
         try {
-            
-            string error = HotelOfferValidator.GetError(request);
+            var error = HotelOfferValidator.GetError(request);
             if (string.IsNullOrEmpty(error) == false) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
 
-            ConnectedUser? connectedUser = _security.GetCurrentUser();
-            if(connectedUser == null) throw new UnauthorizedAccessException("User not connected");
-            
-            HotelDto? hotel = await _hotelService.GetById(request.HotelId);
+            var connectedUser = _security.GetCurrentUser();
+            if (connectedUser == null) throw new UnauthorizedAccessException("User not connected");
+
+            var hotel = await _hotelService.GetById(request.HotelId);
             if (hotel == null) {
-                string errorMessage = "Hotel not found";
+                var errorMessage = "Hotel not found";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
-            
-            HotelOffer newHotelOffer = new HotelOffer {
+
+            var newHotelOffer = new HotelOffer {
                 OfferTitle = request.OfferTitle,
                 Description = request.Description,
                 PricePerNight = request.PricePerNight,
@@ -63,53 +62,53 @@ public class HotelOfferService : IHotelOfferService {
                 HotelId = hotel.Id,
                 UserId = connectedUser.UserId
             };
-            
+
             newHotelOffer = await _hotelOfferDataAccess.Create(newHotelOffer);
 
             // Cache the created hotel offer
-            _cache.Set($"newHotelOffer_{newHotelOffer.Id}", newHotelOffer, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-            
+            _cache.Set($"newHotelOffer_{newHotelOffer.Id}", newHotelOffer,
+                TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+
             _logger.LogInformation("Hotel Offer { id } created", newHotelOffer.Id);
             return newHotelOffer.ToDto();
-            
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
         }
     }
+
     public async Task<HotelOfferDto?> GetById(int id) {
         try {
-            if (_cache.TryGetValue($"hotelOffer_{id}", out HotelOffer cachedHotelOffer)) {
+            if (_cache.TryGetValue($"hotelOffer_{id}", out HotelOffer cachedHotelOffer))
                 return cachedHotelOffer.ToDto();
-            }
 
-            HotelOffer? hotelOffer = await _hotelOfferDataAccess.GetById(id);
+            var hotelOffer = await _hotelOfferDataAccess.GetById(id);
             if (hotelOffer is null) {
-                string errorMessage = "This hotel offer does not exist.";
+                var errorMessage = "This hotel offer does not exist.";
                 _logger.LogError(errorMessage);
-                throw new InvalidDataException(errorMessage);
+                return null;
             }
 
             _cache.Set($"hotelOffer_{id}", hotelOffer, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-            
+
             _logger.LogInformation("Hotel Offer { id } retrieved successfully", hotelOffer.Id);
             return hotelOffer.ToDto();
-            
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
         }
     }
-    
+
     public async Task<IEnumerable<HotelOfferDto>> GetHotelsByUserId(int userId) {
         try {
-            string cacheKey = $"hotelOffers_user_{userId}";
+            var cacheKey = $"hotelOffers_user_{userId}";
 
-            if (_cache.TryGetValue(cacheKey, out IEnumerable<HotelOfferDto> cachedHotelOffers)) {
+            if (_cache.TryGetValue(cacheKey, out IEnumerable<HotelOfferDto> cachedHotelOffers))
                 return cachedHotelOffers;
-            }
 
-            IEnumerable<HotelOffer> hotelOffers = await _hotelOfferDataAccess.GetHotelsOfferByUserId(userId);
+            var hotelOffers = await _hotelOfferDataAccess.GetHotelsOfferByUserId(userId);
             IEnumerable<HotelOfferDto> hotelOfferDtos = hotelOffers.Select(hotelOffer => hotelOffer.ToDto());
 
             _cache.Set(cacheKey, hotelOfferDtos, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
@@ -121,13 +120,13 @@ public class HotelOfferService : IHotelOfferService {
             throw;
         }
     }
-   
+
     public async Task<HotelOfferDto> Update(int id, HotelOfferUpdateRequest request) {
         try {
-            HotelOffer? hotelOffer = await _hotelOfferDataAccess.GetById(id);
+            var hotelOffer = await _hotelOfferDataAccess.GetById(id);
             if (hotelOffer is null) throw new Exception("Hotel offer not found");
 
-            string error = HotelOfferValidator.GetError(request);
+            var error = HotelOfferValidator.GetError(request);
             if (string.IsNullOrEmpty(error) == false) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
@@ -146,11 +145,11 @@ public class HotelOfferService : IHotelOfferService {
 
             // Update cache
             _cache.Set($"hotel_offer_{hotelOffer.Id}", hotelOffer, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-            
+
             _logger.LogInformation("Hotel Offer { stayId } updated successfully", hotelOffer.Id);
             return hotelOffer.ToDto();
-            
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
         }
@@ -158,9 +157,9 @@ public class HotelOfferService : IHotelOfferService {
 
     public async Task Delete(int id) {
         try {
-            HotelOffer? hotelOffer = await _hotelOfferDataAccess.GetById(id);
+            var hotelOffer = await _hotelOfferDataAccess.GetById(id);
             if (hotelOffer is null) {
-                string errorMessage = "Hotel offer not found";
+                var errorMessage = "Hotel offer not found";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
@@ -169,13 +168,12 @@ public class HotelOfferService : IHotelOfferService {
 
             // Remove from cache
             _cache.Remove($"hotel_offer_{hotelOffer.Id}");
-            
+
             _logger.LogInformation("Hotel Offer { id } deleted successfully", hotelOffer.Id);
-            
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
         }
     }
-    
 }

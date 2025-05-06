@@ -5,7 +5,7 @@ public class KeepAliveService : IHostedService, IDisposable {
     private readonly HttpClient _httpClient;
     private readonly string _url;
     private readonly ILogger<KeepAliveService> _logger;
-    
+
 
     public KeepAliveService(IConfiguration configuration, ILogger<KeepAliveService> logger) {
         _httpClient = new HttpClient();
@@ -20,10 +20,8 @@ public class KeepAliveService : IHostedService, IDisposable {
         return Task.CompletedTask;
     }
 
-    private async void SendKeepAliveRequest(object state)
-    {
-        try
-        {
+    private async void SendKeepAliveRequest(object state) {
+        try {
             var response = await _httpClient.GetAsync(_url);
             if (response.IsSuccessStatusCode)
                 _logger.LogInformation($"Keep-alive successful at {DateTime.Now}");
@@ -35,14 +33,12 @@ public class KeepAliveService : IHostedService, IDisposable {
         }
     }
 
-    public Task StopAsync(CancellationToken cancellationToken)
-    {
+    public Task StopAsync(CancellationToken cancellationToken) {
         _timer?.Change(Timeout.Infinite, 0);
         return Task.CompletedTask;
     }
 
-    public void Dispose()
-    {
+    public void Dispose() {
         _timer?.Dispose();
         _httpClient?.Dispose();
     }

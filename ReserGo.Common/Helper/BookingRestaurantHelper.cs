@@ -3,12 +3,9 @@ using ReserGo.Common.Entity;
 
 namespace ReserGo.Common.Helper;
 
-public static class BookingRestaurantHelper
-{
-    public static BookingRestaurantDto ToDto(this BookingRestaurant bookingRestaurant)
-    {
-        return new BookingRestaurantDto
-        {
+public static class BookingRestaurantHelper {
+    public static BookingRestaurantDto ToDto(this BookingRestaurant bookingRestaurant) {
+        return new BookingRestaurantDto {
             Id = bookingRestaurant.Id,
             UserId = bookingRestaurant.UserId,
             RestaurantId = bookingRestaurant.RestaurantId,

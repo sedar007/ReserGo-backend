@@ -9,4 +9,3 @@ public interface IRestaurantOfferDataAccess {
     Task<IEnumerable<RestaurantOffer>> GetRestaurantsOfferByUserId(int userId);
     Task Delete(RestaurantOffer restaurantOffer);
 }
-

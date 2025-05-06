@@ -7,21 +7,18 @@
         <UserSecretsId>c5f3acd7-4487-4503-812a-89ad0606731a</UserSecretsId>
     </PropertyGroup>
 
-  <ItemGroup>
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.1">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
+    <ItemGroup>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3"/>
     </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ReserGo.Common\ReserGo.Common.csproj" />
-  </ItemGroup>
-  
-
-   
+    <ItemGroup>
+        <ProjectReference Include="..\ReserGo.Common\ReserGo.Common.csproj"/>
+    </ItemGroup>
 
 
 </Project>

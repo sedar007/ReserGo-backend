@@ -2,6 +2,7 @@ using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 
 namespace ReserGo.Common.Helper;
+
 public static class OccasionHelper {
     public static OccasionDto ToDto(this Occasion occasion) {
         return new OccasionDto {

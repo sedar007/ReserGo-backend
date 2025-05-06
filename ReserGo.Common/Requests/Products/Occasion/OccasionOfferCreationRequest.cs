@@ -1,8 +1,8 @@
 namespace ReserGo.Common.Requests.Products.Occasion;
 
 public class OccasionOfferCreationRequest {
-    public String OfferTitle { get; init; } = null!;
-    public String? Description { get; init; }
+    public string OfferTitle { get; init; } = null!;
+    public string? Description { get; init; }
     public double Price { get; init; }
     public int NumberOfGuests { get; init; }
     public DateTime OfferStartDate { get; init; }
