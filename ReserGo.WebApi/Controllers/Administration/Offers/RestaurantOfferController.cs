@@ -80,7 +80,7 @@ public class RestaurantOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<RestaurantOfferDto>>> GetById(int id) {
+    public async Task<ActionResult<Resource<RestaurantOfferDto>>> GetById(Guid id) {
         try {
             var restaurantOffer = await _restaurantOfferService.GetById(id);
             if (restaurantOffer == null) return NotFound($"Restaurant offer with ID {id} not found.");
@@ -178,7 +178,7 @@ public class RestaurantOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Resource<RestaurantOfferDto>>> Update(int id, RestaurantOfferUpdateRequest request) {
+    public async Task<ActionResult<Resource<RestaurantOfferDto>>> Update(Guid id, RestaurantOfferUpdateRequest request) {
         try {
             var updatedOffer = await _restaurantOfferService.Update(id, request);
 
@@ -215,7 +215,7 @@ public class RestaurantOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> Delete(int id) {
+    public async Task<ActionResult> Delete(Guid id) {
         try {
             await _restaurantOfferService.Delete(id);
             return NoContent();

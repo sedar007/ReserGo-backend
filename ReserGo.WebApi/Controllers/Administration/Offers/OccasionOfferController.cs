@@ -89,7 +89,7 @@ public class OccasionOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<OccasionOfferDto>>> GetById(int id) {
+    public async Task<ActionResult<Resource<OccasionOfferDto>>> GetById(Guid id) {
         try {
             var occasionOffer = await _occasionOfferService.GetById(id);
             if (occasionOffer == null) return NotFound($"Occasion offer with ID {id} not found.");
@@ -197,7 +197,7 @@ public class OccasionOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Resource<OccasionOfferDto>>> Update(int id, OccasionOfferUpdateRequest request) {
+    public async Task<ActionResult<Resource<OccasionOfferDto>>> Update(Guid id, OccasionOfferUpdateRequest request) {
         try {
             var updatedOffer = await _occasionOfferService.Update(id, request);
 
@@ -239,7 +239,7 @@ public class OccasionOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> Delete(int id) {
+    public async Task<ActionResult> Delete(Guid id) {
         try {
             await _occasionOfferService.Delete(id);
             return NoContent();

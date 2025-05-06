@@ -1,13 +1,14 @@
 namespace ReserGo.Common.Entity;
 
 public class Address {
-    public int Id { get; set; }
+    public Guid Id { get; init; } = Guid.NewGuid();
     public string? Street { get; set; }
     public string? City { get; set; }
     public string? State { get; set; }
-    public string? PostalCode { get; set; } = null!;
-    public string? Country { get; set; } = null!;
+    public string? PostalCode { get; set; } 
+    public string? Country { get; set; }
 
     // Relation One-to-One avec User
-    public virtual User User { get; set; } = null!;
+    public virtual User User { get; init; } = null!;
+    public Guid UserId { get; init; }
 }

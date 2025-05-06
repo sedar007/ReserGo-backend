@@ -23,7 +23,7 @@ public class Security : ISecurity {
         _logger = logger;
     }
 
-    public string GenerateJwtToken(string username, int userId, UserRole userRole) {
+    public string GenerateJwtToken(string username, Guid userId, UserRole userRole) {
         var keyJwt = _configuration.GetSection("Key")?.Get<string>() ?? string.Empty;
         var issuerJwt = _configuration.GetSection("Issuer")?.Value ?? string.Empty;
         var audienceJwt = _configuration.GetSection("Audience")?.Get<string>() ?? string.Empty;
@@ -86,7 +86,7 @@ public class Security : ISecurity {
         }
 
         return new ConnectedUser {
-            UserId = int.Parse(userId),
+            UserId = Guid.Parse(userId),
             Username = username,
             Role = userRole == UserRole.Admin.ToString() ? UserRole.Admin : UserRole.Client,
             RoleString = userRole
@@ -111,7 +111,7 @@ public class Security : ISecurity {
         return Environment.GetEnvironmentVariable(key) ?? "";
     }
 
-    private static Claim[] GetClaims(string username, int userId, UserRole userRole) {
+    private static Claim[] GetClaims(string username, Guid userId, UserRole userRole) {
         return new[] {
             new Claim("UserRole", userRole.ToString()),
             new Claim(ClaimTypes.NameIdentifier, userId.ToString()),

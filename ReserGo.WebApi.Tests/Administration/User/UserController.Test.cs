@@ -34,7 +34,7 @@ public class UserControllerTests {
 
         // Seed the database with test data if necessary
         context.Users.Add(new User
-            { Id = 1, FirstName = "John", LastName = "Doe", Email = "john.doe@example.com", Username = "johndoe" });
+            { Id = Guid.NewGuid(), FirstName = "John", LastName = "Doe", Email = "john.doe@example.com", Username = "johndoe" });
         context.SaveChanges();
 
         _userService = new UserService(new Mock<ILogger<UserService>>().Object, new UserDataAccess(context),
@@ -87,7 +87,7 @@ public class UserControllerTests {
 
     [Fact]
     public async Task ShouldGet404_GET_OneUserById() {
-        var result = await _controller.GetById(1000) as ActionResult<Resource<UserDto>>;
+        var result = await _controller.GetById(Guid.NewGuid()) as ActionResult<Resource<UserDto>>;
         var notFoundResult = result.Result as NotFoundObjectResult;
         notFoundResult.Should().NotBeNull();
         notFoundResult.StatusCode.Should().Be(404);
@@ -95,7 +95,7 @@ public class UserControllerTests {
 
     [Fact]
     public async Task ShouldGet204_DELETE_User() {
-        var result = await _controller.GetById(1000) as ActionResult<Resource<UserDto>>;
+        var result = await _controller.GetById(Guid.NewGuid()) as ActionResult<Resource<UserDto>>;
         var notFoundResult = result.Result as NotFoundObjectResult;
         notFoundResult.Should().NotBeNull();
         notFoundResult.StatusCode.Should().Be(404);
@@ -103,7 +103,7 @@ public class UserControllerTests {
 
     [Fact]
     public async Task ShouldGet404_DELETE_User() {
-        var result = await _controller.Delete(1000) as ActionResult;
+        var result = await _controller.Delete(Guid.NewGuid()) as ActionResult;
         var notFoundResult = result as NotFoundObjectResult;
         notFoundResult.Should().NotBeNull();
         notFoundResult.StatusCode.Should().Be(404);
@@ -142,7 +142,7 @@ public class UserControllerTests {
             Username = "janedoe"
         };
 
-        var result = await _controller.UpdateUser(1000, request) as ActionResult<Resource<UserDto>>;
+        var result = await _controller.UpdateUser(Guid.NewGuid(), request) as ActionResult<Resource<UserDto>>;
         var notFoundResult = result.Result as NotFoundObjectResult;
         notFoundResult.Should().NotBeNull();
         notFoundResult.StatusCode.Should().Be(404);

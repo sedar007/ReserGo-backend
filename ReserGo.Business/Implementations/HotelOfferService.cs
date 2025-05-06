@@ -78,7 +78,7 @@ public class HotelOfferService : IHotelOfferService {
         }
     }
 
-    public async Task<HotelOfferDto?> GetById(int id) {
+    public async Task<HotelOfferDto?> GetById(Guid id) {
         try {
             if (_cache.TryGetValue($"hotelOffer_{id}", out HotelOffer cachedHotelOffer))
                 return cachedHotelOffer.ToDto();
@@ -101,7 +101,7 @@ public class HotelOfferService : IHotelOfferService {
         }
     }
 
-    public async Task<IEnumerable<HotelOfferDto>> GetHotelsByUserId(int userId) {
+    public async Task<IEnumerable<HotelOfferDto>> GetHotelsByUserId(Guid userId) {
         try {
             var cacheKey = $"hotelOffers_user_{userId}";
 
@@ -121,7 +121,7 @@ public class HotelOfferService : IHotelOfferService {
         }
     }
 
-    public async Task<HotelOfferDto> Update(int id, HotelOfferUpdateRequest request) {
+    public async Task<HotelOfferDto> Update(Guid id, HotelOfferUpdateRequest request) {
         try {
             var hotelOffer = await _hotelOfferDataAccess.GetById(id);
             if (hotelOffer is null) throw new Exception("Hotel offer not found");
@@ -155,7 +155,7 @@ public class HotelOfferService : IHotelOfferService {
         }
     }
 
-    public async Task Delete(int id) {
+    public async Task Delete(Guid id) {
         try {
             var hotelOffer = await _hotelOfferDataAccess.GetById(id);
             if (hotelOffer is null) {

@@ -33,7 +33,7 @@ public class ImageService : IImageService {
         return url;
     }
 
-    public async Task<string?> UploadImage(IFormFile file, int userId) {
+    public async Task<string?> UploadImage(IFormFile file, Guid userId) {
         _logger.LogInformation("Uploading image with file name: {FileName}", file.FileName);
         var publicId = await _cloudinary.UploadImage(file, userId);
         if (publicId == null)

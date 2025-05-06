@@ -85,7 +85,7 @@ public class HotelOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<HotelOfferDto?>> GetById(int id) {
+    public async Task<ActionResult<HotelOfferDto?>> GetById(Guid id) {
         try {
             var hotelOffer = await _hotelOfferService.GetById(id);
             if (hotelOffer == null) return NotFound($"Hotel offer with ID {id} not found.");
@@ -194,7 +194,7 @@ public class HotelOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Resource<HotelOfferDto>>> Update(int id, HotelOfferUpdateRequest request) {
+    public async Task<ActionResult<Resource<HotelOfferDto>>> Update(Guid id, HotelOfferUpdateRequest request) {
         try {
             var updatedOffer = await _hotelOfferService.Update(id, request);
 
@@ -236,7 +236,7 @@ public class HotelOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> Delete(int id) {
+    public async Task<ActionResult> Delete(Guid id) {
         try {
             await _hotelOfferService.Delete(id);
             return NoContent();

@@ -77,7 +77,7 @@ public class OccasionOfferService : IOccasionOfferService {
         }
     }
 
-    public async Task<OccasionOfferDto?> GetById(int id) {
+    public async Task<OccasionOfferDto?> GetById(Guid id) {
         try {
             if (_cache.TryGetValue($"occasionOffer_{id}", out OccasionOffer cachedOccasionOffer))
                 return cachedOccasionOffer.ToDto();
@@ -100,7 +100,7 @@ public class OccasionOfferService : IOccasionOfferService {
         }
     }
 
-    public async Task<IEnumerable<OccasionOfferDto>> GetOccasionsByUserId(int userId) {
+    public async Task<IEnumerable<OccasionOfferDto>> GetOccasionsByUserId(Guid userId) {
         try {
             var cacheKey = $"occasionOffers_user_{userId}";
 
@@ -121,7 +121,7 @@ public class OccasionOfferService : IOccasionOfferService {
         }
     }
 
-    public async Task<OccasionOfferDto> Update(int id, OccasionOfferUpdateRequest request) {
+    public async Task<OccasionOfferDto> Update(Guid id, OccasionOfferUpdateRequest request) {
         try {
             var occasionOffer = await _occasionOfferDataAccess.GetById(id);
             if (occasionOffer is null) throw new Exception("Occasion offer not found");
@@ -155,7 +155,7 @@ public class OccasionOfferService : IOccasionOfferService {
         }
     }
 
-    public async Task Delete(int id) {
+    public async Task Delete(Guid id) {
         try {
             var occasionOffer = await _occasionOfferDataAccess.GetById(id);
             if (occasionOffer is null) {

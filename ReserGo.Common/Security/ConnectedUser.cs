@@ -3,8 +3,8 @@
 namespace ReserGo.Common.Security;
 
 public class ConnectedUser {
-    public int UserId { get; set; }
-    public UserRole Role { get; set; }
+    public Guid UserId { get; init; }
+    public UserRole Role { get; init; }
     public string? RoleString { get; set; }
     public string Username { get; set; } = null!;
 }

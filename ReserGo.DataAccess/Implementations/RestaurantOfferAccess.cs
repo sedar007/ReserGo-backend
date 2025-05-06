@@ -12,16 +12,16 @@ public class RestaurantOfferDataAccess : IRestaurantOfferDataAccess {
         _context = context;
     }
 
-    public async Task<RestaurantOffer?> GetById(int id) {
+    public async Task<RestaurantOffer?> GetById(Guid id) {
         return await _context.RestaurantOffer.Include(h => h.Restaurant).FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<IEnumerable<RestaurantOffer>> GetRestaurantsOfferByUserId(int userId) {
+    public async Task<IEnumerable<RestaurantOffer>> GetRestaurantsOfferByUserId(Guid userId) {
         return await _context.RestaurantOffer.Where(x => x.UserId == userId).Include(h => h.Restaurant).ToListAsync();
     }
 
     public async Task<RestaurantOffer> Create(RestaurantOffer user) {
-        EntityEntry<RestaurantOffer> newData = _context.RestaurantOffer.Add(user);
+        var newData = _context.RestaurantOffer.Add(user);
         await _context.SaveChangesAsync();
         return await GetById(newData.Entity.Id) ??
                throw new NullReferenceException("Error creating new restaurant offer.");

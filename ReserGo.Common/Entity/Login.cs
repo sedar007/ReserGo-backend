@@ -1,14 +1,15 @@
 namespace ReserGo.Common.Entity;
 
 public class Login {
-    public int Id { get; set; }
-    public int UserId { get; set; }
-    public string Username { get; set; } = null!;
-    public string Password { get; set; } = null!;
+    public Guid Id { get; init; } = Guid.NewGuid();
+    public string Username { get; init; } = null!;
+    public string Password { get; init; } = null!;
     public DateTime LastLogin { get; set; } = DateTime.Now;
-    public int FailedAttempts { get; set; } = 0;
-    public bool IsLocked { get; set; } = false;
+    public int FailedAttempts { get; set; }
+    public bool IsLocked { get; set; }
 
     // Relation avec User
-    public virtual User User { get; set; } = null!;
+    public virtual User User { get; init; } = null!;
+    public Guid UserId { get; init; }
+    
 }

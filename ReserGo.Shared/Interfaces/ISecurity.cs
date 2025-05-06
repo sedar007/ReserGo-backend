@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 namespace ReserGo.Shared.Interfaces;
 
 public interface ISecurity {
-    string GenerateJwtToken(string username, int userId, UserRole userRole);
+    string GenerateJwtToken(string username, Guid userId, UserRole userRole);
 
     string HashPassword(string providedPassword);
 

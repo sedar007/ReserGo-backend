@@ -13,7 +13,7 @@ public static class OccasionOfferValidator {
         if (request.OfferStartDate == default) return "Offer start date is invalid.";
         if (request.OfferEndDate == default) return "Offer end date is invalid.";
         if (request.OfferStartDate >= request.OfferEndDate) return "Offer start date must be before end date.";
-        if (request.OccasionId <= 0) return "Occasion ID must be greater than zero.";
+        if (request.OccasionId == Guid.Empty) return "Occasion ID cannot be empty.";
         if (request.IsActive == null) return "IsActive cannot be null.";
         return string.Empty;
     }

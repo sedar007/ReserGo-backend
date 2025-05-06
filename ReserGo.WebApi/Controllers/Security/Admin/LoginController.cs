@@ -74,6 +74,11 @@ public class LoginController : ControllerBase {
 
             return Ok(resource);
         }
+        catch (UnauthorizedAccessException e) {
+            _logger.LogWarning("User not unauthorized");
+            _logger.LogError(e, e.Message);
+            return Unauthorized($"The user: {request.Login} or the password is Incorrect");
+        }
         catch (ArgumentNullException e) {
             _logger.LogWarning("User not unauthorized");
             _logger.LogError(e, e.Message);
@@ -120,7 +125,7 @@ public class LoginController : ControllerBase {
                     Method = "POST"
                 }
             }
-        };
+        }; 
 
         return Ok(resource);
     }

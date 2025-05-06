@@ -71,7 +71,7 @@ public class UserService : IUserService {
         }
     }
 
-    public async Task<UserDto?> GetById(int id) {
+    public async Task<UserDto?> GetById(Guid id) {
         try {
             var cacheKey = $"GetById_{id}";
 
@@ -98,7 +98,7 @@ public class UserService : IUserService {
         }
     }
 
-    public async Task<string> GetProfilePicture(int userId) {
+    public async Task<string> GetProfilePicture(Guid userId) {
         var user = await GetById(userId);
         if (user is null) {
             var errorMessage = "This user does not exist.";
@@ -172,7 +172,7 @@ public class UserService : IUserService {
         }
     }
 
-    public async Task Delete(int id) {
+    public async Task Delete(Guid id) {
         try {
             var user = await _userDataAccess.GetById(id);
             if (user is null) {
@@ -200,7 +200,7 @@ public class UserService : IUserService {
         }
     }
 
-    public async Task<UserDto> UpdateUser(int id, UserUpdateRequest request) {
+    public async Task<UserDto> UpdateUser(Guid id, UserUpdateRequest request) {
         try {
             var user = await _userDataAccess.GetById(id);
             if (user is null) throw new Exception("User not found");
@@ -259,7 +259,7 @@ public class UserService : IUserService {
         }
     }
 
-    public async Task<string> UpdateProfilePicture(int userId, IFormFile file) {
+    public async Task<string> UpdateProfilePicture(Guid userId, IFormFile file) {
         _logger.LogInformation("Uploading image with file name: {FileName}", file.FileName);
 
         var user = await _userDataAccess.GetById(userId);
@@ -290,7 +290,7 @@ public class UserService : IUserService {
         return publicId;
     }
 
-    private void RemoveCache(int id, string email, string username) {
+    private void RemoveCache(Guid id, string email, string username) {
         _cache.Remove($"GetById_{id}");
         _cache.Remove($"GetByEmail_{email}");
         _cache.Remove($"GetByUsername_{username}");

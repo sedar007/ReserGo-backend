@@ -12,7 +12,7 @@ public class UserDataAccess : IUserDataAccess {
         _context = context;
     }
 
-    public async Task<User?> GetById(int id) {
+    public async Task<User?> GetById(Guid id) {
         return await _context.Users.Include(u => u.Address).FirstOrDefaultAsync(x => x.Id == id);
     }
 

@@ -54,7 +54,7 @@ public class ImageController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> UploadImage(IFormFile? file, int userId) {
+    public async Task<IActionResult> UploadImage(IFormFile? file, Guid userId) {
         if (file == null || file.Length == 0) {
             _logger.LogWarning("No file sent for upload.");
             return BadRequest("No file sent.");

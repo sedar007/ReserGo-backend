@@ -14,7 +14,7 @@ public static class HotelOfferValidator {
         if (request.OfferStartDate == default) return "Offer start date is invalid.";
         if (request.OfferEndDate == default) return "Offer end date is invalid.";
         if (request.OfferStartDate >= request.OfferEndDate) return "Offer start date must be before end date.";
-        if (request.HotelId <= 0) return "Hotel ID must be greater than zero.";
+        if (request.HotelId == Guid.Empty) return "Hotel ID must be a valid GUID.";
         return "";
     }
 

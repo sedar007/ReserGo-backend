@@ -4,10 +4,10 @@ using ReserGo.Common.Enum;
 namespace ReserGo.Common.Security;
 
 public class AuthenticateResponse {
-    public int Id { get; set; }
-    public string Username { get; set; }
-    public string Token { get; set; }
-    public UserRole Role { get; set; }
+    public readonly Guid Id;
+    public readonly string Username;
+    public readonly string Token;
+    public readonly UserRole Role;
     public string RoleName => Role.ToString();
 
     public AuthenticateResponse(User user, string token, UserRole role) {

@@ -8,5 +8,5 @@ public class RestaurantOfferCreationRequest {
     public DateTime OfferStartDate { get; init; }
     public DateTime OfferEndDate { get; init; }
     public bool IsActive { get; init; }
-    public int RestaurantId { get; init; }
+    public Guid RestaurantId { get; init; }
 }

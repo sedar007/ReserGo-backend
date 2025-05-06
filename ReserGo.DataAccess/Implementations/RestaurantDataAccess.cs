@@ -12,7 +12,7 @@ public class RestaurantDataAccess : IRestaurantDataAccess {
         _context = context;
     }
 
-    public async Task<Restaurant?> GetById(int id) {
+    public async Task<Restaurant?> GetById(Guid id) {
         return await _context.Restaurant.FirstOrDefaultAsync(x => x.Id == id);
     }
 
@@ -20,7 +20,7 @@ public class RestaurantDataAccess : IRestaurantDataAccess {
         return await _context.Restaurant.FirstOrDefaultAsync(x => x.StayId == stayId);
     }
 
-    public async Task<IEnumerable<Restaurant>> GetRestaurantsByUserId(int userId) {
+    public async Task<IEnumerable<Restaurant>> GetRestaurantsByUserId(Guid userId) {
         return await _context.Restaurant.Where(x => x.UserId == userId).ToListAsync();
     }
 

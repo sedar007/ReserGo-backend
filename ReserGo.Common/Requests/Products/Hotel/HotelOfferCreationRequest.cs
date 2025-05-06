@@ -9,5 +9,5 @@ public class HotelOfferCreationRequest {
     public DateTime OfferStartDate { get; init; }
     public DateTime OfferEndDate { get; init; }
     public bool IsActive { get; init; }
-    public int HotelId { get; init; }
+    public Guid HotelId { get; init; }
 }

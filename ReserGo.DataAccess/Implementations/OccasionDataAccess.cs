@@ -12,7 +12,7 @@ public class OccasionDataAccess : IOccasionDataAccess {
         _context = context;
     }
 
-    public async Task<Occasion?> GetById(int id) {
+    public async Task<Occasion?> GetById(Guid id) {
         return await _context.Occasion.FirstOrDefaultAsync(x => x.Id == id);
     }
 
@@ -20,7 +20,7 @@ public class OccasionDataAccess : IOccasionDataAccess {
         return await _context.Occasion.FirstOrDefaultAsync(x => x.StayId == stayId);
     }
 
-    public async Task<IEnumerable<Occasion>> GetOccasionsByUserId(int userId) {
+    public async Task<IEnumerable<Occasion>> GetOccasionsByUserId(Guid userId) {
         return await _context.Occasion.Where(x => x.UserId == userId).ToListAsync();
     }
 

@@ -8,5 +8,5 @@ public class OccasionOfferCreationRequest {
     public DateTime OfferStartDate { get; init; }
     public DateTime OfferEndDate { get; init; }
     public bool IsActive { get; init; }
-    public int OccasionId { get; init; }
+    public Guid OccasionId { get; init; }
 }

@@ -42,7 +42,7 @@ public class CloudinaryService : ICloudinaryService {
         return true;
     }
 
-    public async Task<string?> UploadImage(IFormFile file, int userId) {
+    public async Task<string?> UploadImage(IFormFile file, Guid userId) {
         _logger.LogInformation("Uploading image with file name: {FileName}", file.FileName);
 
 

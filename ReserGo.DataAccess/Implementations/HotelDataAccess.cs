@@ -12,7 +12,7 @@ public class HotelDataAccess : IHotelDataAccess {
         _context = context;
     }
 
-    public async Task<Hotel?> GetById(int id) {
+    public async Task<Hotel?> GetById(Guid id) {
         return await _context.Hotel.FirstOrDefaultAsync(x => x.Id == id);
     }
 
@@ -20,7 +20,7 @@ public class HotelDataAccess : IHotelDataAccess {
         return await _context.Hotel.FirstOrDefaultAsync(x => x.StayId == stayId);
     }
 
-    public async Task<IEnumerable<Hotel>> GetHotelsByUserId(int userId) {
+    public async Task<IEnumerable<Hotel>> GetHotelsByUserId(Guid userId) {
         return await _context.Hotel.Where(x => x.UserId == userId).ToListAsync();
     }
 

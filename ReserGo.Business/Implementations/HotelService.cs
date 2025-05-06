@@ -74,7 +74,7 @@ public class HotelService : IHotelService {
         }
     }
 
-    public async Task<HotelDto?> GetById(int id) {
+    public async Task<HotelDto?> GetById(Guid id) {
         try {
             if (_cache.TryGetValue($"hotel_{id}", out Hotel cachedHotel)) return cachedHotel.ToDto();
 
@@ -96,7 +96,7 @@ public class HotelService : IHotelService {
         }
     }
 
-    public async Task<IEnumerable<HotelDto>> GetHotelsByUserId(int userId) {
+    public async Task<IEnumerable<HotelDto>> GetHotelsByUserId(Guid userId) {
         try {
             var hotels = await _hotelDataAccess.GetHotelsByUserId(userId);
             return hotels.Select(hotel => hotel.ToDto());
@@ -178,7 +178,7 @@ public class HotelService : IHotelService {
         }
     }
 
-    public async Task Delete(int id) {
+    public async Task Delete(Guid id) {
         try {
             var hotel = await _hotelDataAccess.GetById(id);
             if (hotel is null) {

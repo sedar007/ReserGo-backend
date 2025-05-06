@@ -1,8 +1,8 @@
 namespace ReserGo.Common.Models;
 
 public class Resource<T> {
-    public T Data;
-    public List<Link> Links = new();
+    public T Data { get; set; } = default!;
+    public List<Link> Links { get; set; } = new();
 }
 
 public class Link {

@@ -1,7 +1,7 @@
 namespace ReserGo.Common.DTO;
 
 public class RestaurantDto {
-    public int Id { get; set; }
+    public Guid Id { get; init; } = Guid.NewGuid();
     public string Name { get; set; } = null!;
     public string Location { get; set; } = null!;
     public string CuisineType { get; set; } = null!;

@@ -83,7 +83,7 @@ public class RestaurantController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<RestaurantDto>>> GetById(int id) {
+    public async Task<ActionResult<Resource<RestaurantDto>>> GetById(Guid id) {
         try {
             var restaurant = await _restaurantService.GetById(id);
             if (restaurant == null) return NotFound($"Restaurant with ID {id} not found.");
@@ -262,7 +262,7 @@ public class RestaurantController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> Delete(int id) {
+    public async Task<ActionResult> Delete(Guid id) {
         try {
             await _restaurantService.Delete(id);
             return NoContent();

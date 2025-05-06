@@ -77,7 +77,7 @@ public class OccasionService : IOccasionService {
         }
     }
 
-    public async Task<OccasionDto?> GetById(int id) {
+    public async Task<OccasionDto?> GetById(Guid id) {
         try {
             var cacheKey = $"Occasion_GetById_{id}";
 
@@ -131,7 +131,7 @@ public class OccasionService : IOccasionService {
         }
     }
 
-    public async Task<IEnumerable<OccasionDto>> GetOccasionsByUserId(int userId) {
+    public async Task<IEnumerable<OccasionDto>> GetOccasionsByUserId(Guid userId) {
         try {
             var occasions = await _occasionDataAccess.GetOccasionsByUserId(userId);
             return occasions.Select(occasion => occasion.ToDto());
@@ -190,7 +190,7 @@ public class OccasionService : IOccasionService {
         }
     }
 
-    public async Task Delete(int id) {
+    public async Task Delete(Guid id) {
         try {
             var occasion = await _occasionDataAccess.GetById(id);
             if (occasion is null) {
@@ -217,7 +217,7 @@ public class OccasionService : IOccasionService {
         }
     }
 
-    private void RemoveCache(int id, long stayId) {
+    private void RemoveCache(Guid id, long stayId) {
         _cache.Remove($"Occasion_GetById_{id}");
         _cache.Remove($"Occasion_GetByStayId_{stayId}");
     }

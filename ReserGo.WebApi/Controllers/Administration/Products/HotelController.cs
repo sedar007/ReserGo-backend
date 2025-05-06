@@ -78,7 +78,7 @@ public class HotelController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<HotelDto>>> GetById(int id) {
+    public async Task<ActionResult<Resource<HotelDto>>> GetById(Guid id) {
         try {
             var hotel = await _hotelService.GetById(id);
             if (hotel == null) return NotFound($"Hotel with ID {id} not found.");
@@ -258,7 +258,7 @@ public class HotelController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> Delete(int id) {
+    public async Task<ActionResult> Delete(Guid id) {
         try {
             await _hotelService.Delete(id);
             return NoContent();

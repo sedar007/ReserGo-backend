@@ -78,7 +78,7 @@ public class RestaurantOfferService : IRestaurantOfferService {
         }
     }
 
-    public async Task<RestaurantOfferDto?> GetById(int id) {
+    public async Task<RestaurantOfferDto?> GetById(Guid id) {
         try {
             if (_cache.TryGetValue($"restaurantOffer_{id}", out RestaurantOffer cachedRestaurantOffer))
                 return cachedRestaurantOffer.ToDto();
@@ -101,7 +101,7 @@ public class RestaurantOfferService : IRestaurantOfferService {
         }
     }
 
-    public async Task<IEnumerable<RestaurantOfferDto>> GetRestaurantsByUserId(int userId) {
+    public async Task<IEnumerable<RestaurantOfferDto>> GetRestaurantsByUserId(Guid userId) {
         try {
             var cacheKey = $"restaurantOffers_user_{userId}";
 
@@ -122,7 +122,7 @@ public class RestaurantOfferService : IRestaurantOfferService {
         }
     }
 
-    public async Task<RestaurantOfferDto> Update(int id, RestaurantOfferUpdateRequest request) {
+    public async Task<RestaurantOfferDto> Update(Guid id, RestaurantOfferUpdateRequest request) {
         try {
             var restaurantOffer = await _restaurantOfferDataAccess.GetById(id);
             if (restaurantOffer is null) throw new Exception("Restaurant offer not found");
@@ -156,7 +156,7 @@ public class RestaurantOfferService : IRestaurantOfferService {
         }
     }
 
-    public async Task Delete(int id) {
+    public async Task Delete(Guid id) {
         try {
             var restaurantOffer = await _restaurantOfferDataAccess.GetById(id);
             if (restaurantOffer is null) {

@@ -12,11 +12,11 @@ public class OccasionOfferDataAccess : IOccasionOfferDataAccess {
         _context = context;
     }
 
-    public async Task<OccasionOffer?> GetById(int id) {
+    public async Task<OccasionOffer?> GetById(Guid id) {
         return await _context.OccasionOffer.Include(h => h.Occasion).FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<IEnumerable<OccasionOffer>> GetOccasionsOfferByUserId(int userId) {
+    public async Task<IEnumerable<OccasionOffer>> GetOccasionsOfferByUserId(Guid userId) {
         return await _context.OccasionOffer.Where(x => x.UserId == userId).Include(h => h.Occasion).ToListAsync();
     }
 

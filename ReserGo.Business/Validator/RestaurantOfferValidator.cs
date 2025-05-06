@@ -19,7 +19,7 @@ public static class RestaurantOfferValidator {
         if (request.OfferEndDate < DateTime.Now) return "Offer end date cannot be in the past.";
         if (request.OfferStartDate < DateTime.Now) return "Offer start date cannot be in the past.";
         if (request.OfferStartDate >= request.OfferEndDate) return "Offer start date must be before end date.";
-        if (request.RestaurantId <= 0) return "Restaurant ID must be greater than zero.";
+        if (request.RestaurantId == Guid.Empty) return "Restaurant ID cannot be empty.";
         return "";
     }
 

@@ -111,6 +111,18 @@ public class ReserGoContext : DbContext {
             .WithOne(oo => oo.User)
             .HasForeignKey(oo => oo.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        //Config Login
+        modelBuilder.Entity<Login>()
+            .HasKey(l => l.Id);
+        modelBuilder.Entity<Login>()
+            .HasIndex(l => l.Username)
+            .IsUnique();
+        modelBuilder.Entity<Login>()
+            .HasOne(l => l.User)
+            .WithOne(u => u.Login)
+            .HasForeignKey<Login>(l => l.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // Config Hotel, Occasion, Restaurant
         modelBuilder.Entity<Hotel>()
@@ -163,6 +175,15 @@ public class ReserGoContext : DbContext {
             .HasOne(ro => ro.Restaurant)
             .WithMany(r => r.RestaurantOffers)
             .HasForeignKey(ro => ro.RestaurantId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        // Config Address
+        modelBuilder.Entity<Address>()
+            .HasKey(a => a.Id);
+        modelBuilder.Entity<Address>()
+            .HasOne(a => a.User)
+            .WithOne(u => u.Address)
+            .HasForeignKey<Address>(a => a.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Config OccasionOffer

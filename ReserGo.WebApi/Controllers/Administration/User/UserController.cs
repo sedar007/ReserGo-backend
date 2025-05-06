@@ -77,7 +77,7 @@ public class UserController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<UserDto>>> GetById(int id) {
+    public async Task<ActionResult<Resource<UserDto>>> GetById(Guid id) {
         try {
             var user = await _userService.GetById(id);
             if (user == null) return NotFound($"User with ID {id} not found.");
@@ -122,7 +122,7 @@ public class UserController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> Delete(int id) {
+    public async Task<ActionResult> Delete(Guid id) {
         try {
             await _userService.Delete(id);
             return NoContent();
@@ -149,7 +149,7 @@ public class UserController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Resource<UserDto>>> UpdateUser(int id, UserUpdateRequest request) {
+    public async Task<ActionResult<Resource<UserDto>>> UpdateUser(Guid id, UserUpdateRequest request) {
         try {
             var updatedUser = await _userService.UpdateUser(id, request);
 

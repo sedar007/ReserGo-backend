@@ -3,9 +3,9 @@
 namespace ReserGo.DataAccess.Interfaces;
 
 public interface ILoginDataAccess {
-    Task<Login?> GetById(int id);
+    Task<Login?> GetById(Guid id);
     Task<Login> Create(Login login);
-    Task<Login?> GetByUserId(int id);
+    Task<Login?> GetByUserId(Guid id);
 
     Task Update(Login login);
 }

@@ -70,7 +70,7 @@ public class RestaurantService : IRestaurantService {
         }
     }
 
-    public async Task<RestaurantDto?> GetById(int id) {
+    public async Task<RestaurantDto?> GetById(Guid id) {
         try {
             var cacheKey = $"Restaurant_GetById_{id}";
 
@@ -173,7 +173,7 @@ public class RestaurantService : IRestaurantService {
         }
     }
 
-    public async Task<IEnumerable<RestaurantDto>> GetRestaurantsByUserId(int userId) {
+    public async Task<IEnumerable<RestaurantDto>> GetRestaurantsByUserId(Guid userId) {
         try {
             var restaurants = await _restaurantDataAccess.GetRestaurantsByUserId(userId);
             return restaurants.Select(hotel => hotel.ToDto());
@@ -184,7 +184,7 @@ public class RestaurantService : IRestaurantService {
         }
     }
 
-    public async Task Delete(int id) {
+    public async Task Delete(Guid id) {
         try {
             var restaurant = await _restaurantDataAccess.GetById(id);
             if (restaurant is null) {
@@ -211,7 +211,7 @@ public class RestaurantService : IRestaurantService {
         }
     }
 
-    private void RemoveCache(int id, long stayId) {
+    private void RemoveCache(Guid id, long stayId) {
         _cache.Remove($"Restaurant_GetById_{id}");
         _cache.Remove($"Restaurant_GetByStayId_{stayId}");
     }

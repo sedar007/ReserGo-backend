@@ -12,11 +12,11 @@ public class HotelOfferDataAccess : IHotelOfferDataAccess {
         _context = context;
     }
 
-    public async Task<HotelOffer?> GetById(int id) {
+    public async Task<HotelOffer?> GetById(Guid id) {
         return await _context.HotelOffer.Include(h => h.Hotel).FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<IEnumerable<HotelOffer>> GetHotelsOfferByUserId(int userId) {
+    public async Task<IEnumerable<HotelOffer>> GetHotelsOfferByUserId(Guid userId) {
         return await _context.HotelOffer.Where(x => x.UserId == userId).Include(h => h.Hotel).ToListAsync();
     }
 

@@ -79,7 +79,7 @@ public class OccasionController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<OccasionDto>>> GetById(int id) {
+    public async Task<ActionResult<Resource<OccasionDto>>> GetById(Guid id) {
         try {
             var occasion = await _occasionService.GetById(id);
             if (occasion == null) return NotFound($"Occasion with ID {id} not found.");
@@ -258,7 +258,7 @@ public class OccasionController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> Delete(int id) {
+    public async Task<ActionResult> Delete(Guid id) {
         try {
             await _occasionService.Delete(id);
             return NoContent();

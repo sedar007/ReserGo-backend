@@ -72,7 +72,7 @@ public class LoginService : ILoginService {
 
     public async Task<LoginDto?> Create(string password, User user) {
         // User validation
-        if (user == null || user.Id <= 0) {
+        if (user == null || user.Id == Guid.Empty) {
             _logger.LogError("Invalid user object");
             throw new InvalidDataException("User must be created before login");
         }
