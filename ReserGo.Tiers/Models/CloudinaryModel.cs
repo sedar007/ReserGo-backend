@@ -11,9 +11,9 @@ public class CloudinaryModel {
     public CloudinaryModel(IConfiguration configuration, ILogger<CloudinaryModel> logger) {
         _logger = logger;
         _logger.LogInformation("Initializing CloudinaryModel");
-        var cloudinaryCloudName = configuration.GetSection("CloudinaryCloudName")?.Get<string>();
-        var cloudinaryApiKey = configuration.GetSection("CloudinaryApiKey")?.Get<string>();
-        var cloudinaryApiSecret = configuration.GetSection("CloudinaryApiSecret")?.Get<string>();
+        var cloudinaryCloudName = configuration.GetSection("CloudinaryCloudName").Get<string>();
+        var cloudinaryApiKey = configuration.GetSection("CloudinaryApiKey").Get<string>();
+        var cloudinaryApiSecret = configuration.GetSection("CloudinaryApiSecret").Get<string>();
         if (cloudinaryCloudName == null || cloudinaryApiKey == null || cloudinaryApiSecret == null) {
             _logger.LogError("Cloudinary settings are not configured properly.");
             throw new ArgumentNullException(nameof(cloudinaryCloudName), "Cloudinary settings are missing.");
@@ -30,10 +30,4 @@ public class CloudinaryModel {
         _logger.LogInformation("Retrieving Cloudinary instance");
         return _cloudinary;
     }
-}
-
-public class AppSettingsCloudinary {
-    public string CloudinaryCloudName { get; init; } = null!;
-    public string CloudinaryApiKey { get; init; } = null!;
-    public string CloudinaryApiSecret { get; init; } = null!;
 }

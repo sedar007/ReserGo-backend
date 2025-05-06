@@ -25,7 +25,6 @@ public class GoogleAuthService : IGoogleAuthService {
                 Email = payload.Email,
                 FamilyName = payload.FamilyName,
                 GivenName = payload.GivenName,
-                Picture = payload.Picture
             };
 
             _logger.LogInformation("User info retrieved: {Email}", userInfo.Email);

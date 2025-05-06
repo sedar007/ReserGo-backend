@@ -16,9 +16,9 @@ public class CloudinaryService : ICloudinaryService {
         _cloudinary = cloudinary.GetCloudinary();
     }
 
-    public async Task<string> GetPicture(string publicId) {
+    public string GetPicture(string publicId) {
         _logger.LogInformation("Getting picture with publicId: {PublicId}", publicId);
-        var url = _cloudinary.Api.UrlImgUp.Secure(true).BuildUrl(publicId);
+        var url = _cloudinary.Api.UrlImgUp.Secure().BuildUrl(publicId);
         _logger.LogInformation("Generated URL: {Url}", url);
         return url;
     }

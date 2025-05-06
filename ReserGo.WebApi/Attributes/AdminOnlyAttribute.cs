@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using ReserGo.Common.Enum;
 using ReserGo.Shared.Interfaces;
-using ReserGo.Common.Security;
 
 namespace ReserGo.WebAPI.Attributes;
 
