@@ -16,17 +16,19 @@ using ReserGo.Shared;
 namespace ReserGo.Business.Implementations;
 public class RestaurantOfferService : IRestaurantOfferService {
     
-    private readonly ILogger<UserService> _logger;
+    private readonly ILogger<RestaurantOfferService> _logger;
     private readonly ISecurity _security;
-    private readonly IImageService _imageService;
     private readonly IRestaurantService _restaurantService;
     private readonly IRestaurantOfferDataAccess _restaurantOfferDataAccess;
     private readonly IMemoryCache _cache;
 
-    public RestaurantOfferService(ILogger<UserService> logger, IRestaurantOfferDataAccess restaurantOfferDataAccess, IRestaurantService restaurantService, ISecurity security, IImageService imageService, IMemoryCache cache) {
+    public RestaurantOfferService(ILogger<RestaurantOfferService> logger, 
+                                  IRestaurantOfferDataAccess restaurantOfferDataAccess, 
+                                  IRestaurantService restaurantService, 
+                                  ISecurity security, 
+                                  IMemoryCache cache) {
         _logger = logger;
         _security = security;
-        _imageService = imageService;
         _restaurantOfferDataAccess = restaurantOfferDataAccess;
         _restaurantService = restaurantService;
         _cache = cache;
@@ -36,7 +38,7 @@ public class RestaurantOfferService : IRestaurantOfferService {
         try {
             
             string error = RestaurantOfferValidator.GetError(request);
-            if (string.IsNullOrEmpty(error) == false) {
+            if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
@@ -127,7 +129,7 @@ public class RestaurantOfferService : IRestaurantOfferService {
             if (restaurantOffer is null) throw new Exception("Restaurant offer not found");
 
             string error = RestaurantOfferValidator.GetError(request);
-            if (string.IsNullOrEmpty(error) == false) {
+            if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }

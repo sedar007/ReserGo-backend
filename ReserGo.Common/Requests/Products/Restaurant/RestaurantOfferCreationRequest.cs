@@ -2,7 +2,7 @@ namespace ReserGo.Common.Requests.Products.Restaurant;
 
 public class RestaurantOfferCreationRequest {
     public String OfferTitle { get; init; } = null!;
-    public String? Description { get; init; }
+    public String Description { get; init; } = null!;
     public double? PricePerPerson { get; init; }
     public int NumberOfGuests { get; init; }
     public DateTime OfferStartDate { get; init; }

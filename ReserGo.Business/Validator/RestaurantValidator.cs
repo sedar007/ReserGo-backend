@@ -2,7 +2,7 @@ using ReserGo.Common.Requests.Products.Restaurant;
 
 namespace ReserGo.Business.Validator;
 
-public class RestaurantValidator
+public static class RestaurantValidator
 {
     public static string GetError(RestaurantCreationRequest? request) {
         if (request == null) return "Invalid request.";
