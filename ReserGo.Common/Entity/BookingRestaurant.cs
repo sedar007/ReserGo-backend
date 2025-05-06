@@ -5,12 +5,12 @@ public class BookingRestaurant {
     public int RestaurantId { get; set; }
     
     public DateTime BookingDate { get; set; }
-    public string Status { get; set; }
+    public String Status { get; set; } = null!;
     public DateTime ReservationTime { get; set; }
     public int NumberOfPeople { get; set; }
     
-    public User User { get; set; }
-    public Restaurant Restaurant { get; set; }
+    public User User { get; set; } = null!;
+    public Restaurant Restaurant { get; set; } = null!;
     
-    public DateTime? LastUpdated { get; set; }
+    public DateTime LastUpdated { get; set; } = DateTime.Now;
 }

@@ -29,7 +29,7 @@ public class GoogleService : IGoogleService {
         
         if(token == null) {
             _logger.LogWarning("Google Auth failed: token is null.");
-            throw new ArgumentNullException("Google Auth failed");
+            throw new ArgumentNullException(nameof(token), "Google Auth failed");
         }
 
         GoogleAuthResponse? response = await _gooleAuthService.Create(token);
@@ -37,27 +37,21 @@ public class GoogleService : IGoogleService {
             _logger.LogWarning("Google Auth failed: response is null.");
             throw new KeyNotFoundException("Google Auth failed");
         }
-    
-        _logger.LogInformation("Google Auth successful for email: {Email}", response.Email);
-
+        
         User? user = await _userDataAccess.GetByEmail(response.Email);
         if (user == null) {
             _logger.LogInformation("User not found, creating new user with email: {Email}", response.Email);
-            User newUser = new User {
+            user = await _userDataAccess.Create(new User {
                 FirstName = response.GivenName,
                 LastName = response.FamilyName,
                 Email = response.Email,
                 Username = response.Email,
                 Role = UserRole.Admin
-            };
-            user = await _userDataAccess.Create(newUser);
-            _logger.LogInformation("New user created with ID: {UserId}", user.Id);
-        } else {
-            _logger.LogInformation("User found with ID: {UserId}", user.Id);
+            });
         }
-
+        
         string jwtToken = _security.GenerateJwtToken(user.Username, user.Id, user.Role);
-        _logger.LogInformation("JWT token generated for user ID: {UserId}", user.Id);
+        _logger.LogInformation("Google Auth successful for email: {Email}, User ID: {UserId}", response.Email, user.Id);
 
         return new AuthenticateResponse(user, jwtToken, user.Role);
     }

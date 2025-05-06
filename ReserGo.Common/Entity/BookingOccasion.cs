@@ -5,11 +5,11 @@ public class BookingOccasion {
     public int OccasionId { get; set; }
 
     public DateTime BookingDate { get; set; }
-    public string Status { get; set; }
-    public bool VIPAccess { get; set; }
+    public String Status { get; set; } = null!;
+    public bool VipAccess { get; set; } = false;
     
-    public User User { get; set; }
-    public Occasion Occasion { get; set; }
+    public User User { get; set; } = null!;
+    public Occasion Occasion { get; set; } = null!;
     
-    public DateTime? LastUpdated { get; set; }
+    public DateTime LastUpdated { get; set; } = DateTime.Now;
 }

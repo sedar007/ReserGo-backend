@@ -57,7 +57,7 @@ public class UserService : IUserService {
                 LastName = request.LastName,
                 Email = request.Email,
                 Username = request.Username,
-                Role = UserRole.Client
+                Role = UserRole.Admin
             };
             
             newUser = await _userDataAccess.Create(newUser);

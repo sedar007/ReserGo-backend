@@ -87,7 +87,7 @@ public class LoginService : ILoginService {
              UserId = user.Id,  
              Password = hashedPassword,
              Username = user.Username,
-             LastLogin = null,
+             LastLogin = DateTime.UtcNow,
              FailedAttempts = 0,
              IsLocked = false
          };

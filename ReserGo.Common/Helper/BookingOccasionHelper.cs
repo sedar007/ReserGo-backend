@@ -10,7 +10,7 @@ public static class BookingOccasionHelper {
             OccasionId = bookingOccasion.OccasionId,
             BookingDate = bookingOccasion.BookingDate,
             Status = bookingOccasion.Status,
-            VIPAccess = bookingOccasion.VIPAccess
+            VipAccess = bookingOccasion.VipAccess
         };
     }
 }

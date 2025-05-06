@@ -8,7 +8,7 @@ public static class UserValidator {
         if (string.IsNullOrWhiteSpace(request.FirstName) || string.IsNullOrWhiteSpace(request.LastName)) return "FirstName or LastName cannot be empty.";
         if (string.IsNullOrWhiteSpace(request.Username)) return "Username cannot be empty.";
         string emailError = EmailValidator.GetError(request.Email);
-        if (string.IsNullOrEmpty(emailError) == false) return emailError;
+        if (!string.IsNullOrEmpty(emailError)) return emailError;
         return PasswordValidator.GetError(request.Password);
     }
     
@@ -17,7 +17,7 @@ public static class UserValidator {
         if (string.IsNullOrWhiteSpace(request.FirstName) || string.IsNullOrWhiteSpace(request.LastName)) return "FirstName or LastName cannot be empty.";
 
         string emailError = EmailValidator.GetError(request.Email);
-        if (string.IsNullOrEmpty(emailError) == false) return emailError;
+        if (!string.IsNullOrEmpty(emailError)) return emailError;
         
         return string.Empty;
     }

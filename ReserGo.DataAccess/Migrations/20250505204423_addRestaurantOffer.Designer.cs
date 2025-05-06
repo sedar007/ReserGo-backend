@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReserGo.DataAccess;
@@ -11,9 +12,11 @@ using ReserGo.DataAccess;
 namespace ReserGo.DataAccess.Migrations
 {
     [DbContext(typeof(ReserGoContext))]
-    partial class ReserGoContextModelSnapshot : ModelSnapshot
+    [Migration("20250505204423_addRestaurantOffer")]
+    partial class addRestaurantOffer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -103,7 +106,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("LastUpdated")
+                    b.Property<DateTime?>("LastUpdated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("OccasionId")
@@ -116,7 +119,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<int>("UserId")
                         .HasColumnType("integer");
 
-                    b.Property<bool>("VipAccess")
+                    b.Property<bool>("VIPAccess")
                         .HasColumnType("boolean");
 
                     b.HasKey("Id");
@@ -139,7 +142,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("LastUpdated")
+                    b.Property<DateTime?>("LastUpdated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("NumberOfPeople")
@@ -178,7 +181,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("LastUpdated")
+                    b.Property<DateTime?>("LastUpdated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Location")
@@ -217,7 +220,6 @@ namespace ReserGo.DataAccess.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int>("HotelId")
@@ -271,7 +273,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<bool>("IsLocked")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime>("LastLogin")
+                    b.Property<DateTime?>("LastLogin")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Password")
@@ -304,7 +306,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<int>("Capacity")
                         .HasColumnType("integer");
 
-                    b.Property<DateTime>("LastUpdated")
+                    b.Property<DateTime?>("LastUpdated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Location")
@@ -334,52 +336,6 @@ namespace ReserGo.DataAccess.Migrations
                     b.ToTable("Occasion");
                 });
 
-            modelBuilder.Entity("ReserGo.Common.Entity.OccasionOffer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("NumberOfGuests")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("OccasionId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("OfferEndDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("OfferStartDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("OfferTitle")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<double>("Price")
-                        .HasColumnType("double precision");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OccasionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("OccasionOffer");
-                });
-
             modelBuilder.Entity("ReserGo.Common.Entity.Restaurant", b =>
                 {
                     b.Property<int>("Id")
@@ -395,7 +351,7 @@ namespace ReserGo.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("LastUpdated")
+                    b.Property<DateTime?>("LastUpdated")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Location")
@@ -434,7 +390,6 @@ namespace ReserGo.DataAccess.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
@@ -630,25 +585,6 @@ namespace ReserGo.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("ReserGo.Common.Entity.OccasionOffer", b =>
-                {
-                    b.HasOne("ReserGo.Common.Entity.Occasion", "Occasion")
-                        .WithMany("OccasionOffers")
-                        .HasForeignKey("OccasionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ReserGo.Common.Entity.User", "User")
-                        .WithMany("OccasionOffers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Occasion");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("ReserGo.Common.Entity.Restaurant", b =>
                 {
                     b.HasOne("ReserGo.Common.Entity.User", "User")
@@ -705,8 +641,6 @@ namespace ReserGo.DataAccess.Migrations
             modelBuilder.Entity("ReserGo.Common.Entity.Occasion", b =>
                 {
                     b.Navigation("BookingsOccasion");
-
-                    b.Navigation("OccasionOffers");
                 });
 
             modelBuilder.Entity("ReserGo.Common.Entity.Restaurant", b =>
@@ -730,8 +664,6 @@ namespace ReserGo.DataAccess.Migrations
 
                     b.Navigation("Login")
                         .IsRequired();
-
-                    b.Navigation("OccasionOffers");
 
                     b.Navigation("Occasions");
 
