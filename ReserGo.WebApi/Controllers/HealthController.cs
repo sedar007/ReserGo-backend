@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+
 namespace ReserGo.WebAPI.Controllers;
 
 [ApiController]
 [Route("")]
 public class HealthController : ControllerBase {
-    
     /// <summary>
     /// Checks the health status of the API.
     /// </summary>

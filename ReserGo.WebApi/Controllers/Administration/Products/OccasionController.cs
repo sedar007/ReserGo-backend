@@ -10,20 +10,20 @@ namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
 [AdminOnly]
 [ApiController]
-[Tags("Products | Occasion")] 
+[Tags("Products | Occasion")]
 [Route("api/administration/products/occasions/")]
 public class OccasionController : ControllerBase {
-    
     private readonly ILogger<OccasionController> _logger;
     private readonly IOccasionService _occasionService;
     private readonly ISecurity _security;
 
-    public OccasionController(ILogger<OccasionController> logger, IOccasionService occasionService, ISecurity security) {
+    public OccasionController(ILogger<OccasionController> logger, IOccasionService occasionService,
+        ISecurity security) {
         _logger = logger;
         _security = security;
         _occasionService = occasionService;
     }
-    
+
     /// <summary>
     /// Create a new occasion.
     /// </summary>
@@ -38,17 +38,17 @@ public class OccasionController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Create(OccasionCreationRequest request) {
         try {
-            OccasionDto data = await _occasionService.Create(request);
+            var data = await _occasionService.Create(request);
 
             var resource = new Resource<OccasionDto> {
                 Data = data,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id = data.Id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id = data.Id }),
                         Rel = "update",
                         Method = "PUT"
@@ -66,7 +66,7 @@ public class OccasionController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve an occasion by their ID.
     /// </summary>
@@ -82,19 +82,17 @@ public class OccasionController : ControllerBase {
     public async Task<ActionResult<Resource<OccasionDto>>> GetById(int id) {
         try {
             var occasion = await _occasionService.GetById(id);
-            if (occasion == null) {
-                return NotFound($"Occasion with ID {id} not found.");
-            }
+            if (occasion == null) return NotFound($"Occasion with ID {id} not found.");
 
             var resource = new Resource<OccasionDto> {
                 Data = occasion,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id }),
                         Rel = "update",
                         Method = "PUT"
@@ -112,7 +110,7 @@ public class OccasionController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve an occasion by their StayId.
     /// </summary>
@@ -128,19 +126,17 @@ public class OccasionController : ControllerBase {
     public async Task<ActionResult<Resource<OccasionDto>>> GetByStayId(long id) {
         try {
             var occasion = await _occasionService.GetByStayId(id);
-            if (occasion == null) {
-                return NotFound($"Occasion with StayId {id} not found.");
-            }
+            if (occasion == null) return NotFound($"Occasion with StayId {id} not found.");
 
             var resource = new Resource<OccasionDto> {
                 Data = occasion,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetByStayId), new { id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id }),
                         Rel = "update",
                         Method = "PUT"
@@ -158,7 +154,7 @@ public class OccasionController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve occasions for the connected user.
     /// </summary>
@@ -173,21 +169,19 @@ public class OccasionController : ControllerBase {
     public async Task<ActionResult<Resource<IEnumerable<Resource<OccasionDto>>>>> GetOccasionsForConnectedUser() {
         try {
             var connectedUser = _security.GetCurrentUser();
-            if (connectedUser == null) {
-                return Unauthorized("User not authenticated");
-            }
+            if (connectedUser == null) return Unauthorized("User not authenticated");
 
             var occasions = await _occasionService.GetOccasionsByUserId(connectedUser.UserId);
 
             var resources = occasions.Select(occasion => new Resource<OccasionDto> {
                 Data = occasion,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id = occasion.Id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id = occasion.Id }),
                         Rel = "update",
                         Method = "PUT"
@@ -198,7 +192,7 @@ public class OccasionController : ControllerBase {
             var resourceCollection = new Resource<IEnumerable<Resource<OccasionDto>>> {
                 Data = resources,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetOccasionsForConnectedUser)),
                         Rel = "self",
                         Method = "GET"
@@ -213,7 +207,7 @@ public class OccasionController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Update an existing occasion.
     /// </summary>
@@ -234,7 +228,7 @@ public class OccasionController : ControllerBase {
             var resource = new Resource<OccasionDto> {
                 Data = updatedOccasion,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id }),
                         Rel = "self",
                         Method = "GET"
@@ -251,7 +245,7 @@ public class OccasionController : ControllerBase {
             return NotFound(ex.Message);
         }
     }
-    
+
     /// <summary>
     /// Remove an Occasion by their ID.
     /// </summary>

@@ -10,7 +10,7 @@ namespace ReserGo.DataAccess.Implementations {
         {
             _context = context;
         }
-       
+
         public async Task<Login> Create(Login login) {
             var newData = _context.Login.Add(login);
             await _context.SaveChangesAsync();
@@ -18,3 +18,4 @@ namespace ReserGo.DataAccess.Implementations {
         }
     }
 } */
+

@@ -10,4 +10,3 @@ public interface IHotelDataAccess {
     Task<IEnumerable<Hotel>> GetHotelsByUserId(int userId);
     Task Delete(Hotel hotel);
 }
-

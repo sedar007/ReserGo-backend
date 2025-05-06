@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-
 using ReserGo.Business.Interfaces;
 using ReserGo.Business.Validator;
 using ReserGo.Common.DTO;
@@ -14,8 +13,8 @@ using ReserGo.Shared.Interfaces;
 using ReserGo.Shared;
 
 namespace ReserGo.Business.Implementations;
+
 public class OccasionOfferService : IOccasionOfferService {
-    
     private readonly ILogger<UserService> _logger;
     private readonly ISecurity _security;
     private readonly IImageService _imageService;
@@ -23,7 +22,8 @@ public class OccasionOfferService : IOccasionOfferService {
     private readonly IOccasionOfferDataAccess _occasionOfferDataAccess;
     private readonly IMemoryCache _cache;
 
-    public OccasionOfferService(ILogger<UserService> logger, IOccasionOfferDataAccess occasionOfferDataAccess, IOccasionService occasionService, ISecurity security, IImageService imageService, IMemoryCache cache) {
+    public OccasionOfferService(ILogger<UserService> logger, IOccasionOfferDataAccess occasionOfferDataAccess,
+        IOccasionService occasionService, ISecurity security, IImageService imageService, IMemoryCache cache) {
         _logger = logger;
         _security = security;
         _imageService = imageService;
@@ -31,27 +31,26 @@ public class OccasionOfferService : IOccasionOfferService {
         _occasionService = occasionService;
         _cache = cache;
     }
-    
+
     public async Task<OccasionOfferDto> Create(OccasionOfferCreationRequest request) {
         try {
-            
-            string error = OccasionOfferValidator.GetError(request);
+            var error = OccasionOfferValidator.GetError(request);
             if (string.IsNullOrEmpty(error) == false) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
 
-            ConnectedUser? connectedUser = _security.GetCurrentUser();
-            if(connectedUser == null) throw new UnauthorizedAccessException("User not connected");
-            
-            OccasionDto? occasion = await _occasionService.GetById(request.OccasionId);
+            var connectedUser = _security.GetCurrentUser();
+            if (connectedUser == null) throw new UnauthorizedAccessException("User not connected");
+
+            var occasion = await _occasionService.GetById(request.OccasionId);
             if (occasion == null) {
-                string errorMessage = "Occasion not found";
+                var errorMessage = "Occasion not found";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
-            
-            OccasionOffer newOccasionOffer = new OccasionOffer {
+
+            var newOccasionOffer = new OccasionOffer {
                 OfferTitle = request.OfferTitle,
                 Description = request.Description,
                 Price = request.Price,
@@ -62,54 +61,55 @@ public class OccasionOfferService : IOccasionOfferService {
                 OccasionId = occasion.Id,
                 UserId = connectedUser.UserId
             };
-            
+
             newOccasionOffer = await _occasionOfferDataAccess.Create(newOccasionOffer);
 
             // Cache the created occasion offer
-            _cache.Set($"newOccasionOffer_{newOccasionOffer.Id}", newOccasionOffer, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-            
+            _cache.Set($"newOccasionOffer_{newOccasionOffer.Id}", newOccasionOffer,
+                TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+
             _logger.LogInformation("Occasion Offer { id } created", newOccasionOffer.Id);
             return newOccasionOffer.ToDto();
-            
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
         }
     }
+
     public async Task<OccasionOfferDto?> GetById(int id) {
         try {
-            if (_cache.TryGetValue($"occasionOffer_{id}", out OccasionOffer cachedOccasionOffer)) {
+            if (_cache.TryGetValue($"occasionOffer_{id}", out OccasionOffer cachedOccasionOffer))
                 return cachedOccasionOffer.ToDto();
-            }
 
-            OccasionOffer? occasionOffer = await _occasionOfferDataAccess.GetById(id);
+            var occasionOffer = await _occasionOfferDataAccess.GetById(id);
             if (occasionOffer is null) {
-                string errorMessage = "This occasion offer does not exist.";
+                var errorMessage = "This occasion offer does not exist.";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
 
             _cache.Set($"occasionOffer_{id}", occasionOffer, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-            
+
             _logger.LogInformation("Occasion Offer { id } retrieved successfully", occasionOffer.Id);
             return occasionOffer.ToDto();
-            
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
         }
     }
-    
+
     public async Task<IEnumerable<OccasionOfferDto>> GetOccasionsByUserId(int userId) {
         try {
-            string cacheKey = $"occasionOffers_user_{userId}";
+            var cacheKey = $"occasionOffers_user_{userId}";
 
-            if (_cache.TryGetValue(cacheKey, out IEnumerable<OccasionOfferDto> cachedOccasionOffers)) {
+            if (_cache.TryGetValue(cacheKey, out IEnumerable<OccasionOfferDto> cachedOccasionOffers))
                 return cachedOccasionOffers;
-            }
 
-            IEnumerable<OccasionOffer> occasionOffers = await _occasionOfferDataAccess.GetOccasionsOfferByUserId(userId);
-            IEnumerable<OccasionOfferDto> occasionOfferDtos = occasionOffers.Select(occasionOffer => occasionOffer.ToDto());
+            var occasionOffers = await _occasionOfferDataAccess.GetOccasionsOfferByUserId(userId);
+            IEnumerable<OccasionOfferDto> occasionOfferDtos =
+                occasionOffers.Select(occasionOffer => occasionOffer.ToDto());
 
             _cache.Set(cacheKey, occasionOfferDtos, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
@@ -120,13 +120,13 @@ public class OccasionOfferService : IOccasionOfferService {
             throw;
         }
     }
-   
+
     public async Task<OccasionOfferDto> Update(int id, OccasionOfferUpdateRequest request) {
         try {
-            OccasionOffer? occasionOffer = await _occasionOfferDataAccess.GetById(id);
+            var occasionOffer = await _occasionOfferDataAccess.GetById(id);
             if (occasionOffer is null) throw new Exception("Occasion offer not found");
 
-            string error = OccasionOfferValidator.GetError(request);
+            var error = OccasionOfferValidator.GetError(request);
             if (string.IsNullOrEmpty(error) == false) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
@@ -143,12 +143,13 @@ public class OccasionOfferService : IOccasionOfferService {
             occasionOffer = await _occasionOfferDataAccess.Update(occasionOffer);
 
             // Update cache
-            _cache.Set($"occasion_offer_{occasionOffer.Id}", occasionOffer, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-            
+            _cache.Set($"occasion_offer_{occasionOffer.Id}", occasionOffer,
+                TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+
             _logger.LogInformation("Occasion Offer { stayId } updated successfully", occasionOffer.Id);
             return occasionOffer.ToDto();
-            
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
         }
@@ -156,9 +157,9 @@ public class OccasionOfferService : IOccasionOfferService {
 
     public async Task Delete(int id) {
         try {
-            OccasionOffer? occasionOffer = await _occasionOfferDataAccess.GetById(id);
+            var occasionOffer = await _occasionOfferDataAccess.GetById(id);
             if (occasionOffer is null) {
-                string errorMessage = "Occasion offer not found";
+                var errorMessage = "Occasion offer not found";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
@@ -167,13 +168,12 @@ public class OccasionOfferService : IOccasionOfferService {
 
             // Remove from cache
             _cache.Remove($"occasion_offer_{occasionOffer.Id}");
-            
+
             _logger.LogInformation("Occasion Offer { id } deleted successfully", occasionOffer.Id);
-            
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             _logger.LogError(e, e.Message);
             throw;
         }
     }
-    
 }

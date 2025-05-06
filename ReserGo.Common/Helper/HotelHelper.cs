@@ -10,7 +10,7 @@ public static class HotelHelper {
             Name = hotel.Name,
             Location = hotel.Location,
             Capacity = hotel.Capacity,
-            Picture =  hotel.Picture,
+            Picture = hotel.Picture,
             LastUpdated = hotel.LastUpdated,
             StayId = hotel.StayId
         };

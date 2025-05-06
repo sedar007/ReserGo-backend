@@ -1,29 +1,29 @@
 using Microsoft.AspNetCore.Mvc;
-
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products.Restaurant;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.Common.Models;
+
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
 [AdminOnly]
 [ApiController]
-[Tags("Products | Restaurant")] 
+[Tags("Products | Restaurant")]
 [Route("api/administration/products/restaurants/")]
 public class RestaurantController : ControllerBase {
-    
     private readonly ISecurity _security;
     private readonly ILogger<RestaurantController> _logger;
     private readonly IRestaurantService _restaurantService;
-    
-    public RestaurantController(ISecurity security, ILogger<RestaurantController> logger, IRestaurantService restaurantService) {
+
+    public RestaurantController(ISecurity security, ILogger<RestaurantController> logger,
+        IRestaurantService restaurantService) {
         _security = security;
         _logger = logger;
         _restaurantService = restaurantService;
     }
-    
+
     /// <summary>
     /// Create a new restaurant.
     /// </summary>
@@ -42,17 +42,17 @@ public class RestaurantController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Create(RestaurantCreationRequest request) {
         try {
-            RestaurantDto data = await _restaurantService.Create(request);
+            var data = await _restaurantService.Create(request);
 
             var resource = new Resource<RestaurantDto> {
                 Data = data,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id = data.Id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id = data.Id }),
                         Rel = "update",
                         Method = "PUT"
@@ -70,7 +70,7 @@ public class RestaurantController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve a Restaurant by their ID.
     /// </summary>
@@ -86,19 +86,17 @@ public class RestaurantController : ControllerBase {
     public async Task<ActionResult<Resource<RestaurantDto>>> GetById(int id) {
         try {
             var restaurant = await _restaurantService.GetById(id);
-            if (restaurant == null) {
-                return NotFound($"Restaurant with ID {id} not found.");
-            }
+            if (restaurant == null) return NotFound($"Restaurant with ID {id} not found.");
 
             var resource = new Resource<RestaurantDto> {
                 Data = restaurant,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id }),
                         Rel = "update",
                         Method = "PUT"
@@ -116,7 +114,7 @@ public class RestaurantController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve a restaurant by their StayId.
     /// </summary>
@@ -132,19 +130,17 @@ public class RestaurantController : ControllerBase {
     public async Task<ActionResult<Resource<RestaurantDto>>> GetByStayId(long id) {
         try {
             var restaurant = await _restaurantService.GetByStayId(id);
-            if (restaurant == null) {
-                return NotFound($"Restaurant with StayId {id} not found.");
-            }
+            if (restaurant == null) return NotFound($"Restaurant with StayId {id} not found.");
 
             var resource = new Resource<RestaurantDto> {
                 Data = restaurant,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetByStayId), new { id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id }),
                         Rel = "update",
                         Method = "PUT"
@@ -162,7 +158,7 @@ public class RestaurantController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve restaurants for the connected user.
     /// </summary>
@@ -177,21 +173,19 @@ public class RestaurantController : ControllerBase {
     public async Task<ActionResult<Resource<IEnumerable<Resource<RestaurantDto>>>>> GetRestaurantsForConnectedUser() {
         try {
             var connectedUser = _security.GetCurrentUser();
-            if (connectedUser == null) {
-                return Unauthorized("User not authenticated");
-            }
+            if (connectedUser == null) return Unauthorized("User not authenticated");
 
             var restaurants = await _restaurantService.GetRestaurantsByUserId(connectedUser.UserId);
 
             var resources = restaurants.Select(restaurant => new Resource<RestaurantDto> {
                 Data = restaurant,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id = restaurant.Id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id = restaurant.Id }),
                         Rel = "update",
                         Method = "PUT"
@@ -202,7 +196,7 @@ public class RestaurantController : ControllerBase {
             var resourceCollection = new Resource<IEnumerable<Resource<RestaurantDto>>> {
                 Data = resources,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetRestaurantsForConnectedUser)),
                         Rel = "self",
                         Method = "GET"
@@ -217,7 +211,7 @@ public class RestaurantController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Update an existing restaurant.
     /// </summary>
@@ -238,7 +232,7 @@ public class RestaurantController : ControllerBase {
             var resource = new Resource<RestaurantDto> {
                 Data = updatedRestaurant,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id }),
                         Rel = "self",
                         Method = "GET"
@@ -255,7 +249,7 @@ public class RestaurantController : ControllerBase {
             return NotFound(ex.Message);
         }
     }
-    
+
     /// <summary>
     /// Remove an Restaurant by their ID.
     /// </summary>

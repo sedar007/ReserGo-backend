@@ -9,11 +9,10 @@ using ReserGo.Common.Models;
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
 [ApiController]
-[Tags("Products | Hotel")] 
+[Tags("Products | Hotel")]
 [AdminOnly]
 [Route("api/administration/products/hotels/")]
 public class HotelController : ControllerBase {
-    
     private readonly ILogger<HotelController> _logger;
     private readonly IHotelService _hotelService;
     private readonly ISecurity _security;
@@ -23,7 +22,7 @@ public class HotelController : ControllerBase {
         _hotelService = hotelService;
         _security = security;
     }
-    
+
     /// <summary>
     /// Create a new hotel.
     /// </summary>
@@ -38,17 +37,17 @@ public class HotelController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Create(HotelCreationRequest request) {
         try {
-            HotelDto data = await _hotelService.Create(request);
+            var data = await _hotelService.Create(request);
 
             var resource = new Resource<HotelDto> {
                 Data = data,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id = data.Id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id = data.Id }),
                         Rel = "update",
                         Method = "PUT"
@@ -66,7 +65,7 @@ public class HotelController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve an hotel by their ID.
     /// </summary>
@@ -82,19 +81,17 @@ public class HotelController : ControllerBase {
     public async Task<ActionResult<Resource<HotelDto>>> GetById(int id) {
         try {
             var hotel = await _hotelService.GetById(id);
-            if (hotel == null) {
-                return NotFound($"Hotel with ID {id} not found.");
-            }
+            if (hotel == null) return NotFound($"Hotel with ID {id} not found.");
 
             var resource = new Resource<HotelDto> {
                 Data = hotel,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id }),
                         Rel = "update",
                         Method = "PUT"
@@ -112,7 +109,7 @@ public class HotelController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve an hotel by their StayId.
     /// </summary>
@@ -128,19 +125,17 @@ public class HotelController : ControllerBase {
     public async Task<ActionResult<Resource<HotelDto>>> GetByStayId(long id) {
         try {
             var hotel = await _hotelService.GetByStayId(id);
-            if (hotel == null) {
-                return NotFound($"Hotel with StayId {id} not found.");
-            }
+            if (hotel == null) return NotFound($"Hotel with StayId {id} not found.");
 
             var resource = new Resource<HotelDto> {
                 Data = hotel,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetByStayId), new { id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id }),
                         Rel = "update",
                         Method = "PUT"
@@ -158,7 +153,7 @@ public class HotelController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve hotels for the connected user.
     /// </summary>
@@ -173,21 +168,19 @@ public class HotelController : ControllerBase {
     public async Task<ActionResult<Resource<IEnumerable<Resource<HotelDto>>>>> GetHotelsForConnectedUser() {
         try {
             var connectedUser = _security.GetCurrentUser();
-            if (connectedUser == null) {
-                return Unauthorized("User not authenticated");
-            }
+            if (connectedUser == null) return Unauthorized("User not authenticated");
 
             var hotels = await _hotelService.GetHotelsByUserId(connectedUser.UserId);
 
             var resources = hotels.Select(hotel => new Resource<HotelDto> {
                 Data = hotel,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id = hotel.Id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id = hotel.Id }),
                         Rel = "update",
                         Method = "PUT"
@@ -198,7 +191,7 @@ public class HotelController : ControllerBase {
             var resourceCollection = new Resource<IEnumerable<Resource<HotelDto>>> {
                 Data = resources,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetHotelsForConnectedUser)),
                         Rel = "self",
                         Method = "GET"
@@ -213,8 +206,8 @@ public class HotelController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
-    
+
+
     /// <summary>
     /// Update an existing hotel.
     /// </summary>
@@ -235,7 +228,7 @@ public class HotelController : ControllerBase {
             var resource = new Resource<HotelDto> {
                 Data = updatedHotel,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id }),
                         Rel = "self",
                         Method = "GET"
@@ -252,7 +245,7 @@ public class HotelController : ControllerBase {
             return NotFound(ex.Message);
         }
     }
-    
+
     /// <summary>
     /// Remove an hotel by their ID.
     /// </summary>

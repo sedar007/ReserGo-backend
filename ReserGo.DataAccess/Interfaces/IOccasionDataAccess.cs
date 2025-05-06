@@ -10,4 +10,3 @@ public interface IOccasionDataAccess {
     Task<Occasion> Update(Occasion occasion);
     Task Delete(Occasion occasion);
 }
-

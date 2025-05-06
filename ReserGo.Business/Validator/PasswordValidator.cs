@@ -1,8 +1,8 @@
 using System.Text.RegularExpressions;
 
 namespace ReserGo.Business.Validator;
+
 public static class PasswordValidator {
-    
     public static string GetError(string password) {
         if (string.IsNullOrWhiteSpace(password))
             return "Password cannot be empty.";
@@ -19,9 +19,9 @@ public static class PasswordValidator {
         if (!Regex.IsMatch(password, @"\d"))
             return "Password must contain at least one digit.";
 
-        if (!Regex.IsMatch(password, @"[\W_]")) 
+        if (!Regex.IsMatch(password, @"[\W_]"))
             return "Password must contain at least one special character.";
 
-        return string.Empty; 
+        return string.Empty;
     }
 }

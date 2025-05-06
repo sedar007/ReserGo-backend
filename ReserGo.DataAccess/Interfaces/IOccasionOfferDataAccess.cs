@@ -9,4 +9,3 @@ public interface IOccasionOfferDataAccess {
     Task<IEnumerable<OccasionOffer>> GetOccasionsOfferByUserId(int userId);
     Task Delete(OccasionOffer occasionOffer);
 }
-

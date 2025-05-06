@@ -9,21 +9,21 @@ using ReserGo.Common.Models;
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
 [ApiController]
-[Tags("Offers | Restaurant")] 
+[Tags("Offers | Restaurant")]
 [AdminOnly]
 [Route("api/administration/offers/restaurants/")]
 public class RestaurantOfferController : ControllerBase {
-    
     private readonly ILogger<RestaurantController> _logger;
     private readonly IRestaurantOfferService _restaurantOfferService;
     private readonly ISecurity _security;
 
-    public RestaurantOfferController(ILogger<RestaurantController> logger, IRestaurantOfferService restaurantOfferService, ISecurity security) {
+    public RestaurantOfferController(ILogger<RestaurantController> logger,
+        IRestaurantOfferService restaurantOfferService, ISecurity security) {
         _logger = logger;
         _restaurantOfferService = restaurantOfferService;
         _security = security;
     }
-    
+
     /// <summary>
     /// Create a new restaurant offer.
     /// </summary>
@@ -38,17 +38,17 @@ public class RestaurantOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Create(RestaurantOfferCreationRequest request) {
         try {
-            RestaurantOfferDto data = await _restaurantOfferService.Create(request);
+            var data = await _restaurantOfferService.Create(request);
 
             var resource = new Resource<RestaurantOfferDto> {
                 Data = data,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id = data.Id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id = data.Id }),
                         Rel = "update",
                         Method = "PUT"
@@ -66,7 +66,7 @@ public class RestaurantOfferController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
 
     /// <summary>
     /// Retrieve a restaurant offer by its ID.
@@ -83,19 +83,17 @@ public class RestaurantOfferController : ControllerBase {
     public async Task<ActionResult<Resource<RestaurantOfferDto>>> GetById(int id) {
         try {
             var restaurantOffer = await _restaurantOfferService.GetById(id);
-            if (restaurantOffer == null) {
-                return NotFound($"Restaurant offer with ID {id} not found.");
-            }
+            if (restaurantOffer == null) return NotFound($"Restaurant offer with ID {id} not found.");
 
             var resource = new Resource<RestaurantOfferDto> {
                 Data = restaurantOffer,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id }),
                         Rel = "update",
                         Method = "PUT"
@@ -128,21 +126,19 @@ public class RestaurantOfferController : ControllerBase {
     public async Task<ActionResult<Resource<IEnumerable<Resource<RestaurantOfferDto>>>>> GetOffersForConnectedUser() {
         try {
             var connectedUser = _security.GetCurrentUser();
-            if (connectedUser == null) {
-                return Unauthorized("User not authenticated");
-            }
+            if (connectedUser == null) return Unauthorized("User not authenticated");
 
             var restaurantOffers = await _restaurantOfferService.GetRestaurantsByUserId(connectedUser.UserId);
 
             var resources = restaurantOffers.Select(offer => new Resource<RestaurantOfferDto> {
                 Data = offer,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id = offer.Id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id = offer.Id }),
                         Rel = "update",
                         Method = "PUT"
@@ -153,7 +149,7 @@ public class RestaurantOfferController : ControllerBase {
             var resourceCollection = new Resource<IEnumerable<Resource<RestaurantOfferDto>>> {
                 Data = resources,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetOffersForConnectedUser)),
                         Rel = "self",
                         Method = "GET"
@@ -189,7 +185,7 @@ public class RestaurantOfferController : ControllerBase {
             var resource = new Resource<RestaurantOfferDto> {
                 Data = updatedOffer,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id }),
                         Rel = "self",
                         Method = "GET"

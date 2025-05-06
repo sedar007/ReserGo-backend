@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products.Hotel;
@@ -12,21 +11,21 @@ using ReserGo.Common.Models;
 namespace ReserGo.WebAPI.Controllers.Administration.Offers;
 
 [ApiController]
-[Tags("Offers | Hotel")] 
+[Tags("Offers | Hotel")]
 [AdminOnly]
 [Route("api/administration/offers/hotels/")]
 public class HotelOfferController : ControllerBase {
-    
     private readonly ILogger<HotelController> _logger;
     private readonly IHotelOfferService _hotelOfferService;
     private readonly ISecurity _security;
 
-    public HotelOfferController(ILogger<HotelController> logger, IHotelOfferService hotelOfferService, ISecurity security) {
+    public HotelOfferController(ILogger<HotelController> logger, IHotelOfferService hotelOfferService,
+        ISecurity security) {
         _logger = logger;
         _hotelOfferService = hotelOfferService;
         _security = security;
     }
-    
+
     /// <summary>
     /// Create a new hotel offer.
     /// </summary>
@@ -41,21 +40,21 @@ public class HotelOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Create(HotelOfferCreationRequest request) {
         try {
-            HotelOfferDto data = await _hotelOfferService.Create(request);
+            var data = await _hotelOfferService.Create(request);
             var resource = new Resource<HotelOfferDto> {
                 Data = data,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id = data.Id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id = data.Id }),
                         Rel = "update",
                         Method = "PUT"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Delete), new { id = data.Id }),
                         Rel = "delete",
                         Method = "DELETE"
@@ -72,7 +71,7 @@ public class HotelOfferController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
 
     /// <summary>
     /// Retrieve a hotel offer by its ID.
@@ -88,36 +87,31 @@ public class HotelOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<HotelOfferDto?>> GetById(int id) {
         try {
-            HotelOfferDto? hotelOffer = await _hotelOfferService.GetById(id);
-            if (hotelOffer == null) {
-                return NotFound($"Hotel offer with ID {id} not found.");
-            }
+            var hotelOffer = await _hotelOfferService.GetById(id);
+            if (hotelOffer == null) return NotFound($"Hotel offer with ID {id} not found.");
             // Implement the HATEOAS links here 
             var resource = new Resource<HotelOfferDto> {
                 Data = hotelOffer,
                 Links = new List<Link> {
-                    new Link
-                    {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link
-                    {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id }),
                         Rel = "update",
                         Method = "PUT"
                     },
-                    new Link
-                    {
+                    new() {
                         Href = Url.Action(nameof(Delete), new { id }),
                         Rel = "delete",
                         Method = "DELETE"
                     }
                 }
             };
-            
-            
+
+
             return Ok(resource);
         }
         catch (InvalidDataException ex) {
@@ -143,26 +137,24 @@ public class HotelOfferController : ControllerBase {
     public async Task<ActionResult<Resource<IEnumerable<Resource<HotelOfferDto>>>>> GetOffersForConnectedUser() {
         try {
             var connectedUser = _security.GetCurrentUser();
-            if (connectedUser == null) {
-                return Unauthorized("User not authenticated");
-            }
+            if (connectedUser == null) return Unauthorized("User not authenticated");
 
             var hotelOffers = await _hotelOfferService.GetHotelsByUserId(connectedUser.UserId);
 
             var resources = hotelOffers.Select(offer => new Resource<HotelOfferDto> {
                 Data = offer,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id = offer.Id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Update), new { id = offer.Id }),
                         Rel = "update",
                         Method = "PUT"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Delete), new { id = offer.Id }),
                         Rel = "delete",
                         Method = "DELETE"
@@ -173,7 +165,7 @@ public class HotelOfferController : ControllerBase {
             var resourceCollection = new Resource<IEnumerable<Resource<HotelOfferDto>>> {
                 Data = resources,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetOffersForConnectedUser)),
                         Rel = "self",
                         Method = "GET"
@@ -209,12 +201,12 @@ public class HotelOfferController : ControllerBase {
             var resource = new Resource<HotelOfferDto> {
                 Data = updatedOffer,
                 Links = new List<Link> {
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(GetById), new { id }),
                         Rel = "self",
                         Method = "GET"
                     },
-                    new Link {
+                    new() {
                         Href = Url.Action(nameof(Delete), new { id }),
                         Rel = "delete",
                         Method = "DELETE"

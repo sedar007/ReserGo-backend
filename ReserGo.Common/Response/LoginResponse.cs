@@ -1,10 +1,11 @@
 using ReserGo.Common.Enum;
+
 namespace ReserGo.Common.Response;
 
 public class LoginResponse {
-    public String Message { get; init; } = String.Empty;
+    public string Message { get; init; } = string.Empty;
     public int Id { get; init; }
     public UserRole Role { get; init; }
-    public String Username { get; init; } = String.Empty;
-    public String RoleName { get; init; } = String.Empty;
+    public string Username { get; init; } = string.Empty;
+    public string RoleName { get; init; } = string.Empty;
 }
