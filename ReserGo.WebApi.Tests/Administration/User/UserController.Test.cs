@@ -14,6 +14,7 @@ using ReserGo.DataAccess;
 using ReserGo.Common.Entity;
 using ReserGo.Business.Implementations;
 using ReserGo.DataAccess.Implementations;
+using ReserGo.Common.Models;
 
 public class UserControllerTests {
     private readonly UserController _controller;
@@ -54,6 +55,9 @@ public class UserControllerTests {
         };
 
         var result = await _controller.Create(request) as CreatedResult;
+
+        // Add null checks to prevent NullReferenceException
+        result.Should().NotBeNull();
         result.StatusCode.Should().Be(201);
     }
 
@@ -83,21 +87,20 @@ public class UserControllerTests {
     } */
 
    [Fact]
-    public async Task ShouldGet404_GET_OneUserById() {
-        var result = await _controller.GetById(1000) as ActionResult<UserDto>;
-        var notFoundResult = result.Result as NotFoundObjectResult;
-        notFoundResult.Should().NotBeNull();
-        notFoundResult.StatusCode.Should().Be(404);
-    }
+   public async Task ShouldGet404_GET_OneUserById() {
+       var result = await _controller.GetById(1000) as ActionResult<Resource<UserDto>>;
+       var notFoundResult = result.Result as NotFoundObjectResult;
+       notFoundResult.Should().NotBeNull();
+       notFoundResult.StatusCode.Should().Be(404);
+   }
 
-     [Fact]
-    public async Task ShouldGet204_DELETE_User()
-    {
-        var result = await _controller.GetById(1000) as ActionResult<UserDto>;
-        var notFoundResult = result.Result as NotFoundObjectResult;
-        notFoundResult.Should().NotBeNull();
-        notFoundResult.StatusCode.Should().Be(404);
-    }
+   [Fact]
+   public async Task ShouldGet204_DELETE_User() {
+       var result = await _controller.GetById(1000) as ActionResult<Resource<UserDto>>;
+       var notFoundResult = result.Result as NotFoundObjectResult;
+       notFoundResult.Should().NotBeNull();
+       notFoundResult.StatusCode.Should().Be(404);
+   }
 
     [Fact]
     public async Task ShouldGet404_DELETE_User()
@@ -119,10 +122,14 @@ public class UserControllerTests {
             Username = "janedoe"
         };
 
-        var result = await _controller.UpdateUser(1, request) as ActionResult<UserDto>;
+        var result = await _controller.UpdateUser(1, request) as ActionResult<Resource<UserDto>>;
         var okResult = result.Result as OkObjectResult;
         okResult.Should().NotBeNull();
         okResult.StatusCode.Should().Be(200);
+
+        var resource = okResult.Value as Resource<UserDto>;
+        resource.Should().NotBeNull();
+        resource.Data.FirstName.Should().Be("Jane");
     }
 
     [Fact]
@@ -136,7 +143,7 @@ public class UserControllerTests {
             Username = "janedoe"
         };
 
-        var result = await _controller.UpdateUser(1000, request) as ActionResult<UserDto>;
+        var result = await _controller.UpdateUser(1000, request) as ActionResult<Resource<UserDto>>;
         var notFoundResult = result.Result as NotFoundObjectResult;
         notFoundResult.Should().NotBeNull();
         notFoundResult.StatusCode.Should().Be(404);

@@ -87,7 +87,7 @@ public class HotelOfferService : IHotelOfferService {
             if (hotelOffer is null) {
                 string errorMessage = "This hotel offer does not exist.";
                 _logger.LogError(errorMessage);
-                throw new InvalidDataException(errorMessage);
+                return null;
             }
 
             _cache.Set($"hotelOffer_{id}", hotelOffer, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));

@@ -6,7 +6,7 @@ using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.User;
 using ReserGo.Common.Security;
 using ReserGo.WebAPI.Attributes;
-
+using ReserGo.Common.Models;
 namespace ReserGo.WebAPI.Controllers.Administration.User;
    
 [ApiController]
@@ -38,16 +38,32 @@ public class UserController : ControllerBase {
     public async Task<ActionResult> Create(UserCreationRequest request) {
         try {
             UserDto data = await _userService.Create(request);
-            return Created("create", data);
+
+            var resource = new Resource<UserDto> {
+                Data = data,
+                Links = new List<Link> {
+                    new Link {
+                        Href = Url.Action(nameof(GetById), new { id = data.Id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new Link {
+                        Href = Url.Action(nameof(UpdateUser), new { id = data.Id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            };
+
+            return Created("create", resource);
         }
         catch (InvalidDataException ex) {
             return BadRequest(ex.Message);
         }
         catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while retrieving the user.");
+            _logger.LogError(ex, "An error occurred while creating the user.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
-        
     }
     
     /// <summary>
@@ -63,10 +79,30 @@ public class UserController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<UserDto?>> GetById(int id) {
+    public async Task<ActionResult<Resource<UserDto>>> GetById(int id) {
         try {
             var user = await _userService.GetById(id);
-            return Ok(user);
+            if (user == null) {
+                return NotFound($"User with ID {id} not found.");
+            }
+
+            var resource = new Resource<UserDto> {
+                Data = user,
+                Links = new List<Link> {
+                    new Link {
+                        Href = Url.Action(nameof(GetById), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new Link {
+                        Href = Url.Action(nameof(UpdateUser), new { id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            };
+
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return NotFound(ex.Message);
@@ -117,11 +153,22 @@ public class UserController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserDto>> UpdateUser(int id, UserUpdateRequest request)
-    {
+    public async Task<ActionResult<Resource<UserDto>>> UpdateUser(int id, UserUpdateRequest request) {
         try {
             var updatedUser = await _userService.UpdateUser(id, request);
-            return Ok(updatedUser);
+
+            var resource = new Resource<UserDto> {
+                Data = updatedUser,
+                Links = new List<Link> {
+                    new Link {
+                        Href = Url.Action(nameof(GetById), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            };
+
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return BadRequest(ex.Message);
@@ -142,27 +189,37 @@ public class UserController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<UserDto?>> GetConnectedUser() {
+    public async Task<ActionResult<Resource<UserDto>>> GetConnectedUser() {
         try {
-            _logger.LogInformation("Attempting to retrieve the connected user.");
-
             ConnectedUser? connectedUser = _security.GetCurrentUser();
-            if (connectedUser is null) {
-                string errorMessage = "User is not authenticated.";
-                _logger.LogError(errorMessage);
-                return Unauthorized(errorMessage);
+            if (connectedUser == null) {
+                return Unauthorized("User is not authenticated.");
             }
 
             UserDto? user = await _userService.GetById(connectedUser.UserId);
-            if (user is null) {
-                string errorMessage = "This user does not exist.";
-                _logger.LogError(errorMessage);
-                return Unauthorized(errorMessage);
+            if (user == null) {
+                return Unauthorized("This user does not exist.");
             }
 
-            _logger.LogInformation("User {id} retrieved successfully", user.Id);
-            return Ok(user);
-        } catch (Exception ex) {
+            var resource = new Resource<UserDto> {
+                Data = user,
+                Links = new List<Link> {
+                    new Link {
+                        Href = Url.Action(nameof(GetConnectedUser)),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new Link {
+                        Href = Url.Action(nameof(UpdateUser), new { id = user.Id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            };
+
+            return Ok(resource);
+        }
+        catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving the connected user.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }

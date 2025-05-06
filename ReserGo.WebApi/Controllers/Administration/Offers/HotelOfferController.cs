@@ -1,11 +1,15 @@
 using Microsoft.AspNetCore.Mvc;
+
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.Shared.Interfaces;
+using ReserGo.WebAPI.Controllers.Administration.Products;
+using ReserGo.Common.Models;
 
-namespace ReserGo.WebAPI.Controllers.Administration.Products;
+
+namespace ReserGo.WebAPI.Controllers.Administration.Offers;
 
 [ApiController]
 [Tags("Offers | Hotel")] 
@@ -38,7 +42,27 @@ public class HotelOfferController : ControllerBase {
     public async Task<ActionResult> Create(HotelOfferCreationRequest request) {
         try {
             HotelOfferDto data = await _hotelOfferService.Create(request);
-            return Created("create", data);
+            var resource = new Resource<HotelOfferDto> {
+                Data = data,
+                Links = new List<Link> {
+                    new Link {
+                        Href = Url.Action(nameof(GetById), new { id = data.Id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new Link {
+                        Href = Url.Action(nameof(Update), new { id = data.Id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    },
+                    new Link {
+                        Href = Url.Action(nameof(Delete), new { id = data.Id }),
+                        Rel = "delete",
+                        Method = "DELETE"
+                    }
+                }
+            };
+            return Created("create", resource);
         }
         catch (InvalidDataException ex) {
             return BadRequest(ex.Message);
@@ -64,8 +88,37 @@ public class HotelOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<HotelOfferDto?>> GetById(int id) {
         try {
-            var hotelOffer = await _hotelOfferService.GetById(id);
-            return Ok(hotelOffer);
+            HotelOfferDto? hotelOffer = await _hotelOfferService.GetById(id);
+            if (hotelOffer == null) {
+                return NotFound($"Hotel offer with ID {id} not found.");
+            }
+            // Implement the HATEOAS links here 
+            var resource = new Resource<HotelOfferDto> {
+                Data = hotelOffer,
+                Links = new List<Link> {
+                    new Link
+                    {
+                        Href = Url.Action(nameof(GetById), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new Link
+                    {
+                        Href = Url.Action(nameof(Update), new { id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    },
+                    new Link
+                    {
+                        Href = Url.Action(nameof(Delete), new { id }),
+                        Rel = "delete",
+                        Method = "DELETE"
+                    }
+                }
+            };
+            
+            
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return NotFound(ex.Message);
@@ -87,7 +140,7 @@ public class HotelOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<IEnumerable<HotelOfferDto>>> GetOffersForConnectedUser() {
+    public async Task<ActionResult<Resource<IEnumerable<Resource<HotelOfferDto>>>>> GetOffersForConnectedUser() {
         try {
             var connectedUser = _security.GetCurrentUser();
             if (connectedUser == null) {
@@ -95,7 +148,40 @@ public class HotelOfferController : ControllerBase {
             }
 
             var hotelOffers = await _hotelOfferService.GetHotelsByUserId(connectedUser.UserId);
-            return Ok(hotelOffers);
+
+            var resources = hotelOffers.Select(offer => new Resource<HotelOfferDto> {
+                Data = offer,
+                Links = new List<Link> {
+                    new Link {
+                        Href = Url.Action(nameof(GetById), new { id = offer.Id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new Link {
+                        Href = Url.Action(nameof(Update), new { id = offer.Id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    },
+                    new Link {
+                        Href = Url.Action(nameof(Delete), new { id = offer.Id }),
+                        Rel = "delete",
+                        Method = "DELETE"
+                    }
+                }
+            });
+
+            var resourceCollection = new Resource<IEnumerable<Resource<HotelOfferDto>>> {
+                Data = resources,
+                Links = new List<Link> {
+                    new Link {
+                        Href = Url.Action(nameof(GetOffersForConnectedUser)),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            };
+
+            return Ok(resourceCollection);
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving hotel offers for the connected user.");
@@ -116,10 +202,27 @@ public class HotelOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<HotelOfferDto>> Update(int id, HotelOfferUpdateRequest request) {
+    public async Task<ActionResult<Resource<HotelOfferDto>>> Update(int id, HotelOfferUpdateRequest request) {
         try {
             var updatedOffer = await _hotelOfferService.Update(id, request);
-            return Ok(updatedOffer);
+
+            var resource = new Resource<HotelOfferDto> {
+                Data = updatedOffer,
+                Links = new List<Link> {
+                    new Link {
+                        Href = Url.Action(nameof(GetById), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new Link {
+                        Href = Url.Action(nameof(Delete), new { id }),
+                        Rel = "delete",
+                        Method = "DELETE"
+                    }
+                }
+            };
+
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return BadRequest(ex.Message);

@@ -4,6 +4,7 @@ using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products.Restaurant;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.Shared.Interfaces;
+using ReserGo.Common.Models;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
@@ -38,7 +39,24 @@ public class RestaurantOfferController : ControllerBase {
     public async Task<ActionResult> Create(RestaurantOfferCreationRequest request) {
         try {
             RestaurantOfferDto data = await _restaurantOfferService.Create(request);
-            return Created("create", data);
+
+            var resource = new Resource<RestaurantOfferDto> {
+                Data = data,
+                Links = new List<Link> {
+                    new Link {
+                        Href = Url.Action(nameof(GetById), new { id = data.Id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new Link {
+                        Href = Url.Action(nameof(Update), new { id = data.Id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            };
+
+            return Created("create", resource);
         }
         catch (InvalidDataException ex) {
             return BadRequest(ex.Message);
@@ -62,10 +80,30 @@ public class RestaurantOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<RestaurantOfferDto?>> GetById(int id) {
+    public async Task<ActionResult<Resource<RestaurantOfferDto>>> GetById(int id) {
         try {
             var restaurantOffer = await _restaurantOfferService.GetById(id);
-            return Ok(restaurantOffer);
+            if (restaurantOffer == null) {
+                return NotFound($"Restaurant offer with ID {id} not found.");
+            }
+
+            var resource = new Resource<RestaurantOfferDto> {
+                Data = restaurantOffer,
+                Links = new List<Link> {
+                    new Link {
+                        Href = Url.Action(nameof(GetById), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new Link {
+                        Href = Url.Action(nameof(Update), new { id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            };
+
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return NotFound(ex.Message);
@@ -87,7 +125,7 @@ public class RestaurantOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<IEnumerable<RestaurantOfferDto>>> GetOffersForConnectedUser() {
+    public async Task<ActionResult<Resource<IEnumerable<Resource<RestaurantOfferDto>>>>> GetOffersForConnectedUser() {
         try {
             var connectedUser = _security.GetCurrentUser();
             if (connectedUser == null) {
@@ -95,7 +133,35 @@ public class RestaurantOfferController : ControllerBase {
             }
 
             var restaurantOffers = await _restaurantOfferService.GetRestaurantsByUserId(connectedUser.UserId);
-            return Ok(restaurantOffers);
+
+            var resources = restaurantOffers.Select(offer => new Resource<RestaurantOfferDto> {
+                Data = offer,
+                Links = new List<Link> {
+                    new Link {
+                        Href = Url.Action(nameof(GetById), new { id = offer.Id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new Link {
+                        Href = Url.Action(nameof(Update), new { id = offer.Id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            });
+
+            var resourceCollection = new Resource<IEnumerable<Resource<RestaurantOfferDto>>> {
+                Data = resources,
+                Links = new List<Link> {
+                    new Link {
+                        Href = Url.Action(nameof(GetOffersForConnectedUser)),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            };
+
+            return Ok(resourceCollection);
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving restaurant offers for the connected user.");
@@ -116,10 +182,22 @@ public class RestaurantOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<RestaurantOfferDto>> Update(int id, RestaurantOfferUpdateRequest request) {
+    public async Task<ActionResult<Resource<RestaurantOfferDto>>> Update(int id, RestaurantOfferUpdateRequest request) {
         try {
             var updatedOffer = await _restaurantOfferService.Update(id, request);
-            return Ok(updatedOffer);
+
+            var resource = new Resource<RestaurantOfferDto> {
+                Data = updatedOffer,
+                Links = new List<Link> {
+                    new Link {
+                        Href = Url.Action(nameof(GetById), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            };
+
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return BadRequest(ex.Message);
