@@ -111,7 +111,7 @@ public class ReserGoContext : DbContext {
             .WithOne(oo => oo.User)
             .HasForeignKey(oo => oo.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         //Config Login
         modelBuilder.Entity<Login>()
             .HasKey(l => l.Id);
@@ -176,7 +176,7 @@ public class ReserGoContext : DbContext {
             .WithMany(r => r.RestaurantOffers)
             .HasForeignKey(ro => ro.RestaurantId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         // Config Address
         modelBuilder.Entity<Address>()
             .HasKey(a => a.Id);

@@ -33,8 +33,10 @@ public class UserControllerTests {
         var context = new ReserGoContext(options);
 
         // Seed the database with test data if necessary
-        context.Users.Add(new User
-            { Id = Guid.NewGuid(), FirstName = "John", LastName = "Doe", Email = "john.doe@example.com", Username = "johndoe" });
+        context.Users.Add(new User {
+            Id = Guid.NewGuid(), FirstName = "John", LastName = "Doe", Email = "john.doe@example.com",
+            Username = "johndoe"
+        });
         context.SaveChanges();
 
         _userService = new UserService(new Mock<ILogger<UserService>>().Object, new UserDataAccess(context),

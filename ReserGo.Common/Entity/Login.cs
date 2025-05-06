@@ -11,5 +11,4 @@ public class Login {
     // Relation avec User
     public virtual User User { get; init; } = null!;
     public Guid UserId { get; init; }
-    
 }
