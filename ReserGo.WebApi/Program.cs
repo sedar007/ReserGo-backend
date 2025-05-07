@@ -54,6 +54,10 @@ public class Program {
             builder.Services.AddSingleton<CloudinaryModel>();
             builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
 
+            // France Gouv
+            builder.Services.AddHttpClient<IFranceGouvApiService, FranceGouvApiService>();
+            builder.Services.AddScoped<IFranceGouvService, FranceGouvService>();
+
             // User
             builder.Services.AddScoped<IUserDataAccess, UserDataAccess>();
             builder.Services.AddScoped<IUserService, UserService>();

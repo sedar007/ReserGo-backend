@@ -25,7 +25,7 @@ public class ImageService : IImageService {
             return cachedUrl;
         }
 
-        var url =  _cloudinary.GetPicture(publicId);
+        var url = _cloudinary.GetPicture(publicId);
         _logger.LogInformation("Retrieved picture URL: {Url}", url);
 
         _cache.Set(cacheKey, url, TimeSpan.FromMinutes(30));

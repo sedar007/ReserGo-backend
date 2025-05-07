@@ -178,7 +178,8 @@ public class RestaurantOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Resource<RestaurantOfferDto>>> Update(Guid id, RestaurantOfferUpdateRequest request) {
+    public async Task<ActionResult<Resource<RestaurantOfferDto>>>
+        Update(Guid id, RestaurantOfferUpdateRequest request) {
         try {
             var updatedOffer = await _restaurantOfferService.Update(id, request);
 

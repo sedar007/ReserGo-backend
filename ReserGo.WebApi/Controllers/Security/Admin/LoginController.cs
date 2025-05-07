@@ -125,7 +125,7 @@ public class LoginController : ControllerBase {
                     Method = "POST"
                 }
             }
-        }; 
+        };
 
         return Ok(resource);
     }
