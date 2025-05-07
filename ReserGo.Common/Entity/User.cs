@@ -10,7 +10,7 @@ public class User {
     public string? PhoneNumber { get; set; }
     public string? Bio { get; set; }
     public string Username { get; set; } = null!;
-    public int? AddressId { get; init; }
+    //public Guid? AddressId { get; init; }
     public string? ProfilePicture { get; set; }
     public UserRole Role { get; init; }
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
@@ -22,7 +22,7 @@ public class User {
     public virtual Login Login { get; init; } = null!;
 
     // Relation with Address (One-to-One)
-    public virtual Address? Address { get; set; }
+    public virtual Address? Address { get; set; } = null!;
 
     public virtual ICollection<Hotel> Hotels { get; init; } = new List<Hotel>();
     public virtual ICollection<Restaurant> Restaurants { get; init; } = new List<Restaurant>();

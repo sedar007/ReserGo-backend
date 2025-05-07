@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ReserGo.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class addmigration : Migration
+    public partial class update3n : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,7 +22,6 @@ namespace ReserGo.DataAccess.Migrations
                     PhoneNumber = table.Column<string>(type: "text", nullable: true),
                     Bio = table.Column<string>(type: "text", nullable: true),
                     Username = table.Column<string>(type: "text", nullable: false),
-                    AddressId = table.Column<int>(type: "integer", nullable: true),
                     ProfilePicture = table.Column<string>(type: "text", nullable: true),
                     Role = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -399,12 +398,6 @@ namespace ReserGo.DataAccess.Migrations
                 name: "IX_Login_UserId",
                 table: "Login",
                 column: "UserId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Login_Username",
-                table: "Login",
-                column: "Username",
                 unique: true);
 
             migrationBuilder.CreateIndex(

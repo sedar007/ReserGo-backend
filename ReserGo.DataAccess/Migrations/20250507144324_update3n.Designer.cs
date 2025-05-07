@@ -12,8 +12,8 @@ using ReserGo.DataAccess;
 namespace ReserGo.DataAccess.Migrations
 {
     [DbContext(typeof(ReserGoContext))]
-    [Migration("20250506220905_addmigration")]
-    partial class addmigration
+    [Migration("20250507144324_update3n")]
+    partial class update3n
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -285,9 +285,6 @@ namespace ReserGo.DataAccess.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.HasIndex("Username")
-                        .IsUnique();
-
                     b.ToTable("Login");
                 });
 
@@ -466,9 +463,6 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<int?>("AddressId")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Bio")
                         .HasColumnType("text");

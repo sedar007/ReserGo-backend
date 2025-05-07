@@ -282,9 +282,6 @@ namespace ReserGo.DataAccess.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.HasIndex("Username")
-                        .IsUnique();
-
                     b.ToTable("Login");
                 });
 
@@ -463,9 +460,6 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
-
-                    b.Property<int?>("AddressId")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Bio")
                         .HasColumnType("text");
