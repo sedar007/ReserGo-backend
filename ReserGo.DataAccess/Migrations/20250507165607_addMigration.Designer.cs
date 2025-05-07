@@ -12,8 +12,8 @@ using ReserGo.DataAccess;
 namespace ReserGo.DataAccess.Migrations
 {
     [DbContext(typeof(ReserGoContext))]
-    [Migration("20250507144324_update3n")]
-    partial class update3n
+    [Migration("20250507165607_addMigration")]
+    partial class addMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

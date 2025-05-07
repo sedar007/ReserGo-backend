@@ -1,7 +1,7 @@
 namespace ReserGo.Common.DTO;
 
 public class LoginDto {
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; init; } 
     public Guid UserId { get; set; }
     public string Username { get; set; } = null!;
 

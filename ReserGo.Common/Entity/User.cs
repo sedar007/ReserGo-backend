@@ -3,7 +3,7 @@ using ReserGo.Common.Enum;
 namespace ReserGo.Common.Entity;
 
 public class User {
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; init; }
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public string Email { get; set; } = null!;

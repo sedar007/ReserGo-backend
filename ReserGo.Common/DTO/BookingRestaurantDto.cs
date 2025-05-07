@@ -1,7 +1,7 @@
 namespace ReserGo.Common.DTO;
 
 public class BookingRestaurantDto {
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; init; } 
     public Guid UserId { get; set; }
     public Guid RestaurantId { get; set; }
 

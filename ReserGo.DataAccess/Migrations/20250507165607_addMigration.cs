@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ReserGo.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class update3n : Migration
+    public partial class addMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

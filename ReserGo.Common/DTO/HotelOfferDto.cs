@@ -1,7 +1,7 @@
 namespace ReserGo.Common.DTO;
 
 public class HotelOfferDto {
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; init; } 
     public string OfferTitle { get; set; } = null!;
     public string Description { get; set; } = null!;
     public double PricePerNight { get; set; }

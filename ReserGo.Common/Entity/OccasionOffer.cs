@@ -1,7 +1,7 @@
 namespace ReserGo.Common.Entity;
 
 public class OccasionOffer {
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; init; } 
     public string OfferTitle { get; set; } = null!;
     public string Description { get; set; } = null!;
     public double Price { get; set; }

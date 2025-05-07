@@ -1,7 +1,7 @@
 namespace ReserGo.Common.Entity;
 
 public class Address {
-    public Guid Id { get; init; } = Guid.NewGuid();
+    public Guid Id { get; init; }
     public string? Street { get; set; }
     public string? City { get; set; }
     public string? State { get; set; }
