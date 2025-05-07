@@ -1,9 +1,8 @@
-﻿
-namespace ReserGo.Common.Security {
-    public class JwtSettings {
-        public string Key { get; set; } = null!;
-        public string Issuer { get; set; } = null!;
-        public string Audience { get; set; } = null!;
-        public int ExpireMinutes { get; set; }
-    }
+﻿namespace ReserGo.Common.Security;
+
+public class JwtSettings {
+    public string Key { get; init; } = null!;
+    public string Issuer { get; init; } = null!;
+    public string Audience { get; init; } = null!;
+    public int ExpireMinutes { get; init; }
 }

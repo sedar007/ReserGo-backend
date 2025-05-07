@@ -11,7 +11,7 @@ public static class HotelValidator {
         if (request.Capacity == 0) return "Capacity cannot be null or zero.";
         return StayIdValidator.Check(request.StayId, 1);
     }
-    
+
     public static string GetError(HotelUpdateRequest? request) {
         if (request == null) return "Invalid request.";
         if (string.IsNullOrWhiteSpace(request.Name)) return "Name cannot be empty.";
@@ -20,4 +20,3 @@ public static class HotelValidator {
         return "";
     }
 }
-  

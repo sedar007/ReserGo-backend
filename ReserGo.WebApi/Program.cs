@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using System.Reflection;
 using NLog;
 using NLog.Web;
-
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.DataAccess.Implementations;
 using ReserGo.Shared.Interfaces;
@@ -25,9 +24,8 @@ using ReserGo.WebAPI.Services;
 namespace ReserGo.WebAPI;
 
 public class Program {
-
     public static void Main(string[] args) {
-        var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+        var logger = LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
         logger.Info("Starting Application ...");
 
         try {
@@ -39,10 +37,10 @@ public class Program {
                 .AddJsonFile("appsettings.json")
                 .AddUserSecrets<Program>()
                 .Build();
-            
-			var appSettingsSection = rawConfig.GetSection("AppSettings");
-			builder.Services.Configure<AppSettings>(appSettingsSection);
-			builder.Services.Configure<AppSettings>(builder.Configuration);
+
+            var appSettingsSection = rawConfig.GetSection("AppSettings");
+            builder.Services.Configure<AppSettings>(appSettingsSection);
+            builder.Services.Configure<AppSettings>(builder.Configuration);
 
 
             // Context
@@ -51,44 +49,59 @@ public class Program {
             // Add services to the container.
             // Shared
             builder.Services.AddScoped<ISecurity, Security>();
-            
-			// Tiers
-			builder.Services.AddSingleton<CloudinaryModel>();
-			builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
-			
-			// User
-			builder.Services.AddScoped<IUserDataAccess, UserDataAccess>();
-			builder.Services.AddScoped<IUserService, UserService>();
+
+            // Tiers
+            builder.Services.AddSingleton<CloudinaryModel>();
+            builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+
+            // France Gouv
+            builder.Services.AddHttpClient<IFranceGouvApiService, FranceGouvApiService>();
+            builder.Services.AddScoped<IFranceGouvService, FranceGouvService>();
+
+            // User
+            builder.Services.AddScoped<IUserDataAccess, UserDataAccess>();
+            builder.Services.AddScoped<IUserService, UserService>();
 
             // Login
             builder.Services.AddScoped<ILoginDataAccess, LoginDataAccess>();
             builder.Services.AddScoped<ILoginService, LoginService>();
             builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
             builder.Services.AddScoped<IGoogleService, GoogleService>();
-            
+
             // Hotel
             builder.Services.AddScoped<IHotelDataAccess, HotelDataAccess>();
             builder.Services.AddScoped<IHotelService, HotelService>();
-            
+
             // Restaurant
             builder.Services.AddScoped<IRestaurantDataAccess, RestaurantDataAccess>();
             builder.Services.AddScoped<IRestaurantService, RestaurantService>();
-            
+
             // Occasion
             builder.Services.AddScoped<IOccasionDataAccess, OccasionDataAccess>();
             builder.Services.AddScoped<IOccasionService, OccasionService>();
-            
+
             //Image
             builder.Services.AddScoped<IImageService, ImageService>();
+
+            // Hotel Offer
+            builder.Services.AddScoped<IHotelOfferDataAccess, HotelOfferDataAccess>();
+            builder.Services.AddScoped<IHotelOfferService, HotelOfferService>();
+
+            // Restaurant Offer
+            builder.Services.AddScoped<IRestaurantOfferDataAccess, RestaurantOfferDataAccess>();
+            builder.Services.AddScoped<IRestaurantOfferService, RestaurantOfferService>();
+
+            // Occasion Offer
+            builder.Services.AddScoped<IOccasionOfferDataAccess, OccasionOfferDataAccess>();
+            builder.Services.AddScoped<IOccasionOfferService, OccasionOfferService>();
 
             // Add services to the cache memory.
             builder.Services.AddMemoryCache();
 
             // Configure CORS
             builder.Services.AddCors(options =>
-
             {
-                options.AddPolicy(name: Consts.CorsPolicy,
+                options.AddPolicy(Consts.CorsPolicy,
                     policy =>
                     {
                         policy.WithOrigins("http://localhost:5173", "https://resergo-admin.adjysedar.fr",
@@ -98,10 +111,11 @@ public class Program {
                             .AllowAnyMethod();
                     });
             });
-            
+
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen(opt => {
+            builder.Services.AddSwaggerGen(opt =>
+            {
                 opt.SwaggerDoc("v1", new OpenApiInfo { Title = "ReserGo", Version = "v1.0.0" });
                 // Add configuration here to include XML comments
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -118,7 +132,7 @@ public class Program {
                 Key = builder.Configuration.GetSection("Key")?.Get<string>() ?? string.Empty,
                 Issuer = builder.Configuration.GetSection("Issuer")?.Value ?? string.Empty,
                 Audience = builder.Configuration.GetSection("Audience")?.Get<string>() ?? string.Empty,
-                ExpireMinutes = builder.Configuration.GetSection("ExpireMinutes")?.Get<int>() ?? 0,
+                ExpireMinutes = builder.Configuration.GetSection("ExpireMinutes")?.Get<int>() ?? 0
             };
 
             var key = Encoding.ASCII.GetBytes(jwtSettings.Key);
@@ -143,9 +157,8 @@ public class Program {
                     options.Events = new JwtBearerEvents {
                         OnMessageReceived = context =>
                         {
-                            if (context.Request.Cookies.ContainsKey(Consts.AuthToken)) {
+                            if (context.Request.Cookies.ContainsKey(Consts.AuthToken))
                                 context.Token = context.Request.Cookies[Consts.AuthToken];
-                            }
 
                             return Task.CompletedTask;
                         }
@@ -167,18 +180,18 @@ public class Program {
             }
 
             // Configure https 
-            if (app.Environment.IsProduction()) {
+            if (app.Environment.IsProduction())
                 // Active les headers proxy pour détecter que Render utilise HTTPS
                 app.UseForwardedHeaders(new ForwardedHeadersOptions {
                     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
                 });
-            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment()) {
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
             app.UseForwardedHeaders();
             app.UseHttpsRedirection();
             app.UseCors(Consts.CorsPolicy);
@@ -192,7 +205,7 @@ public class Program {
             throw;
         }
         finally {
-            NLog.LogManager.Shutdown();
+            LogManager.Shutdown();
         }
     }
 }

@@ -1,7 +1,6 @@
 using ReserGo.Common.DTO;
 
 namespace ReserGo.Common.Requests.User;
-using ReserGo.Common.Entity;
 
 public class UserUpdateRequest {
     public required string FirstName { get; init; }

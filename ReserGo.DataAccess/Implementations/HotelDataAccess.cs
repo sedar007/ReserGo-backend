@@ -6,39 +6,39 @@ using ReserGo.DataAccess.Interfaces;
 namespace ReserGo.DataAccess.Implementations;
 
 public class HotelDataAccess : IHotelDataAccess {
-    
     private readonly ReserGoContext _context;
-    
+
     public HotelDataAccess(ReserGoContext context) {
         _context = context;
     }
 
-    public async Task<Hotel?> GetById(int id) {
-        return await _context.Hotel.FirstOrDefaultAsync(x => x.Id ==  id);
+    public async Task<Hotel?> GetById(Guid id) {
+        return await _context.Hotel.FirstOrDefaultAsync(x => x.Id == id);
     }
-    
+
     public async Task<Hotel?> GetByStayId(long stayId) {
-        return await _context.Hotel.FirstOrDefaultAsync(x => x.StayId ==  stayId);
+        return await _context.Hotel.FirstOrDefaultAsync(x => x.StayId == stayId);
     }
-    public async Task<IEnumerable<Hotel>> GetHotelsByUserId(int userId) {
-        return await _context.Hotel.Where(x => x.UserId ==  userId).ToListAsync();
+
+    public async Task<IEnumerable<Hotel>> GetHotelsByUserId(Guid userId) {
+        return await _context.Hotel.Where(x => x.UserId == userId).ToListAsync();
     }
-    
+
     public async Task<Hotel> Create(Hotel user) {
         EntityEntry<Hotel> newData = _context.Hotel.Add(user);
         await _context.SaveChangesAsync();
-        return await GetByStayId(newData.Entity.StayId) ?? throw new NullReferenceException("Error creating new hotel.");
+        return await GetByStayId(newData.Entity.StayId) ??
+               throw new NullReferenceException("Error creating new hotel.");
     }
-    
+
     public async Task<Hotel> Update(Hotel hotel) {
         _context.Hotel.Update(hotel);
         await _context.SaveChangesAsync();
         return hotel;
     }
-    
+
     public async Task Delete(Hotel hotel) {
         _context.Hotel.Remove(hotel);
         await _context.SaveChangesAsync();
     }
 }
-

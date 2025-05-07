@@ -1,14 +1,12 @@
 namespace ReserGo.Shared;
 
-public class Utils {
+public static class Utils {
     public static bool CheckMail(string? mail) {
-        if (string.IsNullOrEmpty(mail)) {
-            return false;
-        }
+        if (string.IsNullOrEmpty(mail)) return false;
 
         try {
-            new System.Net.Mail.MailAddress(mail);
-            return true;
+            var mailAddress = new System.Net.Mail.MailAddress(mail);
+            return mailAddress.Address == mail;
         }
         catch (FormatException) {
             return false;

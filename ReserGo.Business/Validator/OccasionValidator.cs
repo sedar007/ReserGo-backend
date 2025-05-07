@@ -12,7 +12,7 @@ public static class OccasionValidator {
         if (request.Capacity == 0) return "Capacity cannot be null or zero.";
         return StayIdValidator.Check(request.StayId, 3);
     }
-    
+
     public static string GetError(OccasionUpdateRequest? request) {
         if (request == null) return "Invalid request.";
         if (string.IsNullOrWhiteSpace(request.Name)) return "Name cannot be empty.";
@@ -21,4 +21,3 @@ public static class OccasionValidator {
         return "";
     }
 }
-  

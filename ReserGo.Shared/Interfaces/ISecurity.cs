@@ -1,19 +1,16 @@
-﻿
-using ReserGo.Common.Enum;
+﻿using ReserGo.Common.Enum;
 using ReserGo.Common.Security;
 using Microsoft.AspNetCore.Http;
 
-namespace ReserGo.Shared.Interfaces {
-    public interface ISecurity {
-         string GenerateJwtToken(string username, int userId, UserRole userRole);
+namespace ReserGo.Shared.Interfaces;
 
-         string HashPassword(string providedPassword);
+public interface ISecurity {
+    string GenerateJwtToken(string username, Guid userId, UserRole userRole);
 
-         bool VerifyPassword(string hashedPassword, string providedPassword);
+    string HashPassword(string providedPassword);
 
-        ConnectedUser? GetCurrentUser();
-        CookieOptions GetCookiesOptions();
+    bool VerifyPassword(string hashedPassword, string providedPassword);
 
-    }
-    
+    ConnectedUser? GetCurrentUser();
+    CookieOptions GetCookiesOptions();
 }

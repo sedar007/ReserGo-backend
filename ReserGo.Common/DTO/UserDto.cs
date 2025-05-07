@@ -1,7 +1,9 @@
 using ReserGo.Common.Enum;
+
 namespace ReserGo.Common.DTO;
+
 public class UserDto {
-    public int Id { get; set; }
+    public Guid Id { get; init; }
     public string FirstName { get; set; } = null!;
     public string LastName { get; set; } = null!;
     public string Username { get; set; } = null!;
@@ -14,9 +16,10 @@ public class UserDto {
     public IEnumerable<BookingHotelDto> BookingsHotel { get; set; } = null!;
     public IEnumerable<BookingOccasionDto> BookingsOccasion { get; set; } = null!;
     public IEnumerable<BookingRestaurantDto> BookingsRestaurant { get; set; } = null!;
-    
+
     // Relation avec Login
     public virtual LoginDto Login { get; set; } = null!;
+
     // Relation with Address
     public virtual AddressDto? Address { get; set; }
 }

@@ -4,15 +4,15 @@ using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.Shared.Interfaces;
+using ReserGo.Common.Models;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
 [ApiController]
-[Tags("Products | Hotel")] 
+[Tags("Products | Hotel")]
 [AdminOnly]
 [Route("api/administration/products/hotels/")]
 public class HotelController : ControllerBase {
-    
     private readonly ILogger<HotelController> _logger;
     private readonly IHotelService _hotelService;
     private readonly ISecurity _security;
@@ -22,7 +22,7 @@ public class HotelController : ControllerBase {
         _hotelService = hotelService;
         _security = security;
     }
-    
+
     /// <summary>
     /// Create a new hotel.
     /// </summary>
@@ -37,18 +37,35 @@ public class HotelController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Create(HotelCreationRequest request) {
         try {
-            HotelDto data = await _hotelService.Create(request);
-            return Created("create", data);
+            var data = await _hotelService.Create(request);
+
+            var resource = new Resource<HotelDto> {
+                Data = data,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetById), new { id = data.Id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Update), new { id = data.Id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            };
+
+            return Created("create", resource);
         }
         catch (InvalidDataException ex) {
             return BadRequest(ex.Message);
         }
         catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while retrieving the hotel.");
+            _logger.LogError(ex, "An error occurred while creating the hotel.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve an hotel by their ID.
     /// </summary>
@@ -61,10 +78,28 @@ public class HotelController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<HotelDto?>> GetById(int id) {
+    public async Task<ActionResult<Resource<HotelDto>>> GetById(Guid id) {
         try {
             var hotel = await _hotelService.GetById(id);
-            return Ok(hotel);
+            if (hotel == null) return NotFound($"Hotel with ID {id} not found.");
+
+            var resource = new Resource<HotelDto> {
+                Data = hotel,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetById), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Update), new { id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            };
+
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return NotFound(ex.Message);
@@ -74,7 +109,7 @@ public class HotelController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve an hotel by their StayId.
     /// </summary>
@@ -87,10 +122,28 @@ public class HotelController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<HotelDto?>> GetByStayId(long id) {
+    public async Task<ActionResult<Resource<HotelDto>>> GetByStayId(long id) {
         try {
             var hotel = await _hotelService.GetByStayId(id);
-            return Ok(hotel);
+            if (hotel == null) return NotFound($"Hotel with StayId {id} not found.");
+
+            var resource = new Resource<HotelDto> {
+                Data = hotel,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetByStayId), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Update), new { id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            };
+
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return NotFound(ex.Message);
@@ -100,7 +153,7 @@ public class HotelController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve hotels for the connected user.
     /// </summary>
@@ -112,26 +165,49 @@ public class HotelController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<IEnumerable<HotelDto>>> GetHotelsForConnectedUser() {
+    public async Task<ActionResult<Resource<IEnumerable<Resource<HotelDto>>>>> GetHotelsForConnectedUser() {
         try {
             var connectedUser = _security.GetCurrentUser();
-            if (connectedUser == null) {
-                return Unauthorized("User not authenticated");
-            }
+            if (connectedUser == null) return Unauthorized("User not authenticated");
 
             var hotels = await _hotelService.GetHotelsByUserId(connectedUser.UserId);
-            return Ok(hotels);
+
+            var resources = hotels.Select(hotel => new Resource<HotelDto> {
+                Data = hotel,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetById), new { id = hotel.Id }),
+                        Rel = "self",
+                        Method = "GET"
+                    },
+                    new() {
+                        Href = Url.Action(nameof(Update), new { id = hotel.Id }),
+                        Rel = "update",
+                        Method = "PUT"
+                    }
+                }
+            });
+
+            var resourceCollection = new Resource<IEnumerable<Resource<HotelDto>>> {
+                Data = resources,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetHotelsForConnectedUser)),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            };
+
+            return Ok(resourceCollection);
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving hotels for the connected user.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
- 
-    
-    
-    
+
+
     /// <summary>
     /// Update an existing hotel.
     /// </summary>
@@ -145,11 +221,22 @@ public class HotelController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<UserDto>> Update(long id, HotelUpdateRequest request)
-    {
+    public async Task<ActionResult<Resource<HotelDto>>> Update(long id, HotelUpdateRequest request) {
         try {
-            var updatedUser = await _hotelService.Update(id, request);
-            return Ok(updatedUser);
+            var updatedHotel = await _hotelService.Update(id, request);
+
+            var resource = new Resource<HotelDto> {
+                Data = updatedHotel,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetById), new { id }),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            };
+
+            return Ok(resource);
         }
         catch (InvalidDataException ex) {
             return BadRequest(ex.Message);
@@ -158,7 +245,7 @@ public class HotelController : ControllerBase {
             return NotFound(ex.Message);
         }
     }
-    
+
     /// <summary>
     /// Remove an hotel by their ID.
     /// </summary>
@@ -171,7 +258,7 @@ public class HotelController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> Delete(int id) {
+    public async Task<ActionResult> Delete(Guid id) {
         try {
             await _hotelService.Delete(id);
             return NoContent();

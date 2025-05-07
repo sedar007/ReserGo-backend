@@ -1,19 +1,17 @@
 using Microsoft.AspNetCore.Http;
-
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.User;
 
 namespace ReserGo.Business.Interfaces;
 
 public interface IUserService {
-    Task Delete(int id);
-    Task<UserDto?> GetById(int id);
+    Task Delete(Guid id);
+    Task<UserDto?> GetById(Guid id);
     Task<UserDto> Create(UserCreationRequest request);
-    Task<UserDto> UpdateUser(int id, UserUpdateRequest request);
+    Task<UserDto> UpdateUser(Guid id, UserUpdateRequest request);
     Task<UserDto?> GetByEmail(string email);
     Task<UserDto?> GetByUsername(string username);
-    
-    Task<string> GetProfilePicture(int userId);
-    Task<string> UpdateProfilePicture(int userId, IFormFile file);
-    
+
+    Task<string> GetProfilePicture(Guid userId);
+    Task<string> UpdateProfilePicture(Guid userId, IFormFile file);
 }

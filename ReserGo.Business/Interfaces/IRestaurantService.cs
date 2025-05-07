@@ -4,10 +4,10 @@ using ReserGo.Common.Requests.Products.Restaurant;
 namespace ReserGo.Business.Interfaces;
 
 public interface IRestaurantService {
-    Task<RestaurantDto?> GetById(int id);
+    Task<RestaurantDto?> GetById(Guid id);
     Task<RestaurantDto?> GetByStayId(long stayId);
-    Task<IEnumerable<RestaurantDto>> GetRestaurantsByUserId(int userId);
+    Task<IEnumerable<RestaurantDto>> GetRestaurantsByUserId(Guid userId);
     Task<RestaurantDto> Create(RestaurantCreationRequest request);
     Task<RestaurantDto> Update(long stayId, RestaurantUpdateRequest request);
-    Task Delete(int id);
+    Task Delete(Guid id);
 }

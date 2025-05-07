@@ -3,11 +3,10 @@
 namespace ReserGo.DataAccess.Interfaces;
 
 public interface IHotelDataAccess {
-    Task<Hotel?> GetById(int id);
+    Task<Hotel?> GetById(Guid id);
     Task<Hotel?> GetByStayId(long stayId);
     Task<Hotel> Create(Hotel hotel);
     Task<Hotel> Update(Hotel hotel);
-    Task<IEnumerable<Hotel>> GetHotelsByUserId(int userId);
+    Task<IEnumerable<Hotel>> GetHotelsByUserId(Guid userId);
     Task Delete(Hotel hotel);
 }
-
