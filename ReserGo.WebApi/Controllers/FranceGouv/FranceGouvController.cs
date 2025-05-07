@@ -9,7 +9,7 @@ using ReserGo.WebAPI.Attributes;
 namespace ReserGo.WebAPI.Controllers.FranceGouv;
 
 [ApiController]
-[Route("api/")]
+[Route("api/[controller]")]
 public class FranceGouvController : ControllerBase {
     private readonly ILogger<FranceGouvController> _logger;
     private readonly IFranceGouvService _franceGouvService;
