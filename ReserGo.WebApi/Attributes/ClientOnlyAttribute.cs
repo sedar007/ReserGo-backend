@@ -5,7 +5,7 @@ using ReserGo.Shared.Interfaces;
 
 namespace ReserGo.WebAPI.Attributes;
 
-public class AdminOnlyAttribute : Attribute, IAuthorizationFilter {
+public class ClientOnlyAttribute : Attribute, IAuthorizationFilter {
     public void OnAuthorization(AuthorizationFilterContext context) {
         var securityService = context.HttpContext.RequestServices.GetService(typeof(ISecurity)) as ISecurity;
         if (securityService is null) {
@@ -14,7 +14,7 @@ public class AdminOnlyAttribute : Attribute, IAuthorizationFilter {
         }
 
         var user = securityService.GetCurrentUser();
-        if (user is null || user.Role != UserRole.Admin)
+        if (user is null || user.Role != UserRole.Client)
             context.Result =
                 new UnauthorizedObjectResult(
                     "Access restricted. Please ensure you are logged in and have the correct permissions.");
