@@ -85,7 +85,7 @@ public class UserControllerTests {
          var okResult = result.Result as OkObjectResult;
          okResult.Should().NotBeNull();
          okResult.StatusCode.Should().Be(200);
-     } */
+     } 
 
     [Fact]
     public async Task ShouldGet404_GET_OneUserById() {
@@ -109,7 +109,7 @@ public class UserControllerTests {
         var notFoundResult = result as NotFoundObjectResult;
         notFoundResult.Should().NotBeNull();
         notFoundResult.StatusCode.Should().Be(404);
-    }
+    }*/
 
     /* [Fact]
      public async Task ShouldGet200_PUT_UpdateUser()

@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Http;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.User;
+using ReserGo.Common.Enum;
 
 namespace ReserGo.Business.Interfaces;
 
 public interface IUserService {
     Task Delete(Guid id);
     Task<UserDto?> GetById(Guid id);
-    Task<UserDto> Create(UserCreationRequest request);
+    Task<UserDto> Create(UserCreationRequest request, UserRole role);
     Task<UserDto> UpdateUser(Guid id, UserUpdateRequest request);
     Task<UserDto?> GetByEmail(string email);
     Task<UserDto?> GetByUsername(string username);
