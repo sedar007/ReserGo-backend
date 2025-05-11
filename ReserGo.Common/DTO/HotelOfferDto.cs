@@ -13,4 +13,6 @@ public class HotelOfferDto {
 
     public Guid HotelId { get; set; }
     public HotelDto Hotel { get; set; } = null!;
+    
+    public Guid UserId { get; set; }
 }

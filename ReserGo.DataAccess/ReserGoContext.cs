@@ -15,6 +15,7 @@ public class ReserGoContext : DbContext {
     public DbSet<HotelOffer> HotelOffer { get; set; }
     public DbSet<RestaurantOffer> RestaurantOffer { get; set; }
     public DbSet<OccasionOffer> OccasionOffer { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
     public DbSet<BookingHotel> BookingHotel { get; set; }
     public DbSet<BookingOccasion> BookingOccasion { get; set; }
@@ -156,9 +157,9 @@ public class ReserGoContext : DbContext {
             .HasForeignKey(b => b.UserId);
 
         modelBuilder.Entity<BookingHotel>()
-            .HasOne(b => b.Hotel)
-            .WithMany(h => h.BookingsHotel)
-            .HasForeignKey(b => b.HotelId);
+            .HasOne(b => b.HotelOffer)
+            .WithMany(h => h.Bookings)
+            .HasForeignKey(b => b.HotelOfferId);
 
         // Config HotelOffer
         modelBuilder.Entity<HotelOffer>()
@@ -227,5 +228,14 @@ public class ReserGoContext : DbContext {
             .HasOne(b => b.Restaurant)
             .WithMany(h => h.BookingRestaurant)
             .HasForeignKey(b => b.RestaurantId);
+        
+        // Config Notification
+        modelBuilder.Entity<Notification>()
+            .HasKey(n => n.Id);
+        modelBuilder.Entity<Notification>()
+            .HasOne(n => n.User)
+            .WithMany(u => u.Notifications)
+            .HasForeignKey(n => n.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

@@ -23,6 +23,7 @@ public class User {
 
     // Relation with Address (One-to-One)
     public virtual Address? Address { get; set; } = null!;
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     public virtual ICollection<Hotel> Hotels { get; init; } = new List<Hotel>();
     public virtual ICollection<Restaurant> Restaurants { get; init; } = new List<Restaurant>();
@@ -30,4 +31,5 @@ public class User {
     public virtual ICollection<HotelOffer> HotelOffers { get; init; } = new List<HotelOffer>();
     public virtual ICollection<RestaurantOffer> RestaurantOffers { get; init; } = new List<RestaurantOffer>();
     public virtual ICollection<OccasionOffer> OccasionOffers { get; init; } = new List<OccasionOffer>();
+    
 }

@@ -12,5 +12,9 @@
         <ProjectReference Include="..\ReserGo.Tiers\ReserGo.Tiers.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
+    </ItemGroup>
+
 
 </Project>

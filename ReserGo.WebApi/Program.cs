@@ -20,6 +20,7 @@ using ReserGo.Tiers.Models;
 using ReserGo.DataAccess;
 using ReserGo.Shared;
 using ReserGo.WebAPI.Services;
+using ReserGo.WebAPI.Hubs;
 
 namespace ReserGo.WebAPI;
 
@@ -94,9 +95,19 @@ public class Program {
             // Occasion Offer
             builder.Services.AddScoped<IOccasionOfferDataAccess, OccasionOfferDataAccess>();
             builder.Services.AddScoped<IOccasionOfferService, OccasionOfferService>();
+            
+            // Notification
+            builder.Services.AddScoped<INotificationDataAccess, NotificationDataAccess>();
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+            
+            // Booking Hotel
+            builder.Services.AddScoped<IBookingHotelDataAccess, BookingHotelDataAccess>();
+            builder.Services.AddScoped<IBookingHotelService, BookingHotelService>();
 
             // Add services to the cache memory.
             builder.Services.AddMemoryCache();
+            
+            builder.Services.AddSignalR();
 
             // Configure CORS
             builder.Services.AddCors(options =>
@@ -157,8 +168,17 @@ public class Program {
                     options.Events = new JwtBearerEvents {
                         OnMessageReceived = context =>
                         {
+                            // Check for token in cookies
                             if (context.Request.Cookies.ContainsKey(Consts.AuthToken))
                                 context.Token = context.Request.Cookies[Consts.AuthToken];
+
+                            // Check for token in SignalR query string
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notifications"))
+                            {
+                                context.Token = accessToken;
+                            }
 
                             return Task.CompletedTask;
                         }
@@ -197,6 +217,7 @@ public class Program {
             app.UseCors(Consts.CorsPolicy);
             app.UseAuthentication();
             app.UseAuthorization();
+            app.MapHub<NotificationHub>("/hubs/notifications");
             app.MapControllers();
             app.Run();
         }

@@ -16,4 +16,5 @@ public class HotelOffer {
 
     public Guid UserId { get; init; }
     public User User { get; init; } = null!;
+    public ICollection<BookingHotel> Bookings { get; set; } = new List<BookingHotel>();
 }
