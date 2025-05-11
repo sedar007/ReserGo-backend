@@ -92,7 +92,7 @@ public class ReserGoContext : DbContext {
             .WithOne(ho => ho.User)
             .HasForeignKey(ho => ho.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         // Config relation User-Address
         modelBuilder.Entity<User>()
             .HasOne(u => u.Address)
@@ -114,17 +114,17 @@ public class ReserGoContext : DbContext {
             .HasForeignKey(oo => oo.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-       /* //Config Login
-        modelBuilder.Entity<Login>()
-            .HasKey(l => l.Id);
-        modelBuilder.Entity<Login>()
-            .HasIndex(l => l.Username)
-            .IsUnique();
-        modelBuilder.Entity<Login>()
-            .HasOne(l => l.User)
-            .WithOne(u => u.Login)
-            .HasForeignKey<Login>(l => l.UserId)
-            .OnDelete(DeleteBehavior.Cascade); */
+        /* //Config Login
+         modelBuilder.Entity<Login>()
+             .HasKey(l => l.Id);
+         modelBuilder.Entity<Login>()
+             .HasIndex(l => l.Username)
+             .IsUnique();
+         modelBuilder.Entity<Login>()
+             .HasOne(l => l.User)
+             .WithOne(u => u.Login)
+             .HasForeignKey<Login>(l => l.UserId)
+             .OnDelete(DeleteBehavior.Cascade); */
 
         // Config Hotel, Occasion, Restaurant
         modelBuilder.Entity<Hotel>()
@@ -169,7 +169,7 @@ public class ReserGoContext : DbContext {
             .WithMany(h => h.HotelOffers)
             .HasForeignKey(ho => ho.HotelId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         // Config Address
         modelBuilder.Entity<Address>()
             .HasKey(a => a.Id);
@@ -191,7 +191,7 @@ public class ReserGoContext : DbContext {
         // Config Address
         modelBuilder.Entity<Address>()
             .HasKey(a => a.Id);
-        
+
         // Config OccasionOffer
         modelBuilder.Entity<OccasionOffer>()
             .HasKey(oo => oo.Id);
@@ -228,7 +228,7 @@ public class ReserGoContext : DbContext {
             .HasOne(b => b.Restaurant)
             .WithMany(h => h.BookingRestaurant)
             .HasForeignKey(b => b.RestaurantId);
-        
+
         // Config Notification
         modelBuilder.Entity<Notification>()
             .HasKey(n => n.Id);

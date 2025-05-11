@@ -13,8 +13,8 @@ public static class NotificationHelper {
             Type = notification.Type,
             CreatedAt = notification.CreatedAt,
             IsRead = notification.IsRead,
-            UserId = notification.UserId,
-           // User = notification.User?.ToDto()
+            UserId = notification.UserId
+            // User = notification.User?.ToDto()
         };
     }
 }

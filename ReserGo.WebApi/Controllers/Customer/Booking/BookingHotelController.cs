@@ -9,6 +9,7 @@ using ReserGo.Common.Models;
 using Microsoft.AspNetCore.SignalR;
 using ReserGo.WebAPI.Controllers.Administration.Notification;
 using ReserGo.WebAPI.Hubs;
+
 namespace ReserGo.WebAPI.Controllers.Customer.Booking;
 
 [ApiController]
@@ -30,7 +31,7 @@ public class BookingHotelController : ControllerBase {
         _bookingHotelService = bookingHotelService;
         _notificationHub = notificationHub;
     }
-    
+
     // <summary>
     ///     Create a new hotel booking reservation.
     /// </summary>
@@ -53,20 +54,16 @@ public class BookingHotelController : ControllerBase {
     public async Task<IActionResult> CreateReservation([FromBody] BookingHotelRequest request) {
         try {
             var user = _security.GetCurrentUser();
-            if (user == null) {
-                return Unauthorized();
-            }
+            if (user == null) return Unauthorized();
             var responses = await _bookingHotelService.CreateBooking(request, user);
-            if (responses == null) {
-                return BadRequest("Booking hotel not created");
-            }
+            if (responses == null) return BadRequest("Booking hotel not created");
 
             var notification = responses.Notification;
             await _notificationHub.Clients.User(notification.UserId.ToString())
                 .SendAsync("ReceiveNotification", notification.Message);
             var bookingHotelService = responses.BookingHotel;
-            
-            
+
+
             return CreatedAtAction(nameof(CreateReservation), bookingHotelService);
         }
         catch (InvalidDataException e) {
@@ -82,6 +79,4 @@ public class BookingHotelController : ControllerBase {
             throw;
         }
     }
-    
 }
-

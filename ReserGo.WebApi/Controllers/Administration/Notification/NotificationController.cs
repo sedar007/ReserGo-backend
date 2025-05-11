@@ -25,7 +25,7 @@ public class NotificationController : ControllerBase {
         _notificationService = notificationService;
         _security = security;
     }
-    
+
     [HttpGet("latest/{count}")]
     [ProducesResponseType(typeof(IEnumerable<NotificationDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -34,12 +34,8 @@ public class NotificationController : ControllerBase {
     public async Task<IActionResult> GetLatestNotifications(int count = 10) {
         try {
             var user = _security.GetCurrentUser();
-            if (user == null) {
-                return Unauthorized();
-            }
-            if (count <= 0) {
-                return BadRequest("Count must be greater than 0");
-            }
+            if (user == null) return Unauthorized();
+            if (count <= 0) return BadRequest("Count must be greater than 0");
             var notifications = await _notificationService.GetLatestNotifications(user.UserId, count);
             return Ok(notifications);
         }
@@ -48,7 +44,7 @@ public class NotificationController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "Error getting latest notifications");
         }
     }
-    
+
     //read notification
     [HttpPut("read/{notificationId}")]
     [ProducesResponseType(typeof(NotificationDto), StatusCodes.Status200OK)]
@@ -58,13 +54,9 @@ public class NotificationController : ControllerBase {
     public async Task<IActionResult> ReadNotification(Guid notificationId) {
         try {
             var user = _security.GetCurrentUser();
-            if (user == null) {
-                return Unauthorized();
-            }
+            if (user == null) return Unauthorized();
             var notification = await _notificationService.ReadNotification(notificationId);
-            if (notification == null) {
-                return NotFound();
-            }
+            if (notification == null) return NotFound();
             return Ok(notification);
         }
         catch (Exception e) {
@@ -72,8 +64,4 @@ public class NotificationController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "Error reading notification");
         }
     }
-    
-
-    
-  
 }

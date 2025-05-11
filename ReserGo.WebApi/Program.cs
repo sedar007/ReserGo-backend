@@ -95,18 +95,18 @@ public class Program {
             // Occasion Offer
             builder.Services.AddScoped<IOccasionOfferDataAccess, OccasionOfferDataAccess>();
             builder.Services.AddScoped<IOccasionOfferService, OccasionOfferService>();
-            
+
             // Notification
             builder.Services.AddScoped<INotificationDataAccess, NotificationDataAccess>();
             builder.Services.AddScoped<INotificationService, NotificationService>();
-            
+
             // Booking Hotel
             builder.Services.AddScoped<IBookingHotelDataAccess, BookingHotelDataAccess>();
             builder.Services.AddScoped<IBookingHotelService, BookingHotelService>();
 
             // Add services to the cache memory.
             builder.Services.AddMemoryCache();
-            
+
             builder.Services.AddSignalR();
 
             // Configure CORS
@@ -115,7 +115,8 @@ public class Program {
                 options.AddPolicy(Consts.CorsPolicy,
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:5173","http://localhost:4173","https://resergo-admin.adjysedar.fr",
+                        policy.WithOrigins("http://localhost:5173", "http://localhost:4173",
+                                "https://resergo-admin.adjysedar.fr",
                                 "resergo-admin.adjysedar.fr", "adjysedar.fr")
                             .AllowCredentials()
                             .AllowAnyHeader()
@@ -176,9 +177,7 @@ public class Program {
                             var accessToken = context.Request.Query["access_token"];
                             var path = context.HttpContext.Request.Path;
                             if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notifications"))
-                            {
                                 context.Token = accessToken;
-                            }
 
                             return Task.CompletedTask;
                         }

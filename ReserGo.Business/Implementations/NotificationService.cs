@@ -23,7 +23,8 @@ public class NotificationService : INotificationService {
     private readonly INotificationDataAccess _notificationDataAccess;
 
     public NotificationService(ILogger<UserService> logger, IUserDataAccess userDataAccess,
-        ILoginService loginService, IImageService imageService, IMemoryCache cache, INotificationDataAccess notificationService) {
+        ILoginService loginService, IImageService imageService, IMemoryCache cache,
+        INotificationDataAccess notificationService) {
         _logger = logger;
         _loginService = loginService;
         _userDataAccess = userDataAccess;
@@ -31,13 +32,14 @@ public class NotificationService : INotificationService {
         _cache = cache;
         _notificationDataAccess = notificationService;
     }
-    
+
     public async Task<NotificationDto> CreateNotification(NotificationCreationRequest request) {
         try {
             if (request == null) {
                 _logger.LogError("Request is null");
                 throw new InvalidDataException("Request is null");
             }
+
             var notification = new Notification {
                 UserId = request.UserId,
                 Message = request.Message,
@@ -49,10 +51,8 @@ public class NotificationService : INotificationService {
             };
             _logger.LogInformation("Creating notification for user { id }", request.UserId);
             notification = await _notificationDataAccess.Create(notification);
-            
-            if (notification == null) {
-                throw new InvalidDataException("Notification not created");
-            }
+
+            if (notification == null) throw new InvalidDataException("Notification not created");
             return notification.ToDto();
         }
         catch (Exception e) {
@@ -60,7 +60,7 @@ public class NotificationService : INotificationService {
             throw;
         }
     }
-    
+
     public async Task<IEnumerable<NotificationDto>> GetLatestNotifications(Guid userId, int count) {
         try {
             var notifications = await _notificationDataAccess.GetLatestNotifications(userId, count);
@@ -71,12 +71,11 @@ public class NotificationService : INotificationService {
             throw;
         }
     }
+
     public async Task<NotificationDto> ReadNotification(Guid notificationId) {
         try {
             var notification = await _notificationDataAccess.GetById(notificationId);
-            if (notification == null) {
-                throw new InvalidDataException("Notification not found");
-            }
+            if (notification == null) throw new InvalidDataException("Notification not found");
             notification.IsRead = true;
             await _notificationDataAccess.Update(notification);
             return notification.ToDto();
@@ -86,6 +85,4 @@ public class NotificationService : INotificationService {
             throw;
         }
     }
-
-    
 }

@@ -10,7 +10,7 @@ public static class BookingHotelHelper {
             HotelOfferId = bookingHotel.HotelOfferId,
             HotelOffer = bookingHotel.HotelOffer?.ToDto(),
             UserId = bookingHotel.UserId,
-           // User = bookingHotel.User?.ToDto(),
+            // User = bookingHotel.User?.ToDto(),
             BookingDate = bookingHotel.BookingDate,
             NumberOfGuests = bookingHotel.NumberOfGuests,
             IsConfirmed = bookingHotel.IsConfirmed,

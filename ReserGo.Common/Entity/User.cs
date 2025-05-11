@@ -9,7 +9,9 @@ public class User {
     public string Email { get; set; } = null!;
     public string? PhoneNumber { get; set; }
     public string? Bio { get; set; }
+
     public string Username { get; set; } = null!;
+
     //public Guid? AddressId { get; init; }
     public string? ProfilePicture { get; set; }
     public UserRole Role { get; init; }
@@ -31,5 +33,4 @@ public class User {
     public virtual ICollection<HotelOffer> HotelOffers { get; init; } = new List<HotelOffer>();
     public virtual ICollection<RestaurantOffer> RestaurantOffers { get; init; } = new List<RestaurantOffer>();
     public virtual ICollection<OccasionOffer> OccasionOffers { get; init; } = new List<OccasionOffer>();
-    
 }

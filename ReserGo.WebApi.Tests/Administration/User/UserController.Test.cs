@@ -85,7 +85,7 @@ public class UserControllerTests {
          var okResult = result.Result as OkObjectResult;
          okResult.Should().NotBeNull();
          okResult.StatusCode.Should().Be(200);
-     } 
+     }
 
     [Fact]
     public async Task ShouldGet404_GET_OneUserById() {

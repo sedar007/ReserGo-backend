@@ -1,7 +1,7 @@
 namespace ReserGo.Common.Entity;
 
 public class BookingRestaurant {
-    public Guid Id { get; init; } 
+    public Guid Id { get; init; }
     public Guid UserId { get; set; }
     public Guid RestaurantId { get; set; }
 
