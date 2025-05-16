@@ -103,6 +103,10 @@ public class Program {
             // Booking Hotel
             builder.Services.AddScoped<IBookingHotelDataAccess, BookingHotelDataAccess>();
             builder.Services.AddScoped<IBookingHotelService, BookingHotelService>();
+            
+            // Booking Restaurant
+            builder.Services.AddScoped<IBookingRestaurantDataAccess, BookingRestaurantDataAccess>();
+            builder.Services.AddScoped<IBookingRestaurantService, BookingRestaurantService>();
 
             // Add services to the cache memory.
             builder.Services.AddMemoryCache();

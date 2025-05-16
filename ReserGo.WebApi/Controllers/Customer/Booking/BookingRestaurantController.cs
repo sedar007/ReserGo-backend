@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
-using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.Common.Requests.Products.Restaurant;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Controllers.Administration.Products;
@@ -10,25 +10,25 @@ using ReserGo.WebAPI.Hubs;
 namespace ReserGo.WebAPI.Controllers.Customer.Booking;
 
 [ApiController]
-[Tags("Booking | Hotel")]
+[Tags("Booking | Restaurant")]
 [ClientOnly]
-[Route("api/customer/booking/hotels/")]
-public class BookingHotelController : ControllerBase {
-    private readonly ILogger<HotelController> _logger;
+[Route("api/customer/booking/restaurants/")]
+public class BookingRestaurantController : ControllerBase {
+    private readonly ILogger<RestaurantController> _logger;
     private readonly ISecurity _security;
-    private readonly IBookingHotelService _bookingHotelService;
+    private readonly IBookingRestaurantService _bookingRestaurantService;
     private readonly IHubContext<NotificationHub> _notificationHub;
 
-    public BookingHotelController(ILogger<HotelController> logger,
-        ISecurity security, IBookingHotelService bookingHotelService, IHubContext<NotificationHub> notificationHub) {
+    public BookingRestaurantController(ILogger<RestaurantController> logger,
+        ISecurity security, IBookingRestaurantService bookingRestaurantService, IHubContext<NotificationHub> notificationHub) {
         _logger = logger;
         _security = security;
-        _bookingHotelService = bookingHotelService;
+        _bookingRestaurantService = bookingRestaurantService;
         _notificationHub = notificationHub;
     }
     
     /// <summary>
-    ///     Create a new hotel booking reservation.
+    ///     Create a new restaurant booking reservation.
     /// </summary>
     /// <param name="request">The booking request containing necessary information.</param>
     /// <returns>
@@ -46,21 +46,24 @@ public class BookingHotelController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> CreateReservation([FromBody] BookingHotelRequest request) {
+    public async Task<IActionResult> CreateReservation([FromBody] BookingRestaurantRequest request) {
         try {
             var user = _security.GetCurrentUser();
             if (user == null) return Unauthorized();
-            var responses = await _bookingHotelService.CreateBooking(request, user);
+            
+            var responses = await _bookingRestaurantService.CreateBooking(request, user);
             var notification = responses.Notification;
+            
             await _notificationHub.Clients.User(notification.UserId.ToString())
                 .SendAsync("ReceiveNotification", notification.Message);
-            var bookingHotelService = responses.Booking;
+            
+            var bookingRestaurantService = responses.Booking;
 
 
-            return CreatedAtAction(nameof(CreateReservation), bookingHotelService);
+            return CreatedAtAction(nameof(CreateReservation), bookingRestaurantService);
         }
         catch (InvalidDataException e) {
-            _logger.LogError(e, "Error creating booking hotel");
+            _logger.LogError(e, "Error creating booking restaurant");
             return BadRequest(e.Message);
         }
         catch (UnauthorizedAccessException e) {
@@ -68,7 +71,7 @@ public class BookingHotelController : ControllerBase {
             return Unauthorized();
         }
         catch (Exception e) {
-            _logger.LogError(e, "An unexpected error occurred while creating booking hotel");
+            _logger.LogError(e, "An unexpected error occurred while creating booking restaurant");
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }

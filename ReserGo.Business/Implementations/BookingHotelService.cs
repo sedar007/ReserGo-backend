@@ -70,14 +70,14 @@ public class BookingHotelService : IBookingHotelService {
                     $"New reservation made by {user.Username} for offer {hotelOffer.OfferTitle} at {hotelOffer.Hotel.Name} " +
                     $"number of guests: {request.NumberOfGuests}",
                 Type = "Hotel",
-                HotelName = hotelName,
+                Name = hotelName,
                 UserId = hotelOffer.UserId
             };
             var notificationDto = await _notificationService.CreateNotification(notification);
 
             return new BookingResponses {
                 Notification = notificationDto,
-                BookingHotel = bookingHotel.ToDto()
+                Booking = bookingHotel.ToDto()
             };
         }
         catch (Exception e) {

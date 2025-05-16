@@ -15,7 +15,8 @@ public static class RestaurantOfferHelper {
             OfferEndDate = restaurant.OfferEndDate,
             IsActive = restaurant.IsActive,
             RestaurantId = restaurant.RestaurantId,
-            Restaurant = restaurant.Restaurant.ToDto()
+            Restaurant = restaurant.Restaurant.ToDto(),
+            UserId = restaurant.UserId
         };
     }
 }
