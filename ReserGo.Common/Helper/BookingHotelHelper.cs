@@ -4,16 +4,17 @@ using ReserGo.Common.Entity;
 namespace ReserGo.Common.Helper;
 
 public static class BookingHotelHelper {
-    public static BookingHotelDto ToDto(BookingHotel bookingHotel) {
+    public static BookingHotelDto ToDto(this BookingHotel bookingHotel) {
         return new BookingHotelDto {
             Id = bookingHotel.Id,
+            HotelOfferId = bookingHotel.HotelOfferId,
+            HotelOffer = bookingHotel.HotelOffer?.ToDto(),
             UserId = bookingHotel.UserId,
-            HotelId = bookingHotel.HotelId,
+            // User = bookingHotel.User?.ToDto(),
             BookingDate = bookingHotel.BookingDate,
-            Status = bookingHotel.Status,
-            CheckIn = bookingHotel.CheckIn,
-            CheckOut = bookingHotel.CheckOut,
-            NumberOfGuests = bookingHotel.NumberOfGuests
+            NumberOfGuests = bookingHotel.NumberOfGuests,
+            IsConfirmed = bookingHotel.IsConfirmed,
+            CreatedAt = bookingHotel.CreatedAt
         };
     }
 }

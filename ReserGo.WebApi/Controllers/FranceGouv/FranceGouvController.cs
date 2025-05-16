@@ -36,12 +36,11 @@ public class FranceGouvController : ControllerBase {
 
         try {
             var addresses = await _franceGouvService.SearchAddresses(query);
-            if (addresses == null || !addresses.Any()) {
-                return NotFound("No addresses found.");
-            }
+            if (addresses == null || !addresses.Any()) return NotFound("No addresses found.");
 
             return Ok(addresses);
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             _logger.LogError(ex, "Error occurred while searching for addresses.");
             return StatusCode(500, "An unexpected error occurred.");
         }
