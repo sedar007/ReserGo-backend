@@ -7,12 +7,14 @@ public static class BookingRestaurantHelper {
     public static BookingRestaurantDto ToDto(this BookingRestaurant bookingRestaurant) {
         return new BookingRestaurantDto {
             Id = bookingRestaurant.Id,
+            RestaurantOfferId = bookingRestaurant.RestaurantOfferId,
+            RestaurantOffer = bookingRestaurant.RestaurantOffer?.ToDto(),
             UserId = bookingRestaurant.UserId,
-            RestaurantId = bookingRestaurant.RestaurantId,
+          //  User = bookingRestaurant.User.ToDto(),
             BookingDate = bookingRestaurant.BookingDate,
-            Status = bookingRestaurant.Status,
-            ReservationTime = bookingRestaurant.ReservationTime,
-            NumberOfPeople = bookingRestaurant.NumberOfPeople
+            NumberOfGuests = bookingRestaurant.NumberOfGuests,
+            IsConfirmed = bookingRestaurant.IsConfirmed,
+            CreatedAt = bookingRestaurant.CreatedAt
         };
     }
 }

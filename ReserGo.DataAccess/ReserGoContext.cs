@@ -146,20 +146,7 @@ public class ReserGoContext : DbContext {
             .IsUnique();
 
         // Config Bookings 
-
-        // BookingHotel
-        modelBuilder.Entity<BookingHotel>()
-            .HasKey(b => b.Id);
-
-        modelBuilder.Entity<BookingHotel>()
-            .HasOne(b => b.User)
-            .WithMany(u => u.BookingsHotel)
-            .HasForeignKey(b => b.UserId);
-
-        modelBuilder.Entity<BookingHotel>()
-            .HasOne(b => b.HotelOffer)
-            .WithMany(h => h.Bookings)
-            .HasForeignKey(b => b.HotelOfferId);
+        
 
         // Config HotelOffer
         modelBuilder.Entity<HotelOffer>()
@@ -223,11 +210,25 @@ public class ReserGoContext : DbContext {
             .HasOne(b => b.User)
             .WithMany(u => u.BookingsRestaurant)
             .HasForeignKey(b => b.UserId);
-
+        
         modelBuilder.Entity<BookingRestaurant>()
-            .HasOne(b => b.Restaurant)
-            .WithMany(h => h.BookingRestaurant)
-            .HasForeignKey(b => b.RestaurantId);
+            .HasOne(b => b.RestaurantOffer)
+            .WithMany(r => r.Bookings)
+            .HasForeignKey(b => b.RestaurantOfferId);
+        
+        // BookingHotel
+        modelBuilder.Entity<BookingHotel>()
+            .HasKey(b => b.Id);
+
+        modelBuilder.Entity<BookingHotel>()
+            .HasOne(b => b.User)
+            .WithMany(u => u.BookingsHotel)
+            .HasForeignKey(b => b.UserId);
+
+        modelBuilder.Entity<BookingHotel>()
+            .HasOne(b => b.HotelOffer)
+            .WithMany(h => h.Bookings)
+            .HasForeignKey(b => b.HotelOfferId);
 
         // Config Notification
         modelBuilder.Entity<Notification>()

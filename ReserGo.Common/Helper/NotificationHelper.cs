@@ -9,7 +9,7 @@ public static class NotificationHelper {
             Id = notification.Id,
             Title = notification.Title,
             Message = notification.Message,
-            HotelName = notification.HotelName,
+            HotelName = notification.Name,
             Type = notification.Type,
             CreatedAt = notification.CreatedAt,
             IsRead = notification.IsRead,

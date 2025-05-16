@@ -44,7 +44,7 @@ public class NotificationService : INotificationService {
                 UserId = request.UserId,
                 Message = request.Message,
                 Title = request.Title,
-                HotelName = request.HotelName,
+                Name = request.Name,
                 Type = request.Type,
                 IsRead = false,
                 CreatedAt = DateTime.UtcNow

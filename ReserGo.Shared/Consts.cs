@@ -10,4 +10,12 @@ public static class Consts {
     
     // User Message
     public const string UserNotFound = "User not found";
+    
+    
+    
+    // Restaurant Offer
+    // Cache
+    public const string RestaurantOffersUserIdCacheKey = "restaurantOffers_user_";
+    public const string RestaurantOffersCacheKey = "restaurantOffers_";
+        
 }
