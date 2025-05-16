@@ -54,7 +54,7 @@ public class BookingHotelController : ControllerBase {
             var notification = responses.Notification;
             await _notificationHub.Clients.User(notification.UserId.ToString())
                 .SendAsync("ReceiveNotification", notification.Message);
-            var bookingHotelService = responses.BookingHotel;
+            var bookingHotelService = responses.Booking;
 
 
             return CreatedAtAction(nameof(CreateReservation), bookingHotelService);

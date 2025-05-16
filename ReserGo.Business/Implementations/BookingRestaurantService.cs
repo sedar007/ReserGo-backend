@@ -77,7 +77,7 @@ public class BookingRestaurantService : IBookingRestaurantService {
 
             return new BookingResponses {
                 Notification = notificationDto,
-                BookingRestaurant = bookingRestaurant.ToDto()
+                Booking = bookingRestaurant.ToDto()
             };
         }
         catch (Exception e) {
