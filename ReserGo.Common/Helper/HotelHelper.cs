@@ -8,11 +8,14 @@ public static class HotelHelper {
         return new HotelDto {
             Id = hotel.Id,
             Name = hotel.Name,
+            StayId = hotel.StayId,
             Location = hotel.Location,
-            Capacity = hotel.Capacity,
+            NumberOfRooms = hotel.NumberOfRooms,
+            Description = hotel.Description,
             Picture = hotel.Picture,
             LastUpdated = hotel.LastUpdated,
-            StayId = hotel.StayId
+            Rooms = hotel.Rooms?.Select(room => room.ToDto())
         };
     }
+    
 }

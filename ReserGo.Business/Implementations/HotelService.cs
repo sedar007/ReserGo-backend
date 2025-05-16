@@ -10,6 +10,7 @@ using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared.Interfaces;
+using ReserGo.Common.Requests.Products.Hotel.Rooms;
 
 namespace ReserGo.Business.Implementations;
 
@@ -19,14 +20,16 @@ public class HotelService : IHotelService {
     private readonly IImageService _imageService;
     private readonly IHotelDataAccess _hotelDataAccess;
     private readonly IMemoryCache _cache;
+    private readonly IRoomDataAccess _roomDataAccess;
 
     public HotelService(ILogger<UserService> logger, IHotelDataAccess hotelDataAccess, ISecurity security,
-        IImageService imageService, IMemoryCache cache) {
+        IImageService imageService, IMemoryCache cache, IRoomDataAccess roomDataAccess) {
         _logger = logger;
         _security = security;
         _imageService = imageService;
         _hotelDataAccess = hotelDataAccess;
         _cache = cache;
+        _roomDataAccess = roomDataAccess;
     }
 
     public async Task<HotelDto> Create(HotelCreationRequest request) {
@@ -50,7 +53,6 @@ public class HotelService : IHotelService {
             var newHotel = new Hotel {
                 Name = request.Name,
                 Location = request.Location,
-                Capacity = request.Capacity,
                 StayId = request.StayId,
                 Picture = request.Picture != null
                     ? await _imageService.UploadImage(request.Picture, connectedUser.UserId)
@@ -60,7 +62,36 @@ public class HotelService : IHotelService {
             };
 
             newHotel = await _hotelDataAccess.Create(newHotel);
-
+            
+            // Create Rooms
+            var rooms = new List<Room>();
+            for (int i = 1; i <= request.NbRoomsVip; i++) {
+                rooms.Add(new Room {
+                    RoomNumber = $"VIP-{i}",
+                    Capacity = 2,
+                    PricePerNight = request.PriceVip,
+                    IsAvailable = true,
+                    HotelId = newHotel.Id
+                });
+            }
+            
+            for (int i = 1; i <= request.NbRoomsStandard; i++) {
+                rooms.Add(new Room {
+                    RoomNumber = $"STD-{i}",
+                    Capacity = 2,
+                    PricePerNight = request.PriceStandard,
+                    IsAvailable = true,
+                    HotelId = newHotel.Id
+                });
+            }
+            
+            foreach (var room in rooms) {
+                await _roomDataAccess.Create(room);
+            }
+            
+            newHotel.NumberOfRooms = rooms.Count;
+            newHotel = await _hotelDataAccess.Update(newHotel);
+            
             // Cache the created hotel
             _cache.Set($"hotel_{newHotel.Id}", newHotel, TimeSpan.FromMinutes(10));
             _cache.Set($"hotel_stay_{newHotel.StayId}", newHotel, TimeSpan.FromMinutes(10));
@@ -99,6 +130,11 @@ public class HotelService : IHotelService {
     public async Task<IEnumerable<HotelDto>> GetHotelsByUserId(Guid userId) {
         try {
             var hotels = await _hotelDataAccess.GetHotelsByUserId(userId);
+            if (hotels is null || !hotels.Any()) {
+                var errorMessage = "This user has no hotels.";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
             return hotels.Select(hotel => hotel.ToDto());
         }
         catch (Exception e) {
@@ -142,7 +178,7 @@ public class HotelService : IHotelService {
 
             hotel.Name = request.Name;
             hotel.Location = request.Location;
-            hotel.Capacity = request.Capacity;
+            //hotel.Capacity = request.Capacity;
             hotel.LastUpdated = DateTime.UtcNow;
 
             if (request.Picture != null) {

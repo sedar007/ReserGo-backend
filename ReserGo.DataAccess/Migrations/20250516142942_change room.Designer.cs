@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReserGo.DataAccess;
@@ -11,9 +12,11 @@ using ReserGo.DataAccess;
 namespace ReserGo.DataAccess.Migrations
 {
     [DbContext(typeof(ReserGoContext))]
-    partial class ReserGoContextModelSnapshot : ModelSnapshot
+    [Migration("20250516142942_change room")]
+    partial class changeroom
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,6 +173,9 @@ namespace ReserGo.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int>("Capacity")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
@@ -183,9 +189,6 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("NumberOfRooms")
-                        .HasColumnType("integer");
 
                     b.Property<string>("Picture")
                         .HasColumnType("text");

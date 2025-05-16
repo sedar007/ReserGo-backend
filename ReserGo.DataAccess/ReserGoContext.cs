@@ -10,6 +10,7 @@ public class ReserGoContext : DbContext {
     public DbSet<User> Users { get; set; }
     public DbSet<Login> Login { get; set; }
     public DbSet<Hotel> Hotel { get; set; }
+    public DbSet<Room> Room { get; set; }
     public DbSet<Occasion> Occasion { get; set; }
     public DbSet<Restaurant> Restaurant { get; set; }
     public DbSet<HotelOffer> HotelOffer { get; set; }
@@ -126,12 +127,30 @@ public class ReserGoContext : DbContext {
              .HasForeignKey<Login>(l => l.UserId)
              .OnDelete(DeleteBehavior.Cascade); */
 
-        // Config Hotel, Occasion, Restaurant
+        // Config Hotel
         modelBuilder.Entity<Hotel>()
             .HasKey(h => h.Id);
         modelBuilder.Entity<Hotel>()
             .HasIndex(h => h.StayId)
             .IsUnique();
+        
+        modelBuilder.Entity<Hotel>()
+            .HasMany(h => h.Rooms) // Configuring one-to-many relationship
+            .WithOne(r => r.Hotel)
+            .HasForeignKey(r => r.HotelId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        // Config Room
+        modelBuilder.Entity<Room>()
+            .HasKey(r => r.Id);
+
+        modelBuilder.Entity<Room>()
+            .HasIndex(r => new { r.HotelId, r.RoomNumber })
+            .IsUnique();
+        
+        
+        
+        
 
         modelBuilder.Entity<Occasion>()
             .HasKey(o => o.Id);

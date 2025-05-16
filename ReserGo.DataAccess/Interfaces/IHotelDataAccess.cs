@@ -9,4 +9,5 @@ public interface IHotelDataAccess {
     Task<Hotel> Update(Hotel hotel);
     Task<IEnumerable<Hotel>> GetHotelsByUserId(Guid userId);
     Task Delete(Hotel hotel);
+    
 }
