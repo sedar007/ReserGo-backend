@@ -1,34 +1,27 @@
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using ReserGo.Business.Interfaces;
-using ReserGo.Business.Validator;
-using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
-using ReserGo.Common.Requests.Products;
 using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
-using ReserGo.Shared.Interfaces;
-using Microsoft.AspNetCore.SignalR;
 using ReserGo.Common.Response;
 using ReserGo.Common.Requests.Notification;
+using ReserGo.Shared;
 
 namespace ReserGo.Business.Implementations;
 
 public class BookingHotelService : IBookingHotelService {
     private readonly ILogger<BookingHotelService> _logger;
     private readonly IHotelOfferService _hotelOfferService;
-    private readonly IHotelOfferDataAccess _hotelOfferDataAccess;
     private readonly IBookingHotelDataAccess _bookingHotelDataAccess;
     private readonly INotificationService _notificationService;
 
     public BookingHotelService(ILogger<BookingHotelService> logger,
-        IHotelOfferService hotelOfferService, IHotelOfferDataAccess hotelOfferDataAccess,
+        IHotelOfferService hotelOfferService,
         IBookingHotelDataAccess bookingHotelDataAccess, INotificationService notificationService) {
         _logger = logger;
         _hotelOfferService = hotelOfferService;
-        _hotelOfferDataAccess = hotelOfferDataAccess;
         _bookingHotelDataAccess = bookingHotelDataAccess;
         _notificationService = notificationService;
     }
@@ -37,7 +30,7 @@ public class BookingHotelService : IBookingHotelService {
         try {
             if (user == null) {
                 _logger.LogError("User not found");
-                throw new InvalidDataException("User not found");
+                throw new InvalidDataException(Consts.UserNotFound);
             }
 
             var hotelOffer = await _hotelOfferService.GetById(request.HotelOfferId);
@@ -59,7 +52,7 @@ public class BookingHotelService : IBookingHotelService {
 
             if (bookingHotel == null) throw new InvalidDataException("Booking hotel not created");
 
-            if (hotelOffer?.Hotel?.Name == null) {
+            if (hotelOffer.Hotel.Name == null) {
                 _logger.LogError("Hotel name is not available for offer {id}", hotelOffer.Id);
                 throw new InvalidDataException("Hotel name is not available.");
             }
