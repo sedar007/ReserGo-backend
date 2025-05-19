@@ -12,8 +12,8 @@ using ReserGo.DataAccess;
 namespace ReserGo.DataAccess.Migrations
 {
     [DbContext(typeof(ReserGoContext))]
-    [Migration("20250516164623_update")]
-    partial class update
+    [Migration("20250519185434_Add Database")]
+    partial class AddDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -528,6 +528,34 @@ namespace ReserGo.DataAccess.Migrations
                     b.ToTable("Room");
                 });
 
+            modelBuilder.Entity("ReserGo.Common.Entity.RoomAvailability", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("HotelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoomId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HotelId");
+
+                    b.HasIndex("RoomId", "StartDate", "EndDate")
+                        .IsUnique();
+
+                    b.ToTable("RoomAvailability");
+                });
+
             modelBuilder.Entity("ReserGo.Common.Entity.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -767,6 +795,25 @@ namespace ReserGo.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Hotel");
+                });
+
+            modelBuilder.Entity("ReserGo.Common.Entity.RoomAvailability", b =>
+                {
+                    b.HasOne("ReserGo.Common.Entity.Hotel", "Hotel")
+                        .WithMany()
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ReserGo.Common.Entity.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("ReserGo.Common.Entity.Hotel", b =>

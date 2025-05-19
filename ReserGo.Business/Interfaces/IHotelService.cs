@@ -10,5 +10,6 @@ public interface IHotelService {
     Task<HotelDto> Create(HotelCreationRequest request);
     Task<HotelDto> Update(long stayId, HotelUpdateRequest request);
     Task<IEnumerable<HotelDto>> GetHotelsByUserId(Guid userId);
+    Task<bool> IsAuthorized(Guid hotelId, Guid userId);
     Task Delete(Guid id);
 }

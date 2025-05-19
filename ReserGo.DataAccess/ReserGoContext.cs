@@ -11,6 +11,7 @@ public class ReserGoContext : DbContext {
     public DbSet<Login> Login { get; set; }
     public DbSet<Hotel> Hotel { get; set; }
     public DbSet<Room> Room { get; set; }
+    public DbSet<RoomAvailability> RoomAvailability { get; set; }
     public DbSet<Occasion> Occasion { get; set; }
     public DbSet<Restaurant> Restaurant { get; set; }
     public DbSet<HotelOffer> HotelOffer { get; set; }
@@ -257,5 +258,27 @@ public class ReserGoContext : DbContext {
             .WithMany(u => u.Notifications)
             .HasForeignKey(n => n.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        
+        
+        // Config RoomAvailability
+        modelBuilder.Entity<RoomAvailability>()
+            .HasKey(ra => ra.Id); // Définir la clé primaire
+
+        modelBuilder.Entity<RoomAvailability>()
+            .HasOne(ra => ra.Hotel)
+            .WithMany()
+            .HasForeignKey(ra => ra.HotelId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<RoomAvailability>()
+            .HasOne(ra => ra.Room)
+            .WithMany()
+            .HasForeignKey(ra => ra.RoomId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<RoomAvailability>()
+            .HasIndex(ra => new { ra.RoomId, ra.StartDate, ra.EndDate }) // Index pour éviter les conflits de disponibilité
+            .IsUnique();
     }
 }

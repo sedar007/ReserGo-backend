@@ -9,18 +9,21 @@ using ReserGo.Common.Models;
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
 [ApiController]
-[Tags("Room | Rooms")]
+[Tags("Hotel | Rooms")]
 [AdminOnly]
-[Route("api/administration/hotels/rooms/")]
+[Route("api/administration/hotels")]
 public class RoomController : ControllerBase {
     private readonly ILogger<RoomController> _logger;
     private readonly IRoomService _roomService;
     private readonly ISecurity _security;
+    private readonly IRoomAvailabilityService _roomAvailabilityService;
 
-    public RoomController(ILogger<RoomController> logger, IRoomService roomService, ISecurity security) {
+    public RoomController(ILogger<RoomController> logger, IRoomService roomService, 
+        ISecurity security, IRoomAvailabilityService roomAvailabilityService) {
         _logger = logger;
         _roomService = roomService;
         _security = security;
+        _roomAvailabilityService = roomAvailabilityService;
     }
 
     /// <summary>
@@ -118,7 +121,7 @@ public class RoomController : ControllerBase {
     /// <response code="200">Rooms retrieved successfully.</response>
     /// <response code="401">User not authenticated.</response>
     /// <response code="500">An unexpected error occurred.</response>
-    [HttpGet("hotel/{hotelId}/rooms")]
+    [HttpGet("{hotelId}/rooms")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -212,4 +215,130 @@ public class RoomController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
+    
+    /// <summary>
+    /// Set the availability for a specific room.
+    /// </summary>
+    /// <param name="roomId">The ID of the room to set availability for.</param>
+    /// <param name="request">The availability request containing start and end dates, and hotel ID.</param>
+    /// <returns>The created or updated room availability object.</returns>
+    /// <response code="201">Availability set successfully.</response>
+    /// <response code="400">Invalid request data or validation error.</response>
+    /// <response code="401">User not authenticated.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpPost("{roomId}/availability")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Resource<RoomAvailabilityDto>>> SetAvailability(Guid roomId, RoomAvailabilityRequest request) {
+        try {
+            
+            var connectedUser = _security.GetCurrentUser();
+            if (connectedUser == null) return Unauthorized("User not authenticated");
+            
+            var availability = await _roomAvailabilityService.SetAvailability(connectedUser,roomId, request);
+
+            var resource = new Resource<RoomAvailabilityDto> {
+                Data = availability,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(SetAvailability), new { availability.Room.Id }),
+                        Rel = "self",
+                        Method = "POST"
+                    }
+                }
+            };
+
+            return Created("set-availability", resource);
+        }
+        catch (InvalidDataException ex) {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while setting room availability.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+        }
+    }
+
+    /// <summary>
+    /// Retrieve availabilities ordered by the most recent dates.
+    /// </summary>
+    /// <param name="hotelId">The ID of the hotel to retrieve availabilities for.</param>
+    /// <param name="skip">The number of records to skip for pagination.</param>
+    /// <param name="take">The number of records to take for pagination.</param>
+    /// <returns>A list of room availabilities ordered by the most recent dates.</returns>
+    /// <response code="200">Availabilities retrieved successfully.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("{hotelId}/rooms/availabilities")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Resource<IEnumerable<RoomAvailabilityDto>>>> GetAvailabilitiesOrderedByDate(
+        Guid hotelId, int skip = 0, int take = 10) {
+        try {
+            var connectedUser = _security.GetCurrentUser();
+            if (connectedUser == null) return Unauthorized("User not authenticated");
+
+            var availabilities =
+                await _roomAvailabilityService.GetAvailabilitiesByHotelId(connectedUser, hotelId, skip, take);
+
+            var resource = new Resource<IEnumerable<RoomAvailabilityDto>> {
+                Data = availabilities,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetAvailabilitiesOrderedByDate), new { hotelId, skip, take }),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            };
+
+            return Ok(resource);
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while retrieving room availabilities.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+        }
+    }
+    
+    /// <summary>
+    /// Retrieve room availabilities for all hotels associated with the connected user.
+    /// </summary>
+    /// <param name="skip">The number of records to skip for pagination.</param>
+    /// <param name="take">The number of records to take for pagination.</param>
+    /// <returns>A list of room availabilities for all hotels associated with the connected user.</returns>
+    /// <response code="200">Availabilities retrieved successfully.</response>
+    /// <response code="401">User not authenticated.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("rooms/availabilities")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Resource<IEnumerable<RoomAvailabilityDto>>>> GetAvailabilitiesForAllHotels(int skip = 0, int take = 10) {
+        try {
+            var connectedUser = _security.GetCurrentUser();
+            if (connectedUser == null) return Unauthorized("User not authenticated");
+
+            var availabilities = await _roomAvailabilityService.GetAvailabilitiesForAllHotels(connectedUser, skip, take);
+
+            var resource = new Resource<IEnumerable<RoomAvailabilityDto>> {
+                Data = availabilities,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetAvailabilitiesForAllHotels), new { skip, take }),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            };
+
+            return Ok(resource);
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while retrieving availabilities for all hotels.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+        }
+    }
+
+
 }

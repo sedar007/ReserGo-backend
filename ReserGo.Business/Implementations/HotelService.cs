@@ -242,4 +242,21 @@ public class HotelService : IHotelService {
             throw;
         }
     }
+    
+    public async Task<bool> IsAuthorized(Guid hotelId, Guid userId) {
+        try {
+            var isAuthorized = await _hotelDataAccess.IsAuthorized(hotelId, userId);
+            if (!isAuthorized) {
+                var errorMessage = "User is not authorized to access this hotel.";
+                _logger.LogError(errorMessage);
+                throw new UnauthorizedAccessException(errorMessage);
+            }
+
+            return true;
+        }
+        catch (Exception e) {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
 }

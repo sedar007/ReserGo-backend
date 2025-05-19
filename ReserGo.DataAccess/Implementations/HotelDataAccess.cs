@@ -42,6 +42,9 @@ public class HotelDataAccess : IHotelDataAccess {
         await _context.SaveChangesAsync();
         return hotel;
     }
+    public async Task<bool> IsAuthorized(Guid hotelId, Guid userId) {
+        return await _context.Hotel.AnyAsync(x => x.Id == hotelId && x.UserId == userId);
+    }
 
     public async Task Delete(Hotel hotel) {
         _context.Hotel.Remove(hotel);
