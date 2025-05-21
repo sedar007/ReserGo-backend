@@ -29,7 +29,7 @@ public class UserService : IUserService {
         _cache = cache;
     }
 
-    public async Task<UserDto> Create(UserCreationRequest request) {
+    public async Task<UserDto> Create(UserCreationRequest request, UserRole role) {
         try {
             var userByUsername = await _userDataAccess.GetByUsername(request.Username);
             if (userByUsername is not null) {
@@ -56,7 +56,7 @@ public class UserService : IUserService {
                 LastName = request.LastName,
                 Email = request.Email,
                 Username = request.Username,
-                Role = UserRole.Admin
+                Role = role
             };
 
             newUser = await _userDataAccess.Create(newUser);

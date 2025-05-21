@@ -4,19 +4,20 @@ using ReserGo.Common.Entity;
 namespace ReserGo.Common.Helper;
 
 public static class HotelOfferHelper {
-    public static HotelOfferDto ToDto(this HotelOffer hotel) {
+    public static HotelOfferDto ToDto(this HotelOffer hotelOffer) {
         return new HotelOfferDto {
-            Id = hotel.Id,
-            OfferTitle = hotel.OfferTitle,
-            Description = hotel.Description,
-            PricePerNight = hotel.PricePerNight,
-            NumberOfGuests = hotel.NumberOfGuests,
-            NumberOfRooms = hotel.NumberOfRooms,
-            OfferStartDate = hotel.OfferStartDate,
-            OfferEndDate = hotel.OfferEndDate,
-            IsActive = hotel.IsActive,
-            HotelId = hotel.HotelId,
-            Hotel = hotel.Hotel.ToDto()
+            Id = hotelOffer.Id,
+            OfferTitle = hotelOffer.OfferTitle,
+            Description = hotelOffer.Description,
+            PricePerNight = hotelOffer.PricePerNight,
+            NumberOfGuests = hotelOffer.NumberOfGuests,
+            NumberOfRooms = hotelOffer.NumberOfRooms,
+            OfferStartDate = hotelOffer.OfferStartDate,
+            OfferEndDate = hotelOffer.OfferEndDate,
+            IsActive = hotelOffer.IsActive,
+            HotelId = hotelOffer.HotelId,
+            UserId = hotelOffer.UserId,
+            Hotel = hotelOffer.Hotel?.ToDto()
         };
     }
 }

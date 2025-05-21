@@ -1,11 +1,10 @@
 namespace ReserGo.Common.Entity;
 
 public class RestaurantOffer {
-    public Guid Id { get; init; } 
-    public string OfferTitle { get; set; } = null!;
-    public string Description { get; set; } = null!;
+    public Guid Id { get; init; }
+    public string? Description { get; set; } = null!;
     public double? PricePerPerson { get; set; }
-    public int NumberOfGuests { get; set; }
+    public int GuestLimit { get; set; }
     public DateTime OfferStartDate { get; set; }
     public DateTime OfferEndDate { get; set; }
     public bool IsActive { get; set; }
@@ -13,4 +12,6 @@ public class RestaurantOffer {
     public Restaurant Restaurant { get; init; } = null!;
     public Guid UserId { get; init; }
     public User User { get; init; } = null!;
+    
+    public ICollection<BookingRestaurant> Bookings { get; set; } = new List<BookingRestaurant>();
 }

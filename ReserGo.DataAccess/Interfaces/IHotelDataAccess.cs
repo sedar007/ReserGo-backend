@@ -8,5 +8,7 @@ public interface IHotelDataAccess {
     Task<Hotel> Create(Hotel hotel);
     Task<Hotel> Update(Hotel hotel);
     Task<IEnumerable<Hotel>> GetHotelsByUserId(Guid userId);
+    Task<bool> IsAuthorized(Guid hotelId, Guid userId);
     Task Delete(Hotel hotel);
+    
 }

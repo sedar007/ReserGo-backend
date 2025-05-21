@@ -1,7 +1,7 @@
 namespace ReserGo.Common.Entity;
 
 public class HotelOffer {
-    public Guid Id { get; init; } 
+    public Guid Id { get; init; }
     public string OfferTitle { get; set; } = null!;
     public string Description { get; set; } = null!;
     public double PricePerNight { get; set; }
@@ -16,4 +16,5 @@ public class HotelOffer {
 
     public Guid UserId { get; init; }
     public User User { get; init; } = null!;
+    public ICollection<BookingHotel> Bookings { get; set; } = new List<BookingHotel>();
 }

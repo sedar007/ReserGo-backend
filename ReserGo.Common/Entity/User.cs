@@ -9,7 +9,9 @@ public class User {
     public string Email { get; set; } = null!;
     public string? PhoneNumber { get; set; }
     public string? Bio { get; set; }
+
     public string Username { get; set; } = null!;
+
     //public Guid? AddressId { get; init; }
     public string? ProfilePicture { get; set; }
     public UserRole Role { get; init; }
@@ -23,6 +25,7 @@ public class User {
 
     // Relation with Address (One-to-One)
     public virtual Address? Address { get; set; } = null!;
+    public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     public virtual ICollection<Hotel> Hotels { get; init; } = new List<Hotel>();
     public virtual ICollection<Restaurant> Restaurants { get; init; } = new List<Restaurant>();

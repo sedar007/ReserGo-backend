@@ -1,7 +1,7 @@
 namespace ReserGo.Common.Entity;
 
 public class Occasion {
-    public Guid Id { get; init; } 
+    public Guid Id { get; init; }
     public long StayId { get; init; }
     public string Name { get; set; } = null!;
     public string Location { get; set; } = null!;

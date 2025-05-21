@@ -1,0 +1,36 @@
+using ReserGo.Common.DTO;
+using ReserGo.Common.Entity;
+
+namespace ReserGo.Common.Helper;
+
+public static class BookingHelper {
+    public static BookingRestaurantDto ToDto(this BookingRestaurant bookingRestaurant) {
+        return new BookingRestaurantDto {
+            Id = bookingRestaurant.Id,
+            UserId = bookingRestaurant.UserId,
+          //  BookingDate = bookingRestaurant.BookingDate,
+            NumberOfGuests = bookingRestaurant.NumberOfGuests,
+            IsConfirmed = bookingRestaurant.IsConfirmed,
+            CreatedAt = bookingRestaurant.CreatedAt,
+            RestaurantOfferId = bookingRestaurant.RestaurantOfferId,
+            RestaurantOffer = bookingRestaurant.RestaurantOffer?.ToDto()
+        };
+    }
+    
+    public static BookingHotelDto ToDto(this BookingHotel bookingHotel) {
+        return new BookingHotelDto {
+            Id = bookingHotel.Id,
+            UserId = bookingHotel.UserId,
+            NumberOfGuests = bookingHotel.NumberOfGuests,
+            IsConfirmed = bookingHotel.IsConfirmed,
+            CreatedAt = bookingHotel.CreatedAt,
+            RoomId = bookingHotel.RoomId,
+            HotelId = bookingHotel.HotelId,
+            StartDate = bookingHotel.StartDate,
+            EndDate = bookingHotel.EndDate,
+            Hotel = bookingHotel?.Hotel.ToDto(),
+            Room = bookingHotel?.Room.ToDto(),
+        };
+    }
+    
+}

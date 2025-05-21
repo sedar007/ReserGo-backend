@@ -5,6 +5,8 @@ using ReserGo.Common.Models;
 using ReserGo.Common.Requests.User;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
+using ReserGo.WebAPI.Controllers.Helper;
+using ReserGo.Common.Enum;
 
 namespace ReserGo.WebAPI.Controllers.Administration.User;
 
@@ -14,11 +16,13 @@ public class UserController : ControllerBase {
     private readonly ILogger<UserController> _logger;
     private readonly ISecurity _security;
     private readonly IUserService _userService;
+    private readonly UserRole _userRole;
 
     public UserController(ILogger<UserController> logger, ISecurity security, IUserService userService) {
         _logger = logger;
         _userService = userService;
         _security = security;
+        _userRole = UserRole.Admin;
     }
 
     /// <summary>
@@ -34,34 +38,7 @@ public class UserController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Create(UserCreationRequest request) {
-        try {
-            var data = await _userService.Create(request);
-
-            var resource = new Resource<UserDto> {
-                Data = data,
-                Links = new List<Link> {
-                    new() {
-                        Href = Url.Action(nameof(GetById), new { id = data.Id }),
-                        Rel = "self",
-                        Method = "GET"
-                    },
-                    new() {
-                        Href = Url.Action(nameof(UpdateUser), new { id = data.Id }),
-                        Rel = "update",
-                        Method = "PUT"
-                    }
-                }
-            };
-
-            return Created("create", resource);
-        }
-        catch (InvalidDataException ex) {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while creating the user.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
-        }
+        return await UserControllerHelper.CreateUser(request, _userService, this, _userRole);
     }
 
     /// <summary>
@@ -73,40 +50,12 @@ public class UserController : ControllerBase {
     /// <response code="404">User not found.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [AdminOnly]
-    [HttpGet("getById/{id}")]
+    [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<Resource<UserDto>>> GetById(Guid id) {
-        try {
-            var user = await _userService.GetById(id);
-            if (user == null) return NotFound($"User with ID {id} not found.");
-
-            var resource = new Resource<UserDto> {
-                Data = user,
-                Links = new List<Link> {
-                    new() {
-                        Href = Url.Action(nameof(GetById), new { id }),
-                        Rel = "self",
-                        Method = "GET"
-                    },
-                    new() {
-                        Href = Url.Action(nameof(UpdateUser), new { id }),
-                        Rel = "update",
-                        Method = "PUT"
-                    }
-                }
-            };
-
-            return Ok(resource);
-        }
-        catch (InvalidDataException ex) {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while retrieving the user.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
-        }
+        return await UserControllerHelper.GetUserById(id, _userService, _security, this);
     }
 
     /// <summary>
@@ -123,17 +72,7 @@ public class UserController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Delete(Guid id) {
-        try {
-            await _userService.Delete(id);
-            return NoContent();
-        }
-        catch (InvalidDataException ex) {
-            return NotFound(ex.Message);
-        }
-        catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while retrieving the user.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
-        }
+        return await UserControllerHelper.DeleteUser(id, _userService, _security, _logger, this);
     }
 
     /// <summary>
@@ -150,28 +89,7 @@ public class UserController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<Resource<UserDto>>> UpdateUser(Guid id, UserUpdateRequest request) {
-        try {
-            var updatedUser = await _userService.UpdateUser(id, request);
-
-            var resource = new Resource<UserDto> {
-                Data = updatedUser,
-                Links = new List<Link> {
-                    new() {
-                        Href = Url.Action(nameof(GetById), new { id }),
-                        Rel = "self",
-                        Method = "GET"
-                    }
-                }
-            };
-
-            return Ok(resource);
-        }
-        catch (InvalidDataException ex) {
-            return BadRequest(ex.Message);
-        }
-        catch (Exception ex) {
-            return NotFound(ex.Message);
-        }
+        return await UserControllerHelper.UpdateUser(id, request, _userService, _security, this);
     }
 
     /// <summary>

@@ -15,6 +15,8 @@ public class AdminOnlyAttribute : Attribute, IAuthorizationFilter {
 
         var user = securityService.GetCurrentUser();
         if (user is null || user.Role != UserRole.Admin)
-            context.Result = new UnauthorizedObjectResult("Admin access required");
+            context.Result =
+                new UnauthorizedObjectResult(
+                    "Access restricted. Please ensure you are logged in and have the correct permissions.");
     }
 }

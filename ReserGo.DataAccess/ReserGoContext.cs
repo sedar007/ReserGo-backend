@@ -10,11 +10,14 @@ public class ReserGoContext : DbContext {
     public DbSet<User> Users { get; set; }
     public DbSet<Login> Login { get; set; }
     public DbSet<Hotel> Hotel { get; set; }
+    public DbSet<Room> Room { get; set; }
+    public DbSet<RoomAvailability> RoomAvailability { get; set; }
     public DbSet<Occasion> Occasion { get; set; }
     public DbSet<Restaurant> Restaurant { get; set; }
     public DbSet<HotelOffer> HotelOffer { get; set; }
     public DbSet<RestaurantOffer> RestaurantOffer { get; set; }
     public DbSet<OccasionOffer> OccasionOffer { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
 
     public DbSet<BookingHotel> BookingHotel { get; set; }
     public DbSet<BookingOccasion> BookingOccasion { get; set; }
@@ -91,7 +94,7 @@ public class ReserGoContext : DbContext {
             .WithOne(ho => ho.User)
             .HasForeignKey(ho => ho.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         // Config relation User-Address
         modelBuilder.Entity<User>()
             .HasOne(u => u.Address)
@@ -113,24 +116,42 @@ public class ReserGoContext : DbContext {
             .HasForeignKey(oo => oo.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-       /* //Config Login
-        modelBuilder.Entity<Login>()
-            .HasKey(l => l.Id);
-        modelBuilder.Entity<Login>()
-            .HasIndex(l => l.Username)
-            .IsUnique();
-        modelBuilder.Entity<Login>()
-            .HasOne(l => l.User)
-            .WithOne(u => u.Login)
-            .HasForeignKey<Login>(l => l.UserId)
-            .OnDelete(DeleteBehavior.Cascade); */
+        /* //Config Login
+         modelBuilder.Entity<Login>()
+             .HasKey(l => l.Id);
+         modelBuilder.Entity<Login>()
+             .HasIndex(l => l.Username)
+             .IsUnique();
+         modelBuilder.Entity<Login>()
+             .HasOne(l => l.User)
+             .WithOne(u => u.Login)
+             .HasForeignKey<Login>(l => l.UserId)
+             .OnDelete(DeleteBehavior.Cascade); */
 
-        // Config Hotel, Occasion, Restaurant
+        // Config Hotel
         modelBuilder.Entity<Hotel>()
             .HasKey(h => h.Id);
         modelBuilder.Entity<Hotel>()
             .HasIndex(h => h.StayId)
             .IsUnique();
+        
+        modelBuilder.Entity<Hotel>()
+            .HasMany(h => h.Rooms) // Configuring one-to-many relationship
+            .WithOne(r => r.Hotel)
+            .HasForeignKey(r => r.HotelId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        // Config Room
+        modelBuilder.Entity<Room>()
+            .HasKey(r => r.Id);
+
+        modelBuilder.Entity<Room>()
+            .HasIndex(r => new { r.HotelId, r.RoomNumber })
+            .IsUnique();
+        
+        
+        
+        
 
         modelBuilder.Entity<Occasion>()
             .HasKey(o => o.Id);
@@ -145,20 +166,7 @@ public class ReserGoContext : DbContext {
             .IsUnique();
 
         // Config Bookings 
-
-        // BookingHotel
-        modelBuilder.Entity<BookingHotel>()
-            .HasKey(b => b.Id);
-
-        modelBuilder.Entity<BookingHotel>()
-            .HasOne(b => b.User)
-            .WithMany(u => u.BookingsHotel)
-            .HasForeignKey(b => b.UserId);
-
-        modelBuilder.Entity<BookingHotel>()
-            .HasOne(b => b.Hotel)
-            .WithMany(h => h.BookingsHotel)
-            .HasForeignKey(b => b.HotelId);
+        
 
         // Config HotelOffer
         modelBuilder.Entity<HotelOffer>()
@@ -168,7 +176,7 @@ public class ReserGoContext : DbContext {
             .WithMany(h => h.HotelOffers)
             .HasForeignKey(ho => ho.HotelId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         // Config Address
         modelBuilder.Entity<Address>()
             .HasKey(a => a.Id);
@@ -190,7 +198,7 @@ public class ReserGoContext : DbContext {
         // Config Address
         modelBuilder.Entity<Address>()
             .HasKey(a => a.Id);
-        
+
         // Config OccasionOffer
         modelBuilder.Entity<OccasionOffer>()
             .HasKey(oo => oo.Id);
@@ -222,10 +230,55 @@ public class ReserGoContext : DbContext {
             .HasOne(b => b.User)
             .WithMany(u => u.BookingsRestaurant)
             .HasForeignKey(b => b.UserId);
-
+        
         modelBuilder.Entity<BookingRestaurant>()
-            .HasOne(b => b.Restaurant)
-            .WithMany(h => h.BookingRestaurant)
-            .HasForeignKey(b => b.RestaurantId);
+            .HasOne(b => b.RestaurantOffer)
+            .WithMany(r => r.Bookings)
+            .HasForeignKey(b => b.RestaurantOfferId);
+        
+        // BookingHotel
+        modelBuilder.Entity<BookingHotel>()
+            .HasKey(b => b.Id);
+
+        modelBuilder.Entity<BookingHotel>()
+            .HasOne(b => b.User)
+            .WithMany(u => u.BookingsHotel)
+            .HasForeignKey(b => b.UserId);
+
+       /* modelBuilder.Entity<BookingHotel>()
+            .HasOne(b => b.HotelOffer)
+            .WithMany(h => h.Bookings)
+            .HasForeignKey(b => b.HotelOfferId);*/
+
+        // Config Notification
+        modelBuilder.Entity<Notification>()
+            .HasKey(n => n.Id);
+        modelBuilder.Entity<Notification>()
+            .HasOne(n => n.User)
+            .WithMany(u => u.Notifications)
+            .HasForeignKey(n => n.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        
+        
+        // Config RoomAvailability
+        modelBuilder.Entity<RoomAvailability>()
+            .HasKey(ra => ra.Id); // Définir la clé primaire
+
+        modelBuilder.Entity<RoomAvailability>()
+            .HasOne(ra => ra.Hotel)
+            .WithMany()
+            .HasForeignKey(ra => ra.HotelId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<RoomAvailability>()
+            .HasOne(ra => ra.Room)
+            .WithMany()
+            .HasForeignKey(ra => ra.RoomId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<RoomAvailability>()
+            .HasIndex(ra => new { ra.RoomId, ra.StartDate, ra.EndDate }) // Index pour éviter les conflits de disponibilité
+            .IsUnique();
     }
 }
