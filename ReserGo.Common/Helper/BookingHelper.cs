@@ -8,7 +8,7 @@ public static class BookingHelper {
         return new BookingRestaurantDto {
             Id = bookingRestaurant.Id,
             UserId = bookingRestaurant.UserId,
-            BookingDate = bookingRestaurant.BookingDate,
+          //  BookingDate = bookingRestaurant.BookingDate,
             NumberOfGuests = bookingRestaurant.NumberOfGuests,
             IsConfirmed = bookingRestaurant.IsConfirmed,
             CreatedAt = bookingRestaurant.CreatedAt,
@@ -21,12 +21,15 @@ public static class BookingHelper {
         return new BookingHotelDto {
             Id = bookingHotel.Id,
             UserId = bookingHotel.UserId,
-            BookingDate = bookingHotel.BookingDate,
             NumberOfGuests = bookingHotel.NumberOfGuests,
             IsConfirmed = bookingHotel.IsConfirmed,
             CreatedAt = bookingHotel.CreatedAt,
-            HotelOfferId = bookingHotel.HotelOfferId,
-            HotelOffer = bookingHotel.HotelOffer?.ToDto()
+            RoomId = bookingHotel.RoomId,
+            HotelId = bookingHotel.HotelId,
+            StartDate = bookingHotel.StartDate,
+            EndDate = bookingHotel.EndDate,
+            Hotel = bookingHotel?.Hotel.ToDto(),
+            Room = bookingHotel?.Room.ToDto(),
         };
     }
     

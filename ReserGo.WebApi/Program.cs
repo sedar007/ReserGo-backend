@@ -72,6 +72,14 @@ public class Program {
             // Hotel
             builder.Services.AddScoped<IHotelDataAccess, HotelDataAccess>();
             builder.Services.AddScoped<IHotelService, HotelService>();
+            
+            // Room
+            builder.Services.AddScoped<IRoomDataAccess, RoomDataAccess>();
+            builder.Services.AddScoped<IRoomService, RoomService>();
+            
+            // Room Availability
+            builder.Services.AddScoped<IRoomAvailabilityDataAccess, RoomAvailabilityDataAccess>();
+            builder.Services.AddScoped<IRoomAvailabilityService, RoomAvailabilityService>();
 
             // Restaurant
             builder.Services.AddScoped<IRestaurantDataAccess, RestaurantDataAccess>();

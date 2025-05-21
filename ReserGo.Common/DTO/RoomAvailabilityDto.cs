@@ -1,8 +1,8 @@
+using ReserGo.Common.Entity;
+
 namespace ReserGo.Common.DTO;
 
-public class BookingHotelDto : BookingDto{
-    public Guid RoomId { get; set; }
-    public Guid HotelId { get; set; }
+public class RoomAvailabilityDto {
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     

@@ -19,8 +19,28 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
 
     public async Task<BookingHotel?> GetById(Guid id) {
         return await _context.BookingHotel
-            .Include(x => x.HotelOffer)
+            //.Include(x => x.HotelOffer)
             .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == id);
+    }
+    
+    public async Task<IEnumerable<BookingHotel>> GetBookingsByRoomId(Guid roomId) {
+        return await _context.BookingHotel
+            .Where(b => b.RoomId == roomId)
+            .ToListAsync();
+    }
+    
+    public async Task<IEnumerable<BookingHotel>> GetBookingsByUserId(Guid userId) {
+        return await _context.BookingHotel
+            .Where(b => b.UserId == userId)
+            .ToListAsync();
+    }
+    
+    public async Task<IEnumerable<BookingHotel>> GetBookingsByAdminId(Guid adminId) {
+        return await _context.BookingHotel
+            .Include(b => b.Hotel)
+            .Include(r => r.Room)
+            .Where(b => b.Hotel.UserId == adminId)
+            .ToListAsync();
     }
 }

@@ -25,10 +25,14 @@ public class FranceGouvService : IFranceGouvService {
 
         if (string.IsNullOrWhiteSpace(query)) {
             _logger.LogWarning("Search query is null or empty.");
-            throw new ArgumentNullException(nameof(query), "Search query cannot be null or empty.");
+            return Enumerable.Empty<string>();
         }
 
         var addresses = await _franceGouvApiService.SearchAddresses(query);
+        if(addresses == null) {
+            _logger.LogWarning("No addresses found for the query: {Query}", query);
+            return Enumerable.Empty<string>();
+        }
         var addressList = addresses?.ToList();
 
         if (addressList == null || !addressList.Any()) {

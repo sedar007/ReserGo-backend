@@ -67,7 +67,7 @@ public class BookingRestaurantService : IBookingRestaurantService {
             var notification = new NotificationCreationRequest {
                 Title = "New Reservation",
                 Message =
-                    $"New reservation made by {user.Username} for offer {restaurantOffer.OfferTitle} at {restaurantOffer.Restaurant.Name} " +
+                    $"New reservation made by {user.Username}  at {restaurantOffer.Restaurant.Name} " +
                     $"number of guests: {request.NumberOfGuests}",
                 Type = "Restaurant",
                 Name = restaurantName,

@@ -17,5 +17,8 @@ public static class Consts {
     // Cache
     public const string RestaurantOffersUserIdCacheKey = "restaurantOffers_user_";
     public const string RestaurantOffersCacheKey = "restaurantOffers_";
+    public const string CacheKeyAvailabilitiesUser = "availabilities_user_{0}_{1}_{2}";
+    public const string CacheKeyAvailabilitiesHotel = "availabilities_hotel_{0}_{1}_{2}";
+
         
 }

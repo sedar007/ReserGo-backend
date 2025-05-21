@@ -6,6 +6,14 @@ using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Controllers.Administration.Products;
 using Microsoft.AspNetCore.SignalR;
 using ReserGo.WebAPI.Hubs;
+using Microsoft.AspNetCore.Mvc;
+using ReserGo.Business.Interfaces;
+using ReserGo.Common.DTO;
+using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.WebAPI.Attributes;
+using ReserGo.Shared.Interfaces;
+using ReserGo.WebAPI.Controllers.Administration.Products;
+using ReserGo.Common.Models;
 
 namespace ReserGo.WebAPI.Controllers.Customer.Booking;
 
@@ -50,8 +58,11 @@ public class BookingHotelController : ControllerBase {
         try {
             var user = _security.GetCurrentUser();
             if (user == null) return Unauthorized();
+            
             var responses = await _bookingHotelService.CreateBooking(request, user);
             var notification = responses.Notification;
+            
+            
             await _notificationHub.Clients.User(notification.UserId.ToString())
                 .SendAsync("ReceiveNotification", notification.Message);
             var bookingHotelService = responses.Booking;
@@ -71,5 +82,73 @@ public class BookingHotelController : ControllerBase {
             _logger.LogError(e, "An unexpected error occurred while creating booking hotel");
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
+    }
+    
+    /// <summary>
+    ///     Retrieve all bookings for the current user.
+    /// </summary>
+    /// <returns>
+    ///     - **200 OK**: If the bookings are successfully retrieved.
+    ///     - **401 Unauthorized**: If the user is not authenticated.
+    ///     - **500 Internal Server Error**: If an unexpected error occurs.
+    /// </returns>
+    /// <response code="200">Bookings retrieved successfully.</response>
+    /// <response code="401">User is not authenticated.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("my-bookings")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<ActionResult<Resource<IEnumerable<Resource<BookingHotelDto>>>>> GetMyBookings() {
+        try {
+            var user = _security.GetCurrentUser();
+            if (user == null) return Unauthorized();
+
+            var bookings = await _bookingHotelService.GetBookingsByUserId(user.UserId);
+
+            var bookingsWithLinks = bookings.Select(booking => new Resource<BookingHotelDto> {
+                Data = booking,
+                Links = GenerateLinks(booking.Id)
+            });
+
+            var resourceCollection = new Resource<IEnumerable<Resource<BookingHotelDto>>> {
+                Data = bookingsWithLinks,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetMyBookings)),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            };
+
+            return Ok(resourceCollection);
+            
+            
+        }
+        catch (Exception e) {
+            _logger.LogError(e, "An unexpected error occurred while retrieving bookings");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
+        }
+    }
+    
+    private List<Link> GenerateLinks(Guid bookingId) {
+        return new List<Link> {
+            new() {
+                Href = Url.Action(nameof(GetMyBookings), new { id = bookingId }),
+                Rel = "self",
+                Method = "GET"
+            },
+            new() {
+                Href = Url.Action(nameof(CreateReservation), new { id = bookingId }),
+                Rel = "create",
+                Method = "POST"
+            },
+            new() {
+                Href = Url.Action("DeleteBooking", new { id = bookingId }),
+                Rel = "delete",
+                Method = "DELETE"
+            }
+        };
     }
 }

@@ -32,17 +32,22 @@ public class FranceGouvController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> SearchAddresses([FromQuery] string query) {
-        if (string.IsNullOrWhiteSpace(query)) return BadRequest("Query parameter is required.");
-
+        if (string.IsNullOrWhiteSpace(query)) {
+            _logger.LogWarning("Search query is null or empty.");
+            return Ok(Array.Empty<object>());
+        }
         try {
             var addresses = await _franceGouvService.SearchAddresses(query);
-            if (addresses == null || !addresses.Any()) return NotFound("No addresses found.");
+            if (addresses == null || !addresses.Any()) {
+                _logger.LogWarning("No addresses found for the query: {Query}", query);
+                return Ok(Array.Empty<object>());
+            }
 
             return Ok(addresses);
         }
         catch (Exception ex) {
             _logger.LogError(ex, "Error occurred while searching for addresses.");
-            return StatusCode(500, "An unexpected error occurred.");
+            return Ok(Array.Empty<object>());
         }
     }
 }

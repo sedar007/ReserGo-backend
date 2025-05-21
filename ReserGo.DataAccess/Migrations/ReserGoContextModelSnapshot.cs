@@ -60,16 +60,19 @@ namespace ReserGo.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("BookingDate")
+                    b.Property<DateTime?>("BookingDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("HotelId")
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("HotelId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("HotelOfferId")
+                    b.Property<Guid?>("HotelOfferId")
                         .HasColumnType("uuid");
 
                     b.Property<bool>("IsConfirmed")
@@ -77,6 +80,12 @@ namespace ReserGo.DataAccess.Migrations
 
                     b.Property<int>("NumberOfGuests")
                         .HasColumnType("integer");
+
+                    b.Property<Guid>("RoomId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -86,6 +95,8 @@ namespace ReserGo.DataAccess.Migrations
                     b.HasIndex("HotelId");
 
                     b.HasIndex("HotelOfferId");
+
+                    b.HasIndex("RoomId");
 
                     b.HasIndex("UserId");
 
@@ -132,7 +143,7 @@ namespace ReserGo.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("BookingDate")
+                    b.Property<DateTime?>("BookingDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("CreatedAt")
@@ -170,8 +181,8 @@ namespace ReserGo.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Capacity")
-                        .HasColumnType("integer");
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("timestamp with time zone");
@@ -183,6 +194,9 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("NumberOfRooms")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Picture")
                         .HasColumnType("text");
@@ -455,24 +469,19 @@ namespace ReserGo.DataAccess.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("GuestLimit")
+                        .HasColumnType("integer");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
-
-                    b.Property<int>("NumberOfGuests")
-                        .HasColumnType("integer");
 
                     b.Property<DateTime>("OfferEndDate")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<DateTime>("OfferStartDate")
                         .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("OfferTitle")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<double?>("PricePerPerson")
                         .HasColumnType("double precision");
@@ -490,6 +499,64 @@ namespace ReserGo.DataAccess.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RestaurantOffer");
+                });
+
+            modelBuilder.Entity("ReserGo.Common.Entity.Room", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Capacity")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("HotelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("PricePerNight")
+                        .HasColumnType("numeric");
+
+                    b.Property<string>("RoomNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HotelId", "RoomNumber")
+                        .IsUnique();
+
+                    b.ToTable("Room");
+                });
+
+            modelBuilder.Entity("ReserGo.Common.Entity.RoomAvailability", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("HotelId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoomId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HotelId");
+
+                    b.HasIndex("RoomId", "StartDate", "EndDate")
+                        .IsUnique();
+
+                    b.ToTable("RoomAvailability");
                 });
 
             modelBuilder.Entity("ReserGo.Common.Entity.User", b =>
@@ -547,13 +614,19 @@ namespace ReserGo.DataAccess.Migrations
 
             modelBuilder.Entity("ReserGo.Common.Entity.BookingHotel", b =>
                 {
-                    b.HasOne("ReserGo.Common.Entity.Hotel", null)
+                    b.HasOne("ReserGo.Common.Entity.Hotel", "Hotel")
                         .WithMany("BookingsHotel")
-                        .HasForeignKey("HotelId");
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasOne("ReserGo.Common.Entity.HotelOffer", "HotelOffer")
+                    b.HasOne("ReserGo.Common.Entity.HotelOffer", null)
                         .WithMany("Bookings")
-                        .HasForeignKey("HotelOfferId")
+                        .HasForeignKey("HotelOfferId");
+
+                    b.HasOne("ReserGo.Common.Entity.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -563,7 +636,9 @@ namespace ReserGo.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("HotelOffer");
+                    b.Navigation("Hotel");
+
+                    b.Navigation("Room");
 
                     b.Navigation("User");
                 });
@@ -722,11 +797,43 @@ namespace ReserGo.DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("ReserGo.Common.Entity.Room", b =>
+                {
+                    b.HasOne("ReserGo.Common.Entity.Hotel", "Hotel")
+                        .WithMany("Rooms")
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+                });
+
+            modelBuilder.Entity("ReserGo.Common.Entity.RoomAvailability", b =>
+                {
+                    b.HasOne("ReserGo.Common.Entity.Hotel", "Hotel")
+                        .WithMany()
+                        .HasForeignKey("HotelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ReserGo.Common.Entity.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Hotel");
+
+                    b.Navigation("Room");
+                });
+
             modelBuilder.Entity("ReserGo.Common.Entity.Hotel", b =>
                 {
                     b.Navigation("BookingsHotel");
 
                     b.Navigation("HotelOffers");
+
+                    b.Navigation("Rooms");
                 });
 
             modelBuilder.Entity("ReserGo.Common.Entity.HotelOffer", b =>

@@ -20,7 +20,7 @@ public class FranceGouvApiService : IFranceGouvApiService {
     public async Task<IEnumerable<string>?> SearchAddresses(string query) {
         if (string.IsNullOrWhiteSpace(query) || query.Length < 3) {
             _logger.LogWarning("Invalid query: Query must be at least 3 characters long.");
-            throw new ArgumentException("Query must be at least 3 characters long.", nameof(query));
+            return Enumerable.Empty<string>();
         }
 
         if (string.IsNullOrWhiteSpace(_api)) {
@@ -64,7 +64,7 @@ public class FranceGouvApiService : IFranceGouvApiService {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while searching for addresses.");
-            throw;
+            return Enumerable.Empty<string>();
         }
     }
 }
