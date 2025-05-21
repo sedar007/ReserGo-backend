@@ -245,10 +245,10 @@ public class ReserGoContext : DbContext {
             .WithMany(u => u.BookingsHotel)
             .HasForeignKey(b => b.UserId);
 
-        modelBuilder.Entity<BookingHotel>()
+       /* modelBuilder.Entity<BookingHotel>()
             .HasOne(b => b.HotelOffer)
             .WithMany(h => h.Bookings)
-            .HasForeignKey(b => b.HotelOfferId);
+            .HasForeignKey(b => b.HotelOfferId);*/
 
         // Config Notification
         modelBuilder.Entity<Notification>()

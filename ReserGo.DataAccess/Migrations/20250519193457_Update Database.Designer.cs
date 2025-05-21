@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReserGo.DataAccess;
@@ -11,9 +12,11 @@ using ReserGo.DataAccess;
 namespace ReserGo.DataAccess.Migrations
 {
     [DbContext(typeof(ReserGoContext))]
-    partial class ReserGoContextModelSnapshot : ModelSnapshot
+    [Migration("20250519193457_Update Database")]
+    partial class UpdateDatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -95,8 +98,6 @@ namespace ReserGo.DataAccess.Migrations
                     b.HasIndex("HotelId");
 
                     b.HasIndex("HotelOfferId");
-
-                    b.HasIndex("RoomId");
 
                     b.HasIndex("UserId");
 
@@ -619,7 +620,7 @@ namespace ReserGo.DataAccess.Migrations
 
             modelBuilder.Entity("ReserGo.Common.Entity.BookingHotel", b =>
                 {
-                    b.HasOne("ReserGo.Common.Entity.Hotel", "Hotel")
+                    b.HasOne("ReserGo.Common.Entity.Hotel", null)
                         .WithMany("BookingsHotel")
                         .HasForeignKey("HotelId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -629,21 +630,11 @@ namespace ReserGo.DataAccess.Migrations
                         .WithMany("Bookings")
                         .HasForeignKey("HotelOfferId");
 
-                    b.HasOne("ReserGo.Common.Entity.Room", "Room")
-                        .WithMany()
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("ReserGo.Common.Entity.User", "User")
                         .WithMany("BookingsHotel")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Hotel");
-
-                    b.Navigation("Room");
 
                     b.Navigation("User");
                 });

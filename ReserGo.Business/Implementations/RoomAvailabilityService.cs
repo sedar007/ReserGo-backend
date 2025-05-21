@@ -81,6 +81,32 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
         throw;
     }
 }
+    public async Task<RoomAvailabilityDto> GetAvailabilityByRoomId(Guid roomId) {
+        try {
+          //  var cacheKey = $"availability_{id}";
+
+          /*  if (_cache.TryGetValue(cacheKey, out RoomAvailabilityDto? cachedAvailability)) {
+                _logger.LogInformation("Returning cached availability for ID: {Id}", id);
+                return cachedAvailability;
+            }*/
+
+            var availability = await _availabilityDataAccess.GetByRoomId(roomId);
+            if (availability == null) {
+                var errorMessage = "This availability does not exist.";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+
+            var availabilityDto = availability.ToDto();
+           // _cache.Set(cacheKey, availabilityDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+            _logger.LogInformation("Availability { id } retrieved successfully", roomId);
+
+            return availabilityDto;
+        } catch (Exception e) {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
 
     private void ValidateRequest(RoomAvailabilityRequest request) {
         if (request.StartDate >= request.EndDate) {

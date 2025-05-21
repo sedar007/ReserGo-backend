@@ -7,6 +7,7 @@ public static class HotelHelper {
     public static HotelDto ToDto(this Hotel hotel) {
         return new HotelDto {
             Id = hotel.Id,
+            UserId = hotel.UserId,
             Name = hotel.Name,
             StayId = hotel.StayId,
             Location = hotel.Location,

@@ -12,6 +12,7 @@ public interface IRoomAvailabilityService {
     Task<IEnumerable<RoomAvailabilityDto>> GetAvailabilitiesForAllHotels(ConnectedUser connectedUser, int skip, int take);
     
     
+    Task<RoomAvailabilityDto> GetAvailabilityByRoomId(Guid roomId);
     
     
 }
