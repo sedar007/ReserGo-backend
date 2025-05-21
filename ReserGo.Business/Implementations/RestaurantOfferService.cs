@@ -50,12 +50,47 @@ public class RestaurantOfferService : IRestaurantOfferService {
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
+            
+            if(request.GuestLimit < 1) {
+                var errorMessage = "Number of guests must be greater than 0";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+            if (request.PricePerPerson != null && request.PricePerPerson < 0) {
+                var errorMessage = "Price per person must be greater than or equal to 0";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+            if (request.OfferStartDate.Date < DateTime.UtcNow.Date) {
+                var errorMessage = "Offer start date must be greater than or equal to today";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+            if (request.OfferEndDate.Date < request.OfferStartDate.Date) {
+                var errorMessage = "Offer end date must be greater than or equal to offer start date";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+            if (request.OfferEndDate.Date < DateTime.UtcNow.Date) {
+                var errorMessage = "Offer end date must be greater than or equal to today";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+            if (request.OfferStartDate.Date > request.OfferEndDate.Date) {
+                var errorMessage = "Offer start date must be less than or equal to offer end date";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+            if(restaurant.Capacity < request.GuestLimit){
+                var errorMessage = "Number of guests must be greater than or equal to restaurant capacity";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
 
             var newRestaurantOffer = new RestaurantOffer {
-                OfferTitle = request.OfferTitle,
                 Description = request.Description,
                 PricePerPerson = request.PricePerPerson,
-                NumberOfGuests = request.NumberOfGuests,
+                GuestLimit = request.GuestLimit,
                 OfferStartDate = request.OfferStartDate,
                 OfferEndDate = request.OfferEndDate,
                 IsActive = request.IsActive,
@@ -141,11 +176,10 @@ public class RestaurantOfferService : IRestaurantOfferService {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
-
-            restaurantOffer.OfferTitle = request.OfferTitle;
+            
             restaurantOffer.Description = request.Description;
             restaurantOffer.PricePerPerson = request.PricePerPerson;
-            restaurantOffer.NumberOfGuests = request.NumberOfGuests;
+            restaurantOffer.GuestLimit = request.GuestLimit;
             restaurantOffer.OfferStartDate = request.OfferStartDate;
             restaurantOffer.OfferEndDate = request.OfferEndDate;
             restaurantOffer.IsActive = request.IsActive;
