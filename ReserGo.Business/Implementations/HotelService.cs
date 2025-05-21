@@ -133,7 +133,7 @@ public class HotelService : IHotelService {
             if (hotels is null || !hotels.Any()) {
                 var errorMessage = "This user has no hotels.";
                 _logger.LogError(errorMessage);
-                throw new InvalidDataException(errorMessage);
+                return Enumerable.Empty<HotelDto>();
             }
             return hotels.Select(hotel => hotel.ToDto());
         }
