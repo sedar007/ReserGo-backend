@@ -10,5 +10,4 @@ public interface IBookingHotelService {
     
     Task<IEnumerable<BookingHotelDto>> GetBookingsByUserId(Guid userId);
     Task<IEnumerable<BookingHotelDto>> GetBookingsByAdminId(Guid adminId);
-
 }

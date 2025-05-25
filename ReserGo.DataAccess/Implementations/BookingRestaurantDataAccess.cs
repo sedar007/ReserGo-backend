@@ -23,4 +23,23 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
             .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
+    public async Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId,
+        DateTime startDate, DateTime endDate) {
+        return await _context.BookingRestaurant
+            .Include(b => b.RestaurantOffer)
+            .Where(b => b.RestaurantOffer.UserId == adminId)
+            .Where(b => startDate.Date >= b.BookingDate && endDate.Date <= b.BookingDate)
+            .CountAsync();
+    }
+    
+    public async Task<int> GetNbBookingsLast30Days(Guid adminId) {
+        var today = DateTime.UtcNow;
+        var days30Before = today.AddDays(-30);
+
+        return await _context.BookingRestaurant
+            .Include(b => b.RestaurantOffer)
+            .Where(b => b.RestaurantOffer.UserId == adminId)
+            .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
+            .CountAsync();
+    }
 }

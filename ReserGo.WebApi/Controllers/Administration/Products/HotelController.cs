@@ -271,4 +271,5 @@ public class HotelController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
+    
 }

@@ -115,6 +115,10 @@ public class Program {
             // Booking Restaurant
             builder.Services.AddScoped<IBookingRestaurantDataAccess, BookingRestaurantDataAccess>();
             builder.Services.AddScoped<IBookingRestaurantService, BookingRestaurantService>();
+            
+            // Metrics
+            builder.Services.AddScoped<IMetricsDataAccess, MetricsDataAccess>();
+            builder.Services.AddScoped<IMetricsService, MetricsService>();
 
             // Add services to the cache memory.
             builder.Services.AddMemoryCache();

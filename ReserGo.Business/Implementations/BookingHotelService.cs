@@ -39,13 +39,13 @@ public class BookingHotelService : IBookingHotelService {
         var availability = await _roomAvailabilityService.GetAvailabilityByRoomId(request.RoomId);
 
         if (availability == null || availability.StartDate.Date > request.StartDate.Date || availability.EndDate.Date < request.EndDate.Date) {
-            throw new InvalidOperationException("The room is not available for the selected dates.");
+            throw new InvalidDataException("The room is not available for the selected dates.");
         }
 
         var existingBookings = await _bookingHotelDataAccess.GetBookingsByRoomId(request.RoomId);
         if (existingBookings.Any(b => 
                 request.StartDate.Date < b.EndDate.Date && request.EndDate.Date > b.StartDate.Date)) {
-            throw new InvalidOperationException("The room is already booked for the selected dates.");
+            throw new InvalidDataException("The room is already booked for the selected dates.");
         }
 
         var reservation = new BookingHotel {
@@ -53,6 +53,7 @@ public class BookingHotelService : IBookingHotelService {
             HotelId = availability.Hotel.Id,
             UserId = request.UserId,
             StartDate = request.StartDate,
+            BookingDate = DateTime.UtcNow,
             EndDate = request.EndDate,
             NumberOfGuests = request.NumberOfGuests,
             IsConfirmed = request.IsConfirmed,
@@ -64,7 +65,7 @@ public class BookingHotelService : IBookingHotelService {
             _logger.LogError("Booking hotel not created");
             throw new InvalidDataException("Booking hotel not created");
         }
-        var bookingHotel = createdReservation.ToDto();
+        var bookingHotel = createdReservation?.ToDto();
 
         var notification = new NotificationCreationRequest {
             Title = "New Reservation",
@@ -105,4 +106,6 @@ public class BookingHotelService : IBookingHotelService {
         var bookings = await _bookingHotelDataAccess.GetBookingsByAdminId(adminId);
         return bookings.Select(b => b.ToDto());
     }
+    
+    
 }

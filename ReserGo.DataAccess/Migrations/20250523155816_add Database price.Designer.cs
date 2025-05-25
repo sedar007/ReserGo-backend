@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReserGo.DataAccess;
@@ -11,9 +12,11 @@ using ReserGo.DataAccess;
 namespace ReserGo.DataAccess.Migrations
 {
     [DbContext(typeof(ReserGoContext))]
-    partial class ReserGoContextModelSnapshot : ModelSnapshot
+    [Migration("20250523155816_add Database price")]
+    partial class addDatabaseprice
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -81,7 +84,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<int>("NumberOfGuests")
                         .HasColumnType("integer");
 
-                    b.Property<double?>("Price")
+                    b.Property<double>("Price")
                         .HasColumnType("double precision");
 
                     b.Property<Guid>("RoomId")
@@ -158,7 +161,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<int>("NumberOfGuests")
                         .HasColumnType("integer");
 
-                    b.Property<double?>("Price")
+                    b.Property<double>("Price")
                         .HasColumnType("double precision");
 
                     b.Property<Guid?>("RestaurantId")

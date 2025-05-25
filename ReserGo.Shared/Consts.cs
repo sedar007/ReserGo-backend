@@ -6,6 +6,7 @@ public static class Consts {
     public const string AuthToken = "AuthToken";
     public const string DefaultProfile = "system/w8k94kbgqqu6zytrrgjg";
     public const int CacheDurationMinutes = 30;
+    public const int CookiesExpiration = 120;
     
     
     // User Message

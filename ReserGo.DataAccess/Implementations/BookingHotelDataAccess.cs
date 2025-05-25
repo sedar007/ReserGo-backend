@@ -43,4 +43,27 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
             .Where(b => b.Hotel.UserId == adminId)
             .ToListAsync();
     }
+    
+    public async Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId,
+        DateTime startDate, DateTime endDate) {
+        return await _context.BookingHotel
+            .Include(b => b.Hotel)
+            .Where(b => b.Hotel.UserId == adminId)
+            .Where(b => startDate.Date >= b.BookingDate && endDate.Date <= b.BookingDate)
+            .CountAsync();
+    }
+    
+    public async Task<int> GetNbBookingsLast30Days(Guid adminId) {
+        var today = DateTime.UtcNow;
+        var days30Before = today.AddDays(-30);
+
+        return await _context.BookingHotel
+            .Include(b => b.Hotel)
+            .Where(b => b.Hotel.UserId == adminId)
+            .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
+            .CountAsync();
+    }
+    
+
+
 }
