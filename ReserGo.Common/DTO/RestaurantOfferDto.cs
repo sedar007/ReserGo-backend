@@ -10,6 +10,6 @@ public class RestaurantOfferDto {
     public bool IsActive { get; set; }
     public Guid RestaurantId { get; set; }
     public RestaurantDto Restaurant { get; set; } = null!;
-    
+
     public Guid UserId { get; set; }
 }

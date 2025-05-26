@@ -22,7 +22,7 @@ public class MetricsService : IMetricsService {
 
     public MetricsService(ILogger<BookingRestaurantService> logger,
         IRestaurantOfferService restaurantOfferService,
-        IBookingRestaurantDataAccess bookingRestaurantDataAccess, 
+        IBookingRestaurantDataAccess bookingRestaurantDataAccess,
         INotificationService notificationService,
         IBookingHotelDataAccess bookingHotelDataAccess,
         IBookingOccasionDataAccess bookingEventDataAccess) {
@@ -48,27 +48,33 @@ public class MetricsService : IMetricsService {
             throw;
         }
     }
+
     public async Task<MetricsResponse> GetNbBookingsLast30Days(Guid adminId, Product types) {
         var today = DateTime.UtcNow;
         var days30Before = today.AddDays(-30);
         var days60Before = today.AddDays(-60);
 
-        int nbBookingThisMonth = 0;
-        int nbBookingLastMonth = 0;
+        var nbBookingThisMonth = 0;
+        var nbBookingLastMonth = 0;
 
 
         switch (types) {
             case Product.Hotel:
-                nbBookingThisMonth = await _bookingHotelDataAccess.GetNbBookingsLast30Days(adminId); 
-                nbBookingLastMonth = await _bookingHotelDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days30Before, today);
+                nbBookingThisMonth = await _bookingHotelDataAccess.GetNbBookingsLast30Days(adminId);
+                nbBookingLastMonth =
+                    await _bookingHotelDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days30Before, today);
                 break;
             case Product.Restaurant:
                 nbBookingThisMonth = await _bookingRestaurantDataAccess.GetNbBookingsLast30Days(adminId);
-                nbBookingLastMonth = await _bookingRestaurantDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before, days30Before);
+                nbBookingLastMonth =
+                    await _bookingRestaurantDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before,
+                        days30Before);
                 break;
             case Product.Occasion:
                 nbBookingThisMonth = await _bookingEventDataAccess.GetNbBookingsLast30Days(adminId);
-                nbBookingLastMonth = await _bookingEventDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before, days30Before);
+                nbBookingLastMonth =
+                    await _bookingEventDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before,
+                        days30Before);
                 break;
             default:
                 throw new InvalidDataException("Invalid product type specified.");
@@ -78,9 +84,10 @@ public class MetricsService : IMetricsService {
         bool? up = null;
 
         if (nbBookingLastMonth > 0) {
-            statsPercent = ((double)(nbBookingThisMonth - nbBookingLastMonth) / nbBookingLastMonth) * 100;
+            statsPercent = (double)(nbBookingThisMonth - nbBookingLastMonth) / nbBookingLastMonth * 100;
             up = nbBookingThisMonth > nbBookingLastMonth;
-        } else if (nbBookingThisMonth > 0) {
+        }
+        else if (nbBookingThisMonth > 0) {
             statsPercent = 100;
             up = true;
         }

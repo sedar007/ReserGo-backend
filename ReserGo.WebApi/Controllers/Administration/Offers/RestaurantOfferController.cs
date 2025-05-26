@@ -19,7 +19,8 @@ public class RestaurantOfferController : ControllerBase {
     private readonly IBookingRestaurantService _bookingRestaurantService;
 
     public RestaurantOfferController(ILogger<RestaurantController> logger,
-        IRestaurantOfferService restaurantOfferService, ISecurity security, IBookingRestaurantService bookingRestaurantService) {
+        IRestaurantOfferService restaurantOfferService, ISecurity security,
+        IBookingRestaurantService bookingRestaurantService) {
         _logger = logger;
         _restaurantOfferService = restaurantOfferService;
         _security = security;
@@ -231,7 +232,7 @@ public class RestaurantOfferController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     ///     Retrieve all bookings related to the admin's offers.
     /// </summary>
@@ -277,7 +278,7 @@ public class RestaurantOfferController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-    
+
     private List<Link> GenerateLinks(Guid bookingId) {
         return new List<Link> {
             new() {
@@ -292,5 +293,4 @@ public class RestaurantOfferController : ControllerBase {
             }
         };
     }
-
 }

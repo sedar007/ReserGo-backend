@@ -50,38 +50,44 @@ public class RestaurantOfferService : IRestaurantOfferService {
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
-            
-            if(request.GuestLimit < 1) {
+
+            if (request.GuestLimit < 1) {
                 var errorMessage = "Number of guests must be greater than 0";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
+
             if (request.PricePerPerson != null && request.PricePerPerson < 0) {
                 var errorMessage = "Price per person must be greater than or equal to 0";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
+
             if (request.OfferStartDate.Date < DateTime.UtcNow.Date) {
                 var errorMessage = "Offer start date must be greater than or equal to today";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
+
             if (request.OfferEndDate.Date < request.OfferStartDate.Date) {
                 var errorMessage = "Offer end date must be greater than or equal to offer start date";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
+
             if (request.OfferEndDate.Date < DateTime.UtcNow.Date) {
                 var errorMessage = "Offer end date must be greater than or equal to today";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
+
             if (request.OfferStartDate.Date > request.OfferEndDate.Date) {
                 var errorMessage = "Offer start date must be less than or equal to offer end date";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
-            if(restaurant.Capacity < request.GuestLimit){
+
+            if (restaurant.Capacity < request.GuestLimit) {
                 var errorMessage = "Number of guests must be greater than or equal to restaurant capacity";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
@@ -100,12 +106,12 @@ public class RestaurantOfferService : IRestaurantOfferService {
 
             newRestaurantOffer = await _restaurantOfferDataAccess.Create(newRestaurantOffer);
             var cacheKey = Consts.RestaurantOffersCacheKey.Concat(newRestaurantOffer.Id.ToString());
-            
+
             RemoveCache(newRestaurantOffer.Id, connectedUser.UserId);
             // Cache the created restaurant offer
             _cache.Set(cacheKey, newRestaurantOffer,
                 TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-            
+
 
             _logger.LogInformation("Restaurant Offer { id } created", newRestaurantOffer.Id);
             return newRestaurantOffer.ToDto();
@@ -123,6 +129,7 @@ public class RestaurantOfferService : IRestaurantOfferService {
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
+
             var cacheKey = Consts.RestaurantOffersCacheKey.Concat(id.ToString());
             if (_cache.TryGetValue(cacheKey, out RestaurantOffer cachedRestaurantOffer))
                 return cachedRestaurantOffer.ToDto();
@@ -176,7 +183,7 @@ public class RestaurantOfferService : IRestaurantOfferService {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
-            
+
             restaurantOffer.Description = request.Description;
             restaurantOffer.PricePerPerson = request.PricePerPerson;
             restaurantOffer.GuestLimit = request.GuestLimit;
@@ -225,14 +232,10 @@ public class RestaurantOfferService : IRestaurantOfferService {
     private void RemoveCache(Guid restaurantOfferId, Guid userId) {
         // Remove from cache
         var cacheKey = Consts.RestaurantOffersCacheKey.Concat(restaurantOfferId.ToString());
-        if (_cache.TryGetValue(cacheKey, out RestaurantOffer cachedRestaurantOffer)) {
-            _cache.Remove(cacheKey);
-        }
+        if (_cache.TryGetValue(cacheKey, out RestaurantOffer cachedRestaurantOffer)) _cache.Remove(cacheKey);
         // Remove from cache
         var userCacheKey = Consts.RestaurantOffersUserIdCacheKey.Concat(userId.ToString());
-        if (_cache.TryGetValue(userCacheKey, out IEnumerable<RestaurantOfferDto> cachedRestaurantOffers)) {
+        if (_cache.TryGetValue(userCacheKey, out IEnumerable<RestaurantOfferDto> cachedRestaurantOffers))
             _cache.Remove(userCacheKey);
-        }
-        
     }
 }

@@ -23,19 +23,19 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
             .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
-    
+
     public async Task<IEnumerable<BookingHotel>> GetBookingsByRoomId(Guid roomId) {
         return await _context.BookingHotel
             .Where(b => b.RoomId == roomId)
             .ToListAsync();
     }
-    
+
     public async Task<IEnumerable<BookingHotel>> GetBookingsByUserId(Guid userId) {
         return await _context.BookingHotel
             .Where(b => b.UserId == userId)
             .ToListAsync();
     }
-    
+
     public async Task<IEnumerable<BookingHotel>> GetBookingsByAdminId(Guid adminId) {
         return await _context.BookingHotel
             .Include(b => b.Hotel)
@@ -43,7 +43,7 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
             .Where(b => b.Hotel.UserId == adminId)
             .ToListAsync();
     }
-    
+
     public async Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId,
         DateTime startDate, DateTime endDate) {
         return await _context.BookingHotel
@@ -52,7 +52,7 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
             .Where(b => startDate.Date >= b.BookingDate && endDate.Date <= b.BookingDate)
             .CountAsync();
     }
-    
+
     public async Task<int> GetNbBookingsLast30Days(Guid adminId) {
         var today = DateTime.UtcNow;
         var days30Before = today.AddDays(-30);
@@ -63,7 +63,4 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
             .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
             .CountAsync();
     }
-    
-
-
 }

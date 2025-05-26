@@ -1,4 +1,5 @@
 namespace ReserGo.Common.Entity;
+
 public class BookingRestaurant : Booking {
     public Guid RestaurantOfferId { get; set; }
     public Guid RestaurantId { get; set; }

@@ -36,6 +36,7 @@ public class FranceGouvController : ControllerBase {
             _logger.LogWarning("Search query is null or empty.");
             return Ok(Array.Empty<object>());
         }
+
         try {
             var addresses = await _franceGouvService.SearchAddresses(query);
             if (addresses == null || !addresses.Any()) {

@@ -6,4 +6,3 @@ public class BookingOccasion : Booking {
     public DateTime EndDate { get; set; }
     public virtual Occasion Occasion { get; set; } = null!;
 }
-

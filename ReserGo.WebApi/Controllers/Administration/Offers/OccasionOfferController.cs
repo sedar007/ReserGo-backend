@@ -18,7 +18,7 @@ public class OccasionOfferController : ControllerBase {
     private readonly ISecurity _security;
     private readonly IBookingOccasionService _bookingOccasionService;
 
-    public OccasionOfferController(ILogger<OccasionController> logger, 
+    public OccasionOfferController(ILogger<OccasionController> logger,
         IOccasionOfferService occasionOfferService,
         ISecurity security, IBookingOccasionService bookingOccasionService) {
         _logger = logger;
@@ -255,8 +255,8 @@ public class OccasionOfferController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
-    
+
+
     /// <summary>
     ///     Retrieve all bookings related to the admin's offers.
     /// </summary>
@@ -302,7 +302,7 @@ public class OccasionOfferController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-    
+
     private List<Link> GenerateLinks(Guid bookingId) {
         return new List<Link> {
             new() {

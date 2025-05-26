@@ -21,7 +21,8 @@ public class BookingOccasionService : IBookingOccasionService {
 
     public BookingOccasionService(ILogger<BookingOccasionService> logger,
         IOccasionOfferService hotelOfferService,
-        IBookingOccasionDataAccess bookingOccasionDataAccess, INotificationService notificationService, IRoomAvailabilityService roomAvailabilityService) {
+        IBookingOccasionDataAccess bookingOccasionDataAccess, INotificationService notificationService,
+        IRoomAvailabilityService roomAvailabilityService) {
         _logger = logger;
         _hotelOfferService = hotelOfferService;
         _bookingOccasionDataAccess = bookingOccasionDataAccess;
@@ -29,64 +30,64 @@ public class BookingOccasionService : IBookingOccasionService {
         _roomAvailabilityService = roomAvailabilityService;
     }
 
-   /* public async Task<BookingResponses> CreateBooking(BookingOccasionRequest request, ConnectedUser user) {
-    try {
-        if (user == null) {
-            _logger.LogError("User not found");
-            throw new InvalidDataException(Consts.UserNotFound);
-        }
+    /* public async Task<BookingResponses> CreateBooking(BookingOccasionRequest request, ConnectedUser user) {
+     try {
+         if (user == null) {
+             _logger.LogError("User not found");
+             throw new InvalidDataException(Consts.UserNotFound);
+         }
 
-        var availability = await _roomAvailabilityService.GetAvailabilityByRoomId(request.RoomId);
+         var availability = await _roomAvailabilityService.GetAvailabilityByRoomId(request.RoomId);
 
-        if (availability == null || availability.StartDate.Date > request.StartDate.Date || availability.EndDate.Date < request.EndDate.Date) {
-            throw new InvalidDataException("The room is not available for the selected dates.");
-        }
+         if (availability == null || availability.StartDate.Date > request.StartDate.Date || availability.EndDate.Date < request.EndDate.Date) {
+             throw new InvalidDataException("The room is not available for the selected dates.");
+         }
 
-        var existingBookings = await _bookingOccasionDataAccess.GetBookingsByRoomId(request.RoomId);
-        if (existingBookings.Any(b => 
-                request.StartDate.Date < b.EndDate.Date && request.EndDate.Date > b.StartDate.Date)) {
-            throw new InvalidDataException("The room is already booked for the selected dates.");
-        }
+         var existingBookings = await _bookingOccasionDataAccess.GetBookingsByRoomId(request.RoomId);
+         if (existingBookings.Any(b =>
+                 request.StartDate.Date < b.EndDate.Date && request.EndDate.Date > b.StartDate.Date)) {
+             throw new InvalidDataException("The room is already booked for the selected dates.");
+         }
 
-        var reservation = new BookingOccasion {
-            RoomId = request.RoomId,
-            OccasionId = availability.Occasion.Id,
-            UserId = request.UserId,
-            StartDate = request.StartDate,
-            BookingDate = DateTime.UtcNow,
-            EndDate = request.EndDate,
-            NumberOfGuests = request.NumberOfGuests,
-            IsConfirmed = request.IsConfirmed,
-            CreatedAt = DateTime.UtcNow
-        };
+         var reservation = new BookingOccasion {
+             RoomId = request.RoomId,
+             OccasionId = availability.Occasion.Id,
+             UserId = request.UserId,
+             StartDate = request.StartDate,
+             BookingDate = DateTime.UtcNow,
+             EndDate = request.EndDate,
+             NumberOfGuests = request.NumberOfGuests,
+             IsConfirmed = request.IsConfirmed,
+             CreatedAt = DateTime.UtcNow
+         };
 
-        var createdReservation = await _bookingOccasionDataAccess.Create(reservation);
-        if (createdReservation == null) {
-            _logger.LogError("Booking hotel not created");
-            throw new InvalidDataException("Booking hotel not created");
-        }
-        var bookingOccasion = createdReservation?.ToDto();
+         var createdReservation = await _bookingOccasionDataAccess.Create(reservation);
+         if (createdReservation == null) {
+             _logger.LogError("Booking hotel not created");
+             throw new InvalidDataException("Booking hotel not created");
+         }
+         var bookingOccasion = createdReservation?.ToDto();
 
-        var notification = new NotificationCreationRequest {
-            Title = "New Reservation",
-            Message = $"New reservation made by {user.Username} for offer at {availability.Occasion.Name} " +
-                      $"number of guests: {request.NumberOfGuests}",
-            Type = "Occasion",
-            Name = availability.Occasion.Name,
-            UserId = availability.Occasion.UserId,
-        };
-        var notificationDto = await _notificationService.CreateNotification(notification);
+         var notification = new NotificationCreationRequest {
+             Title = "New Reservation",
+             Message = $"New reservation made by {user.Username} for offer at {availability.Occasion.Name} " +
+                       $"number of guests: {request.NumberOfGuests}",
+             Type = "Occasion",
+             Name = availability.Occasion.Name,
+             UserId = availability.Occasion.UserId,
+         };
+         var notificationDto = await _notificationService.CreateNotification(notification);
 
-        return new BookingResponses {
-            Notification = notificationDto,
-            Booking = bookingOccasion
-        };
-    } catch (Exception e) {
-        Console.WriteLine(e);
-        throw;
-    }
-}*/
-    
+         return new BookingResponses {
+             Notification = notificationDto,
+             Booking = bookingOccasion
+         };
+     } catch (Exception e) {
+         Console.WriteLine(e);
+         throw;
+     }
+ }*/
+
     public async Task<IEnumerable<BookingOccasionDto>> GetBookingsByUserId(Guid userId) {
         var bookings = await _bookingOccasionDataAccess.GetBookingsByUserId(userId);
         return bookings.Select(b => new BookingOccasionDto {
@@ -100,11 +101,9 @@ public class BookingOccasionService : IBookingOccasionService {
             CreatedAt = b.CreatedAt
         });
     }
-    
+
     public async Task<IEnumerable<BookingOccasionDto>> GetBookingsByAdminId(Guid adminId) {
         var bookings = await _bookingOccasionDataAccess.GetBookingsByAdminId(adminId);
         return bookings.Select(b => b.ToDto());
     }
-    
-    
 }

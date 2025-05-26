@@ -51,18 +51,16 @@ public class MetricsController : ControllerBase {
             if (user == null) return Unauthorized();
 
             var responses = await _metricsService.GetMetricsMonths(product, user.UserId);
-            
+
 
             return Ok(responses);
-
-
         }
         catch (Exception e) {
             _logger.LogError(e, "An unexpected error occurred while retrieving bookings");
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Get the percentage change in bookings over the last 30 days compared to the previous 30 days.
     /// </summary>
@@ -83,9 +81,9 @@ public class MetricsController : ControllerBase {
             var admin = _security.GetCurrentUser();
             if (admin == null) return Unauthorized("User not authenticated.");
 
-            MetricsResponse metrics = await _metricsService.GetNbBookingsLast30Days(admin.UserId, types);
+            var metrics = await _metricsService.GetNbBookingsLast30Days(admin.UserId, types);
             return Ok(metrics);
-        } 
+        }
         catch (InvalidDataException ex) {
             _logger.LogError(ex, "Invalid data provided for booking metrics.");
             return BadRequest(ex.Message);
@@ -95,6 +93,4 @@ public class MetricsController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-    
-    
 }

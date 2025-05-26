@@ -34,7 +34,7 @@ public class BookingHotelController : ControllerBase {
         _bookingHotelService = bookingHotelService;
         _notificationHub = notificationHub;
     }
-    
+
     /// <summary>
     ///     Create a new hotel booking reservation.
     /// </summary>
@@ -58,11 +58,11 @@ public class BookingHotelController : ControllerBase {
         try {
             var user = _security.GetCurrentUser();
             if (user == null) return Unauthorized();
-            
+
             var responses = await _bookingHotelService.CreateBooking(request, user);
             var notification = responses.Notification;
-            
-            
+
+
             await _notificationHub.Clients.User(notification.UserId.ToString())
                 .SendAsync("ReceiveNotification", notification.Message);
             var bookingHotelService = responses.Booking;
@@ -83,7 +83,7 @@ public class BookingHotelController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-    
+
     /// <summary>
     ///     Retrieve all bookings for the current user.
     /// </summary>
@@ -123,15 +123,13 @@ public class BookingHotelController : ControllerBase {
             };
 
             return Ok(resourceCollection);
-            
-            
         }
         catch (Exception e) {
             _logger.LogError(e, "An unexpected error occurred while retrieving bookings");
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-    
+
     private List<Link> GenerateLinks(Guid bookingId) {
         return new List<Link> {
             new() {

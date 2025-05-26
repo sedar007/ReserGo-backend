@@ -2,7 +2,6 @@ namespace ReserGo.Common.Response;
 
 public class MetricsResponse {
     public int StatsNumber { get; set; }
-    public Double? StatsPercent { get; set; }
-    public Boolean? Up { get; set; } = null!;
+    public double? StatsPercent { get; set; }
+    public bool? Up { get; set; } = null!;
 }
-

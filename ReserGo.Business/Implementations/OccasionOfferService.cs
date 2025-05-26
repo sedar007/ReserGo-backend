@@ -130,7 +130,7 @@ public class OccasionOfferService : IOccasionOfferService {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
-            
+
             occasionOffer.Description = request.Description;
             occasionOffer.PricePerPerson = request.PricePerPerson;
             occasionOffer.GuestLimit = request.GuestLimit;

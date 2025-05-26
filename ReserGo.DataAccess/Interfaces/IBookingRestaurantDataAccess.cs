@@ -10,5 +10,4 @@ public interface IBookingRestaurantDataAccess {
     Task<int> GetNbBookingsLast30Days(Guid adminId);
     Task<IEnumerable<BookingRestaurant>> GetBookingsByUserId(Guid userId);
     Task<IEnumerable<BookingRestaurant>> GetBookingsByAdminId(Guid adminId);
-
 }

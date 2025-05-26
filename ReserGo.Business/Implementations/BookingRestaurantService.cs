@@ -86,7 +86,7 @@ public class BookingRestaurantService : IBookingRestaurantService {
             throw;
         }
     }
-    
+
     public async Task<IEnumerable<BookingRestaurantDto>> GetBookingsByUserId(Guid userId) {
         var bookings = await _bookingRestaurantDataAccess.GetBookingsByUserId(userId);
         return bookings.Select(b => new BookingRestaurantDto {
@@ -100,7 +100,7 @@ public class BookingRestaurantService : IBookingRestaurantService {
             CreatedAt = b.CreatedAt
         });
     }
-    
+
     public async Task<IEnumerable<BookingRestaurantDto>> GetBookingsByAdminId(Guid adminId) {
         var bookings = await _bookingRestaurantDataAccess.GetBookingsByAdminId(adminId);
         return bookings.Select(b => b.ToDto());

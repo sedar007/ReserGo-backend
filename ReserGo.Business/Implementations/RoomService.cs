@@ -20,7 +20,7 @@ public class RoomService : IRoomService {
     private readonly IMemoryCache _cache;
     private readonly IHotelService _hotelService;
 
-    public RoomService(ILogger<UserService> logger, IRoomDataAccess roomDataAccess, 
+    public RoomService(ILogger<UserService> logger, IRoomDataAccess roomDataAccess,
         IImageService imageService, IMemoryCache cache, IHotelService hotelService) {
         _logger = logger;
         _imageService = imageService;
@@ -42,7 +42,7 @@ public class RoomService : IRoomService {
                 Capacity = request.Capacity,
                 PricePerNight = request.PricePerNight,
                 IsAvailable = request.IsAvailable,
-                HotelId = request.HotelId,
+                HotelId = request.HotelId
             };
 
             newRoom = await _roomDataAccess.Create(newRoom);
@@ -88,7 +88,7 @@ public class RoomService : IRoomService {
     public async Task<IEnumerable<RoomDto>> GetRoomsByHotelId(Guid hotelId) {
         try {
             var cacheKey = $"rooms_user_{hotelId}";
-            
+
             var hotel = await _hotelService.GetById(hotelId);
             if (hotel is null) {
                 var errorMessage = "This hotel does not exist.";
@@ -114,9 +114,7 @@ public class RoomService : IRoomService {
         }
     }
 
-   
 
-    
     public async Task<RoomDto> Update(Guid id, RoomUpdateRequest request) {
         try {
             var room = await _roomDataAccess.GetById(id);
@@ -166,9 +164,9 @@ public class RoomService : IRoomService {
             }
 
             // Delete image if it exists
-            
+
             await _roomDataAccess.Delete(room);
-            
+
             // Remove from cache
             _cache.Remove($"room_{room.Id}");
             _cache.Remove($"room_stay_{room.Id}");

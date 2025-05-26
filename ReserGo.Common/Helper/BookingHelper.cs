@@ -9,7 +9,7 @@ public static class BookingHelper {
             Id = bookingRestaurant.Id,
             UserId = bookingRestaurant.UserId,
             Price = bookingRestaurant.Price,
-          //  BookingDate = bookingRestaurant.BookingDate,
+            //  BookingDate = bookingRestaurant.BookingDate,
             NumberOfGuests = bookingRestaurant.NumberOfGuests,
             IsConfirmed = bookingRestaurant.IsConfirmed,
             CreatedAt = bookingRestaurant.CreatedAt,
@@ -20,7 +20,7 @@ public static class BookingHelper {
             EndDate = bookingRestaurant.EndDate
         };
     }
-    
+
     public static BookingHotelDto ToDto(this BookingHotel bookingHotel) {
         return new BookingHotelDto {
             Id = bookingHotel.Id,
@@ -34,10 +34,10 @@ public static class BookingHelper {
             StartDate = bookingHotel.StartDate,
             EndDate = bookingHotel.EndDate,
             Hotel = bookingHotel?.Hotel.ToDto(),
-            Room = bookingHotel?.Room.ToDto(),
+            Room = bookingHotel?.Room.ToDto()
         };
     }
-    
+
     public static BookingOccasionDto ToDto(this BookingOccasion bookingOccasion) {
         return new BookingOccasionDto {
             Id = bookingOccasion.Id,
@@ -49,12 +49,7 @@ public static class BookingHelper {
             OccasionId = bookingOccasion.OccasionId,
             StartDate = bookingOccasion.StartDate,
             EndDate = bookingOccasion.EndDate,
-            Occasion = bookingOccasion?.Occasion?.ToDto(),
+            Occasion = bookingOccasion?.Occasion?.ToDto()
         };
     }
-    
-    
-    
-    
-    
 }

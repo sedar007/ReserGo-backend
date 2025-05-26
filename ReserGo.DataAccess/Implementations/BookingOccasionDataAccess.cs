@@ -23,21 +23,21 @@ public class BookingOccasionDataAccess : IBookingOccasionDataAccess {
             .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
-    
-    
+
+
     public async Task<IEnumerable<BookingOccasion>> GetBookingsByUserId(Guid userId) {
         return await _context.BookingOccasion
             .Where(b => b.UserId == userId)
             .ToListAsync();
     }
-    
+
     public async Task<IEnumerable<BookingOccasion>> GetBookingsByAdminId(Guid adminId) {
         return await _context.BookingOccasion
             .Include(b => b.Occasion)
             .Where(b => b.Occasion.UserId == adminId)
             .ToListAsync();
     }
-    
+
     public async Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId,
         DateTime startDate, DateTime endDate) {
         return await _context.BookingOccasion
@@ -46,7 +46,7 @@ public class BookingOccasionDataAccess : IBookingOccasionDataAccess {
             .Where(b => startDate.Date >= b.BookingDate && endDate.Date <= b.BookingDate)
             .CountAsync();
     }
-    
+
     public async Task<int> GetNbBookingsLast30Days(Guid adminId) {
         var today = DateTime.UtcNow;
         var days30Before = today.AddDays(-30);
@@ -57,7 +57,4 @@ public class BookingOccasionDataAccess : IBookingOccasionDataAccess {
             .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
             .CountAsync();
     }
-    
-
-
 }

@@ -11,5 +11,4 @@ public interface IMetricsDataAccess {
     Task<IEnumerable<Room>> GetRoomsByHotelId(Guid hotelmId);
     Task Delete(Room room);
     Task<MetricsResponse> GetMetricsMonths(Product product, Guid userId);
-
 }

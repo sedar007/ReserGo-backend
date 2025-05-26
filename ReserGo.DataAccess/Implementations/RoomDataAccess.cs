@@ -15,7 +15,7 @@ public class RoomDataAccess : IRoomDataAccess {
     public async Task<Room?> GetById(Guid id) {
         return await _context.Room.FirstOrDefaultAsync(x => x.Id == id);
     }
-    
+
     public async Task<IEnumerable<Room>> GetRoomsByHotelId(Guid hotelId) {
         return await _context.Room.Where(x => x.HotelId == hotelId).ToListAsync();
     }
