@@ -42,4 +42,17 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
             .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
             .CountAsync();
     }
+    
+    public async Task<IEnumerable<BookingRestaurant>> GetBookingsByUserId(Guid userId) {
+        return await _context.BookingRestaurant
+            .Where(b => b.UserId == userId)
+            .ToListAsync();
+    }
+    
+    public async Task<IEnumerable<BookingRestaurant>> GetBookingsByAdminId(Guid adminId) {
+        return await _context.BookingRestaurant
+            .Include(b => b.Restaurant)
+            .Where(b => b.Restaurant.UserId == adminId)
+            .ToListAsync();
+    }
 }

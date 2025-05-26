@@ -51,10 +51,9 @@ public class OccasionOfferService : IOccasionOfferService {
             }
 
             var newOccasionOffer = new OccasionOffer {
-                OfferTitle = request.OfferTitle,
                 Description = request.Description,
-                Price = request.Price,
-                NumberOfGuests = request.NumberOfGuests,
+                PricePerPerson = request.PricePerPerson,
+                GuestLimit = request.GuestLimit,
                 OfferStartDate = request.OfferStartDate,
                 OfferEndDate = request.OfferEndDate,
                 IsActive = request.IsActive,
@@ -131,11 +130,10 @@ public class OccasionOfferService : IOccasionOfferService {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
-
-            occasionOffer.OfferTitle = request.OfferTitle;
+            
             occasionOffer.Description = request.Description;
-            occasionOffer.Price = request.Price;
-            occasionOffer.NumberOfGuests = request.NumberOfGuests;
+            occasionOffer.PricePerPerson = request.PricePerPerson;
+            occasionOffer.GuestLimit = request.GuestLimit;
             occasionOffer.OfferStartDate = request.OfferStartDate;
             occasionOffer.OfferEndDate = request.OfferEndDate;
             occasionOffer.IsActive = request.IsActive;

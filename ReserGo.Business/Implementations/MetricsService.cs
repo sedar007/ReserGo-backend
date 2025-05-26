@@ -18,17 +18,20 @@ public class MetricsService : IMetricsService {
     private readonly IBookingRestaurantDataAccess _bookingRestaurantDataAccess;
     private readonly INotificationService _notificationService;
     private readonly IBookingHotelDataAccess _bookingHotelDataAccess;
+    private readonly IBookingOccasionDataAccess _bookingEventDataAccess;
 
     public MetricsService(ILogger<BookingRestaurantService> logger,
         IRestaurantOfferService restaurantOfferService,
         IBookingRestaurantDataAccess bookingRestaurantDataAccess, 
         INotificationService notificationService,
-        IBookingHotelDataAccess bookingHotelDataAccess) {
+        IBookingHotelDataAccess bookingHotelDataAccess,
+        IBookingOccasionDataAccess bookingEventDataAccess) {
         _logger = logger;
         _restaurantOfferService = restaurantOfferService;
         _bookingRestaurantDataAccess = bookingRestaurantDataAccess;
         _notificationService = notificationService;
         _bookingHotelDataAccess = bookingHotelDataAccess;
+        _bookingEventDataAccess = bookingEventDataAccess;
     }
 
     public async Task<MetricsResponse> GetMetricsMonths(Product product, Guid userId) {
@@ -63,10 +66,10 @@ public class MetricsService : IMetricsService {
                 nbBookingThisMonth = await _bookingRestaurantDataAccess.GetNbBookingsLast30Days(adminId);
                 nbBookingLastMonth = await _bookingRestaurantDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before, days30Before);
                 break;
-           /* case Product.Event:
+            case Product.Occasion:
                 nbBookingThisMonth = await _bookingEventDataAccess.GetNbBookingsLast30Days(adminId);
                 nbBookingLastMonth = await _bookingEventDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before, days30Before);
-                break;*/
+                break;
             default:
                 throw new InvalidDataException("Invalid product type specified.");
         }

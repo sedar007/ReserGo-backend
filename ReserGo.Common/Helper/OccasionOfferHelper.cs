@@ -7,10 +7,9 @@ public static class OccasionOfferHelper {
     public static OccasionOfferDto ToDto(this OccasionOffer occasion) {
         return new OccasionOfferDto {
             Id = occasion.Id,
-            OfferTitle = occasion.OfferTitle,
             Description = occasion.Description,
-            Price = occasion.Price,
-            NumberOfGuests = occasion.NumberOfGuests,
+            PricePerPerson = occasion.PricePerPerson,
+            GuestLimit = occasion.GuestLimit,
             OfferStartDate = occasion.OfferStartDate,
             OfferEndDate = occasion.OfferEndDate,
             IsActive = occasion.IsActive,

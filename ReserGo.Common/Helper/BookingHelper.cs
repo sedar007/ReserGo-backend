@@ -14,7 +14,10 @@ public static class BookingHelper {
             IsConfirmed = bookingRestaurant.IsConfirmed,
             CreatedAt = bookingRestaurant.CreatedAt,
             RestaurantOfferId = bookingRestaurant.RestaurantOfferId,
-            RestaurantOffer = bookingRestaurant.RestaurantOffer?.ToDto()
+            RestaurantOffer = bookingRestaurant.RestaurantOffer?.ToDto(),
+            Restaurant = bookingRestaurant?.Restaurant?.ToDto(),
+            StartDate = bookingRestaurant.StartDate,
+            EndDate = bookingRestaurant.EndDate
         };
     }
     
@@ -34,5 +37,24 @@ public static class BookingHelper {
             Room = bookingHotel?.Room.ToDto(),
         };
     }
+    
+    public static BookingOccasionDto ToDto(this BookingOccasion bookingOccasion) {
+        return new BookingOccasionDto {
+            Id = bookingOccasion.Id,
+            UserId = bookingOccasion.UserId,
+            Price = bookingOccasion.Price,
+            NumberOfGuests = bookingOccasion.NumberOfGuests,
+            IsConfirmed = bookingOccasion.IsConfirmed,
+            CreatedAt = bookingOccasion.CreatedAt,
+            OccasionId = bookingOccasion.OccasionId,
+            StartDate = bookingOccasion.StartDate,
+            EndDate = bookingOccasion.EndDate,
+            Occasion = bookingOccasion?.Occasion?.ToDto(),
+        };
+    }
+    
+    
+    
+    
     
 }

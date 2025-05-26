@@ -116,6 +116,10 @@ public class Program {
             builder.Services.AddScoped<IBookingRestaurantDataAccess, BookingRestaurantDataAccess>();
             builder.Services.AddScoped<IBookingRestaurantService, BookingRestaurantService>();
             
+            // Booking Occasion
+            builder.Services.AddScoped<IBookingOccasionDataAccess, BookingOccasionDataAccess>();
+            builder.Services.AddScoped<IBookingOccasionService, BookingOccasionService>();
+            
             // Metrics
             builder.Services.AddScoped<IMetricsDataAccess, MetricsDataAccess>();
             builder.Services.AddScoped<IMetricsService, MetricsService>();

@@ -2,10 +2,9 @@ namespace ReserGo.Common.Entity;
 
 public class OccasionOffer {
     public Guid Id { get; init; }
-    public string OfferTitle { get; set; } = null!;
-    public string Description { get; set; } = null!;
-    public double Price { get; set; }
-    public int NumberOfGuests { get; set; }
+    public string? Description { get; set; } = null!;
+    public double PricePerPerson { get; set; }
+    public int GuestLimit { get; set; }
     public DateTime OfferStartDate { get; set; }
     public DateTime OfferEndDate { get; set; }
     public bool IsActive { get; set; }
