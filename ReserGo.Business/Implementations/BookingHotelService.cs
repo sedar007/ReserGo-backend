@@ -48,16 +48,18 @@ public class BookingHotelService : IBookingHotelService {
                     request.StartDate.Date < b.EndDate.Date && request.EndDate.Date > b.StartDate.Date))
                 throw new InvalidDataException("The room is already booked for the selected dates.");
 
+            var price = request.NumberOfGuests * (double)availability.Room.PricePerNight * 
+                        (request.EndDate.Date - request.StartDate.Date).TotalDays;
             var reservation = new BookingHotel {
                 RoomId = request.RoomId,
                 HotelId = availability.Hotel.Id,
                 UserId = request.UserId,
                 StartDate = request.StartDate,
-                BookingDate = DateTime.UtcNow,
                 EndDate = request.EndDate,
                 NumberOfGuests = request.NumberOfGuests,
+                Price = price,
                 IsConfirmed = request.IsConfirmed,
-                CreatedAt = DateTime.UtcNow
+                BookingDate = DateTime.UtcNow
             };
 
             var createdReservation = await _bookingHotelDataAccess.Create(reservation);
@@ -100,7 +102,7 @@ public class BookingHotelService : IBookingHotelService {
             EndDate = b.EndDate,
             NumberOfGuests = b.NumberOfGuests,
             IsConfirmed = b.IsConfirmed,
-            CreatedAt = b.CreatedAt
+            BookingDate = b.BookingDate
         });
     }
 

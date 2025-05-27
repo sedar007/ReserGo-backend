@@ -63,4 +63,12 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
             .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
             .CountAsync();
     }
+    
+    public async Task<IEnumerable<BookingHotel>> GetBookingYearsByUserId(Guid userId) {
+        var currentYear = DateTime.UtcNow.Year;
+        return await _context.BookingHotel
+            .Include(b => b.Hotel)
+            .Where(b => b.Hotel.UserId == userId && b.BookingDate.Year == currentYear)
+            .ToListAsync();
+    }
 }

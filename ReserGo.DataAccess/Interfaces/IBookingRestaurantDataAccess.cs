@@ -9,5 +9,6 @@ public interface IBookingRestaurantDataAccess {
     Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId, DateTime startDate, DateTime endDate);
     Task<int> GetNbBookingsLast30Days(Guid adminId);
     Task<IEnumerable<BookingRestaurant>> GetBookingsByUserId(Guid userId);
+    Task<IEnumerable<BookingRestaurant>> GetBookingYearsByUserId(Guid userId);
     Task<IEnumerable<BookingRestaurant>> GetBookingsByAdminId(Guid adminId);
 }

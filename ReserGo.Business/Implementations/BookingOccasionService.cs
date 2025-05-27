@@ -98,7 +98,7 @@ public class BookingOccasionService : IBookingOccasionService {
             EndDate = b.EndDate,
             NumberOfGuests = b.NumberOfGuests,
             IsConfirmed = b.IsConfirmed,
-            CreatedAt = b.CreatedAt
+            BookingDate = b.BookingDate
         });
     }
 

@@ -56,4 +56,12 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
             .Where(b => b.Restaurant.UserId == adminId)
             .ToListAsync();
     }
+    
+    public async Task<IEnumerable<BookingRestaurant>> GetBookingYearsByUserId(Guid userId) {
+        var currentYear = DateTime.UtcNow.Year;
+        return await _context.BookingRestaurant
+            .Include(b => b.Restaurant)
+            .Where(b => b.Restaurant.UserId == userId && b.BookingDate.Year == currentYear)
+            .ToListAsync();
+    }
 }

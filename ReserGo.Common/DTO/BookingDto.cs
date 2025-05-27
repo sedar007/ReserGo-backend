@@ -8,5 +8,4 @@ public abstract class BookingDto {
 
     public int NumberOfGuests { get; set; }
     public bool IsConfirmed { get; set; }
-    public DateTime CreatedAt { get; set; }
 }

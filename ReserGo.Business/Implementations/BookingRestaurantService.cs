@@ -43,10 +43,9 @@ public class BookingRestaurantService : IBookingRestaurantService {
             var bookingRestaurant = new BookingRestaurant {
                 RestaurantOfferId = restaurantOffer.Id,
                 UserId = user.UserId,
-                BookingDate = request.BookingDate,
                 NumberOfGuests = request.NumberOfGuests,
                 IsConfirmed = request.IsConfirmed,
-                CreatedAt = DateTime.UtcNow
+                BookingDate = DateTime.UtcNow
             };
             _logger.LogInformation("Creating booking restaurant for user { id }", user.UserId);
             bookingRestaurant = await _bookingRestaurantDataAccess.Create(bookingRestaurant);
@@ -97,7 +96,7 @@ public class BookingRestaurantService : IBookingRestaurantService {
             EndDate = b.EndDate,
             NumberOfGuests = b.NumberOfGuests,
             IsConfirmed = b.IsConfirmed,
-            CreatedAt = b.CreatedAt
+            BookingDate = b.BookingDate
         });
     }
 
