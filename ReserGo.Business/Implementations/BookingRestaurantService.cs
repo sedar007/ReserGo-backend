@@ -8,6 +8,7 @@ using ReserGo.DataAccess.Interfaces;
 using ReserGo.Common.Response;
 using ReserGo.Common.Requests.Notification;
 using ReserGo.Shared;
+using ReserGo.Common.DTO;
 
 namespace ReserGo.Business.Implementations;
 
@@ -42,10 +43,9 @@ public class BookingRestaurantService : IBookingRestaurantService {
             var bookingRestaurant = new BookingRestaurant {
                 RestaurantOfferId = restaurantOffer.Id,
                 UserId = user.UserId,
-                BookingDate = request.BookingDate,
                 NumberOfGuests = request.NumberOfGuests,
                 IsConfirmed = request.IsConfirmed,
-                CreatedAt = DateTime.UtcNow
+                BookingDate = DateTime.UtcNow
             };
             _logger.LogInformation("Creating booking restaurant for user { id }", user.UserId);
             bookingRestaurant = await _bookingRestaurantDataAccess.Create(bookingRestaurant);
@@ -84,5 +84,24 @@ public class BookingRestaurantService : IBookingRestaurantService {
             Console.WriteLine(e);
             throw;
         }
+    }
+
+    public async Task<IEnumerable<BookingRestaurantDto>> GetBookingsByUserId(Guid userId) {
+        var bookings = await _bookingRestaurantDataAccess.GetBookingsByUserId(userId);
+        return bookings.Select(b => new BookingRestaurantDto {
+            Id = b.Id,
+            RestaurantId = b.RestaurantId,
+            UserId = b.UserId,
+            StartDate = b.StartDate,
+            EndDate = b.EndDate,
+            NumberOfGuests = b.NumberOfGuests,
+            IsConfirmed = b.IsConfirmed,
+            BookingDate = b.BookingDate
+        });
+    }
+
+    public async Task<IEnumerable<BookingRestaurantDto>> GetBookingsByAdminId(Guid adminId) {
+        var bookings = await _bookingRestaurantDataAccess.GetBookingsByAdminId(adminId);
+        return bookings.Select(b => b.ToDto());
     }
 }

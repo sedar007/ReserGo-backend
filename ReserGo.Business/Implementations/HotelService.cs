@@ -62,10 +62,10 @@ public class HotelService : IHotelService {
             };
 
             newHotel = await _hotelDataAccess.Create(newHotel);
-            
+
             // Create Rooms
             var rooms = new List<Room>();
-            for (int i = 1; i <= request.NbRoomsVip; i++) {
+            for (var i = 1; i <= request.NbRoomsVip; i++)
                 rooms.Add(new Room {
                     RoomNumber = $"VIP-{i}",
                     Capacity = 2,
@@ -73,9 +73,8 @@ public class HotelService : IHotelService {
                     IsAvailable = true,
                     HotelId = newHotel.Id
                 });
-            }
-            
-            for (int i = 1; i <= request.NbRoomsStandard; i++) {
+
+            for (var i = 1; i <= request.NbRoomsStandard; i++)
                 rooms.Add(new Room {
                     RoomNumber = $"STD-{i}",
                     Capacity = 2,
@@ -83,15 +82,12 @@ public class HotelService : IHotelService {
                     IsAvailable = true,
                     HotelId = newHotel.Id
                 });
-            }
-            
-            foreach (var room in rooms) {
-                await _roomDataAccess.Create(room);
-            }
-            
+
+            foreach (var room in rooms) await _roomDataAccess.Create(room);
+
             newHotel.NumberOfRooms = rooms.Count;
             newHotel = await _hotelDataAccess.Update(newHotel);
-            
+
             // Cache the created hotel
             _cache.Set($"hotel_{newHotel.Id}", newHotel, TimeSpan.FromMinutes(10));
             _cache.Set($"hotel_stay_{newHotel.StayId}", newHotel, TimeSpan.FromMinutes(10));
@@ -135,6 +131,7 @@ public class HotelService : IHotelService {
                 _logger.LogError(errorMessage);
                 return Enumerable.Empty<HotelDto>();
             }
+
             return hotels.Select(hotel => hotel.ToDto());
         }
         catch (Exception e) {
@@ -242,7 +239,7 @@ public class HotelService : IHotelService {
             throw;
         }
     }
-    
+
     public async Task<bool> IsAuthorized(Guid hotelId, Guid userId) {
         try {
             var isAuthorized = await _hotelDataAccess.IsAuthorized(hotelId, userId);

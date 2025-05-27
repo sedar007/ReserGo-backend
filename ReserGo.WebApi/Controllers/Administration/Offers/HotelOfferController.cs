@@ -251,7 +251,7 @@ public class HotelOfferController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     ///     Retrieve all bookings related to the admin's offers.
     /// </summary>
@@ -297,7 +297,7 @@ public class HotelOfferController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-    
+
     private List<Link> GenerateLinks(Guid bookingId) {
         return new List<Link> {
             new() {

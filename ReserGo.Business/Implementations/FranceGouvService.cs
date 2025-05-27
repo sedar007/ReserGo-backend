@@ -29,10 +29,11 @@ public class FranceGouvService : IFranceGouvService {
         }
 
         var addresses = await _franceGouvApiService.SearchAddresses(query);
-        if(addresses == null) {
+        if (addresses == null) {
             _logger.LogWarning("No addresses found for the query: {Query}", query);
             return Enumerable.Empty<string>();
         }
+
         var addressList = addresses?.ToList();
 
         if (addressList == null || !addressList.Any()) {

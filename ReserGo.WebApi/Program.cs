@@ -72,11 +72,11 @@ public class Program {
             // Hotel
             builder.Services.AddScoped<IHotelDataAccess, HotelDataAccess>();
             builder.Services.AddScoped<IHotelService, HotelService>();
-            
+
             // Room
             builder.Services.AddScoped<IRoomDataAccess, RoomDataAccess>();
             builder.Services.AddScoped<IRoomService, RoomService>();
-            
+
             // Room Availability
             builder.Services.AddScoped<IRoomAvailabilityDataAccess, RoomAvailabilityDataAccess>();
             builder.Services.AddScoped<IRoomAvailabilityService, RoomAvailabilityService>();
@@ -111,10 +111,18 @@ public class Program {
             // Booking Hotel
             builder.Services.AddScoped<IBookingHotelDataAccess, BookingHotelDataAccess>();
             builder.Services.AddScoped<IBookingHotelService, BookingHotelService>();
-            
+
             // Booking Restaurant
             builder.Services.AddScoped<IBookingRestaurantDataAccess, BookingRestaurantDataAccess>();
             builder.Services.AddScoped<IBookingRestaurantService, BookingRestaurantService>();
+
+            // Booking Occasion
+            builder.Services.AddScoped<IBookingOccasionDataAccess, BookingOccasionDataAccess>();
+            builder.Services.AddScoped<IBookingOccasionService, BookingOccasionService>();
+
+            // Metrics
+            builder.Services.AddScoped<IMetricsDataAccess, MetricsDataAccess>();
+            builder.Services.AddScoped<IMetricsService, MetricsService>();
 
             // Add services to the cache memory.
             builder.Services.AddMemoryCache();

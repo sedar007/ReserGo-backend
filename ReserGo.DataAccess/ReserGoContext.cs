@@ -134,13 +134,13 @@ public class ReserGoContext : DbContext {
         modelBuilder.Entity<Hotel>()
             .HasIndex(h => h.StayId)
             .IsUnique();
-        
+
         modelBuilder.Entity<Hotel>()
             .HasMany(h => h.Rooms) // Configuring one-to-many relationship
             .WithOne(r => r.Hotel)
             .HasForeignKey(r => r.HotelId)
             .OnDelete(DeleteBehavior.Cascade);
-        
+
         // Config Room
         modelBuilder.Entity<Room>()
             .HasKey(r => r.Id);
@@ -148,10 +148,7 @@ public class ReserGoContext : DbContext {
         modelBuilder.Entity<Room>()
             .HasIndex(r => new { r.HotelId, r.RoomNumber })
             .IsUnique();
-        
-        
-        
-        
+
 
         modelBuilder.Entity<Occasion>()
             .HasKey(o => o.Id);
@@ -166,7 +163,7 @@ public class ReserGoContext : DbContext {
             .IsUnique();
 
         // Config Bookings 
-        
+
 
         // Config HotelOffer
         modelBuilder.Entity<HotelOffer>()
@@ -230,12 +227,12 @@ public class ReserGoContext : DbContext {
             .HasOne(b => b.User)
             .WithMany(u => u.BookingsRestaurant)
             .HasForeignKey(b => b.UserId);
-        
+
         modelBuilder.Entity<BookingRestaurant>()
             .HasOne(b => b.RestaurantOffer)
             .WithMany(r => r.Bookings)
             .HasForeignKey(b => b.RestaurantOfferId);
-        
+
         // BookingHotel
         modelBuilder.Entity<BookingHotel>()
             .HasKey(b => b.Id);
@@ -245,10 +242,10 @@ public class ReserGoContext : DbContext {
             .WithMany(u => u.BookingsHotel)
             .HasForeignKey(b => b.UserId);
 
-       /* modelBuilder.Entity<BookingHotel>()
-            .HasOne(b => b.HotelOffer)
-            .WithMany(h => h.Bookings)
-            .HasForeignKey(b => b.HotelOfferId);*/
+        /* modelBuilder.Entity<BookingHotel>()
+             .HasOne(b => b.HotelOffer)
+             .WithMany(h => h.Bookings)
+             .HasForeignKey(b => b.HotelOfferId);*/
 
         // Config Notification
         modelBuilder.Entity<Notification>()
@@ -258,9 +255,8 @@ public class ReserGoContext : DbContext {
             .WithMany(u => u.Notifications)
             .HasForeignKey(n => n.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-        
-        
-        
+
+
         // Config RoomAvailability
         modelBuilder.Entity<RoomAvailability>()
             .HasKey(ra => ra.Id); // Définir la clé primaire
@@ -278,7 +274,8 @@ public class ReserGoContext : DbContext {
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<RoomAvailability>()
-            .HasIndex(ra => new { ra.RoomId, ra.StartDate, ra.EndDate }) // Index pour éviter les conflits de disponibilité
+            .HasIndex(ra => new
+                { ra.RoomId, ra.StartDate, ra.EndDate }) // Index pour éviter les conflits de disponibilité
             .IsUnique();
     }
 }

@@ -70,7 +70,7 @@ public class Security : ISecurity {
             HttpOnly = true, // Prevents access via JavaScript (XSS protection)
             Secure = true, // Only active in HTTPS
             SameSite = SameSiteMode.None, // Prevents CSRF attacks
-            Expires = DateTime.UtcNow.AddMinutes(30) // Expiration duration
+            Expires = DateTime.UtcNow.AddMinutes(Consts.CookiesExpiration) // Expiration duration
         };
     }
 

@@ -16,7 +16,8 @@ public static class RestaurantOfferValidator {
             return "Cannot deactivate an expired offer.";
         if (request.OfferEndDate.Date < DateTime.Now.Date) return "Offer end date cannot be in the past.";
         if (request.OfferStartDate.Date < DateTime.Now.Date) return "Offer start date cannot be in the past.";
-        if (request.OfferStartDate.Date >= request.OfferEndDate.Date) return "Offer start date must be before end date.";
+        if (request.OfferStartDate.Date >= request.OfferEndDate.Date)
+            return "Offer start date must be before end date.";
         if (request.RestaurantId == Guid.Empty) return "Restaurant ID cannot be empty.";
         return "";
     }

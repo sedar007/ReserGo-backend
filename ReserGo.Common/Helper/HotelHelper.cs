@@ -18,5 +18,4 @@ public static class HotelHelper {
             Rooms = hotel.Rooms?.Select(room => room.ToDto())
         };
     }
-    
 }

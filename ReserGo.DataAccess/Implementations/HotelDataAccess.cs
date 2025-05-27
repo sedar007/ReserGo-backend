@@ -13,21 +13,15 @@ public class HotelDataAccess : IHotelDataAccess {
     }
 
     public async Task<Hotel?> GetById(Guid id) {
-        return await _context.Hotel.
-            Include(x => x.Rooms).
-            FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Hotel.Include(x => x.Rooms).FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<Hotel?> GetByStayId(long stayId) {
-        return await _context.Hotel.
-            Include(x => x.Rooms).
-            FirstOrDefaultAsync(x => x.StayId == stayId);
+        return await _context.Hotel.Include(x => x.Rooms).FirstOrDefaultAsync(x => x.StayId == stayId);
     }
 
     public async Task<IEnumerable<Hotel>> GetHotelsByUserId(Guid userId) {
-        return await _context.Hotel.
-            Include(x => x.Rooms).
-            Where(x => x.UserId == userId).ToListAsync();
+        return await _context.Hotel.Include(x => x.Rooms).Where(x => x.UserId == userId).ToListAsync();
     }
 
     public async Task<Hotel> Create(Hotel user) {
@@ -42,6 +36,7 @@ public class HotelDataAccess : IHotelDataAccess {
         await _context.SaveChangesAsync();
         return hotel;
     }
+
     public async Task<bool> IsAuthorized(Guid hotelId, Guid userId) {
         return await _context.Hotel.AnyAsync(x => x.Id == hotelId && x.UserId == userId);
     }

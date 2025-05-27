@@ -20,13 +20,14 @@ public class BookingRestaurantController : ControllerBase {
     private readonly IHubContext<NotificationHub> _notificationHub;
 
     public BookingRestaurantController(ILogger<RestaurantController> logger,
-        ISecurity security, IBookingRestaurantService bookingRestaurantService, IHubContext<NotificationHub> notificationHub) {
+        ISecurity security, IBookingRestaurantService bookingRestaurantService,
+        IHubContext<NotificationHub> notificationHub) {
         _logger = logger;
         _security = security;
         _bookingRestaurantService = bookingRestaurantService;
         _notificationHub = notificationHub;
     }
-    
+
     /// <summary>
     ///     Create a new restaurant booking reservation.
     /// </summary>
@@ -50,13 +51,13 @@ public class BookingRestaurantController : ControllerBase {
         try {
             var user = _security.GetCurrentUser();
             if (user == null) return Unauthorized();
-            
+
             var responses = await _bookingRestaurantService.CreateBooking(request, user);
             var notification = responses.Notification;
-            
+
             await _notificationHub.Clients.User(notification.UserId.ToString())
                 .SendAsync("ReceiveNotification", notification.Message);
-            
+
             var bookingRestaurantService = responses.Booking;
 
 

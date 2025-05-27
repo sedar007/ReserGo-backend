@@ -23,4 +23,45 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
             .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
+
+    public async Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId,
+        DateTime startDate, DateTime endDate) {
+        return await _context.BookingRestaurant
+            .Include(b => b.RestaurantOffer)
+            .Where(b => b.RestaurantOffer.UserId == adminId)
+            .Where(b => startDate.Date >= b.BookingDate && endDate.Date <= b.BookingDate)
+            .CountAsync();
+    }
+
+    public async Task<int> GetNbBookingsLast30Days(Guid adminId) {
+        var today = DateTime.UtcNow;
+        var days30Before = today.AddDays(-30);
+
+        return await _context.BookingRestaurant
+            .Include(b => b.RestaurantOffer)
+            .Where(b => b.RestaurantOffer.UserId == adminId)
+            .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
+            .CountAsync();
+    }
+
+    public async Task<IEnumerable<BookingRestaurant>> GetBookingsByUserId(Guid userId) {
+        return await _context.BookingRestaurant
+            .Where(b => b.UserId == userId)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<BookingRestaurant>> GetBookingsByAdminId(Guid adminId) {
+        return await _context.BookingRestaurant
+            .Include(b => b.Restaurant)
+            .Where(b => b.Restaurant.UserId == adminId)
+            .ToListAsync();
+    }
+    
+    public async Task<IEnumerable<BookingRestaurant>> GetBookingYearsByUserId(Guid userId) {
+        var currentYear = DateTime.UtcNow.Year;
+        return await _context.BookingRestaurant
+            .Include(b => b.Restaurant)
+            .Where(b => b.Restaurant.UserId == userId && b.BookingDate.Year == currentYear)
+            .ToListAsync();
+    }
 }
