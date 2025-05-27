@@ -137,7 +137,8 @@ public class Program {
                     {
                         policy.WithOrigins("http://localhost:5173", "http://localhost:4173",
                                 "https://resergo-admin.adjysedar.fr",
-                                "resergo-admin.adjysedar.fr", "adjysedar.fr")
+                                "resergo-admin.adjysedar.fr", "adjysedar.fr", "https://resergo.adjysedar.fr",
+                                "resergo.adjysedar.fr")
                             .AllowCredentials()
                             .AllowAnyHeader()
                             .AllowAnyMethod();
