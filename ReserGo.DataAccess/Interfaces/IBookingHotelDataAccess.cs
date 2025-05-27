@@ -7,7 +7,9 @@ public interface IBookingHotelDataAccess {
     Task<IEnumerable<BookingHotel>> GetBookingsByRoomId(Guid roomId);
     Task<IEnumerable<BookingHotel>> GetBookingsByUserId(Guid userId);
     Task<IEnumerable<BookingHotel>> GetBookingsByAdminId(Guid adminId);
-
+    Task<IEnumerable<BookingHotel>> GetBookingYearsByUserId(Guid userId);
+    Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId, DateTime startDate, DateTime endDate);
+    Task<int> GetNbBookingsLast30Days(Guid adminId);
 
 
     Task<BookingHotel?> GetById(Guid id);

@@ -18,7 +18,7 @@ public class RoomController : ControllerBase {
     private readonly ISecurity _security;
     private readonly IRoomAvailabilityService _roomAvailabilityService;
 
-    public RoomController(ILogger<RoomController> logger, IRoomService roomService, 
+    public RoomController(ILogger<RoomController> logger, IRoomService roomService,
         ISecurity security, IRoomAvailabilityService roomAvailabilityService) {
         _logger = logger;
         _roomService = roomService;
@@ -112,7 +112,7 @@ public class RoomController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
 
     /// <summary>
     /// Retrieve rooms for the connected user.
@@ -215,7 +215,7 @@ public class RoomController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Set the availability for a specific room.
     /// </summary>
@@ -231,13 +231,13 @@ public class RoomController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<RoomAvailabilityDto>>> SetAvailability(Guid roomId, RoomAvailabilityRequest request) {
+    public async Task<ActionResult<Resource<RoomAvailabilityDto>>> SetAvailability(Guid roomId,
+        RoomAvailabilityRequest request) {
         try {
-            
             var connectedUser = _security.GetCurrentUser();
             if (connectedUser == null) return Unauthorized("User not authenticated");
-            
-            var availability = await _roomAvailabilityService.SetAvailability(connectedUser,roomId, request);
+
+            var availability = await _roomAvailabilityService.SetAvailability(connectedUser, roomId, request);
 
             var resource = new Resource<RoomAvailabilityDto> {
                 Data = availability,
@@ -300,7 +300,7 @@ public class RoomController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-    
+
     /// <summary>
     /// Retrieve room availabilities for all hotels associated with the connected user.
     /// </summary>
@@ -314,12 +314,14 @@ public class RoomController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<IEnumerable<RoomAvailabilityDto>>>> GetAvailabilitiesForAllHotels(int skip = 0, int take = 10) {
+    public async Task<ActionResult<Resource<IEnumerable<RoomAvailabilityDto>>>> GetAvailabilitiesForAllHotels(
+        int skip = 0, int take = 10) {
         try {
             var connectedUser = _security.GetCurrentUser();
             if (connectedUser == null) return Unauthorized("User not authenticated");
 
-            var availabilities = await _roomAvailabilityService.GetAvailabilitiesForAllHotels(connectedUser, skip, take);
+            var availabilities =
+                await _roomAvailabilityService.GetAvailabilitiesForAllHotels(connectedUser, skip, take);
 
             var resource = new Resource<IEnumerable<RoomAvailabilityDto>> {
                 Data = availabilities,
@@ -339,6 +341,4 @@ public class RoomController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
-
-
 }

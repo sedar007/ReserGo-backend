@@ -16,12 +16,15 @@ public class OccasionOfferController : ControllerBase {
     private readonly ILogger<OccasionController> _logger;
     private readonly IOccasionOfferService _occasionOfferService;
     private readonly ISecurity _security;
+    private readonly IBookingOccasionService _bookingOccasionService;
 
-    public OccasionOfferController(ILogger<OccasionController> logger, IOccasionOfferService occasionOfferService,
-        ISecurity security) {
+    public OccasionOfferController(ILogger<OccasionController> logger,
+        IOccasionOfferService occasionOfferService,
+        ISecurity security, IBookingOccasionService bookingOccasionService) {
         _logger = logger;
         _occasionOfferService = occasionOfferService;
         _security = security;
+        _bookingOccasionService = bookingOccasionService;
     }
 
     /// <summary>
@@ -251,5 +254,67 @@ public class OccasionOfferController : ControllerBase {
             _logger.LogError(ex, "An error occurred while deleting the occasion offer.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
+    }
+
+
+    /// <summary>
+    ///     Retrieve all bookings related to the admin's offers.
+    /// </summary>
+    /// <returns>
+    ///     - **200 OK**: If the bookings are successfully retrieved.
+    ///     - **401 Unauthorized**: If the admin is not authenticated.
+    ///     - **500 Internal Server Error**: If an unexpected error occurs.
+    /// </returns>
+    /// <response code="200">Bookings retrieved successfully.</response>
+    /// <response code="401">Admin is not authenticated.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("my-bookings")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> GetBookingsForAdminOffers() {
+        try {
+            var admin = _security.GetCurrentUser();
+            if (admin == null) return Unauthorized();
+
+            var bookings = await _bookingOccasionService.GetBookingsByAdminId(admin.UserId);
+
+            var bookingsWithLinks = bookings.Select(booking => new Resource<BookingOccasionDto> {
+                Data = booking,
+                Links = GenerateLinks(booking.Id)
+            });
+
+            var resourceCollection = new Resource<IEnumerable<Resource<BookingOccasionDto>>> {
+                Data = bookingsWithLinks,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(GetBookingsForAdminOffers)),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            };
+
+            return Ok(resourceCollection);
+        }
+        catch (Exception e) {
+            _logger.LogError(e, "An unexpected error occurred while retrieving bookings for admin offers");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
+        }
+    }
+
+    private List<Link> GenerateLinks(Guid bookingId) {
+        return new List<Link> {
+            new() {
+                Href = Url.Action(nameof(GetBookingsForAdminOffers), new { id = bookingId }),
+                Rel = "self",
+                Method = "GET"
+            },
+            new() {
+                Href = Url.Action("DeleteBooking", new { id = bookingId }),
+                Rel = "delete",
+                Method = "DELETE"
+            }
+        };
     }
 }

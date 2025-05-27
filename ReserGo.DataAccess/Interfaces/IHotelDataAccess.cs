@@ -10,5 +10,4 @@ public interface IHotelDataAccess {
     Task<IEnumerable<Hotel>> GetHotelsByUserId(Guid userId);
     Task<bool> IsAuthorized(Guid hotelId, Guid userId);
     Task Delete(Hotel hotel);
-    
 }
