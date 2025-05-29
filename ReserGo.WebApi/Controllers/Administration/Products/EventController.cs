@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
-using ReserGo.Common.Requests.Products.Occasion;
+using ReserGo.Common.Requests.Products.Event;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.Common.Models;
@@ -10,37 +10,37 @@ namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
 [AdminOnly]
 [ApiController]
-[Tags("Products | Occasion")]
-[Route("api/administration/products/occasions/")]
-public class OccasionController : ControllerBase {
-    private readonly ILogger<OccasionController> _logger;
-    private readonly IOccasionService _occasionService;
+[Tags("Products | Event")]
+[Route("api/administration/products/events/")]
+public class EventController : ControllerBase {
+    private readonly ILogger<EventController> _logger;
+    private readonly IEventService _eventService;
     private readonly ISecurity _security;
 
-    public OccasionController(ILogger<OccasionController> logger, IOccasionService occasionService,
+    public EventController(ILogger<EventController> logger, IEventService eventService,
         ISecurity security) {
         _logger = logger;
         _security = security;
-        _occasionService = occasionService;
+        _eventService = eventService;
     }
 
     /// <summary>
-    /// Create a new occasion.
+    /// Create a new @event.
     /// </summary>
-    /// <param name="request">The occasion creation request containing necessary information.</param>
-    /// <returns>The created occasion object.</returns>
-    /// <response code="201">Occasion created successfully.</response>
+    /// <param name="request">The @event creation request containing necessary information.</param>
+    /// <returns>The created @event object.</returns>
+    /// <response code="201">Event created successfully.</response>
     /// <response code="400">Invalid request data.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> Create(OccasionCreationRequest request) {
+    public async Task<ActionResult> Create(EventCreationRequest request) {
         try {
-            var data = await _occasionService.Create(request);
+            var data = await _eventService.Create(request);
 
-            var resource = new Resource<OccasionDto> {
+            var resource = new Resource<EventDto> {
                 Data = data,
                 Links = new List<Link> {
                     new() {
@@ -62,29 +62,29 @@ public class OccasionController : ControllerBase {
             return BadRequest(ex.Message);
         }
         catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while creating the occasion.");
+            _logger.LogError(ex, "An error occurred while creating the @event.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
 
     /// <summary>
-    /// Retrieve an occasion by their ID.
+    /// Retrieve an @event by their ID.
     /// </summary>
-    /// <param name="id">The ID of the occasion.</param>
-    /// <returns>The Occasion object.</returns>
-    /// <response code="200">Occasion found and returned.</response>
-    /// <response code="404">Occasion not found.</response>
+    /// <param name="id">The ID of the @event.</param>
+    /// <returns>The Event object.</returns>
+    /// <response code="200">Event found and returned.</response>
+    /// <response code="404">Event not found.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<OccasionDto>>> GetById(Guid id) {
+    public async Task<ActionResult<Resource<EventDto>>> GetById(Guid id) {
         try {
-            var occasion = await _occasionService.GetById(id);
-            if (occasion == null) return NotFound($"Occasion with ID {id} not found.");
+            var occasion = await _eventService.GetById(id);
+            if (occasion == null) return NotFound($"Event with ID {id} not found.");
 
-            var resource = new Resource<OccasionDto> {
+            var resource = new Resource<EventDto> {
                 Data = occasion,
                 Links = new List<Link> {
                     new() {
@@ -106,29 +106,29 @@ public class OccasionController : ControllerBase {
             return NotFound(ex.Message);
         }
         catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while retrieving the occasion.");
+            _logger.LogError(ex, "An error occurred while retrieving the @event.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
 
     /// <summary>
-    /// Retrieve an occasion by their StayId.
+    /// Retrieve an @event by their StayId.
     /// </summary>
-    /// <param name="id">The StayId of the occasion.</param>
-    /// <returns>The Occasion object.</returns>
-    /// <response code="200">Occasion found and returned.</response>
-    /// <response code="404">Occasion not found.</response>
+    /// <param name="id">The StayId of the @event.</param>
+    /// <returns>The Event object.</returns>
+    /// <response code="200">Event found and returned.</response>
+    /// <response code="404">Event not found.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet("stayId/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<OccasionDto>>> GetByStayId(long id) {
+    public async Task<ActionResult<Resource<EventDto>>> GetByStayId(long id) {
         try {
-            var occasion = await _occasionService.GetByStayId(id);
-            if (occasion == null) return NotFound($"Occasion with StayId {id} not found.");
+            var occasion = await _eventService.GetByStayId(id);
+            if (occasion == null) return NotFound($"Event with StayId {id} not found.");
 
-            var resource = new Resource<OccasionDto> {
+            var resource = new Resource<EventDto> {
                 Data = occasion,
                 Links = new List<Link> {
                     new() {
@@ -150,30 +150,30 @@ public class OccasionController : ControllerBase {
             return NotFound(ex.Message);
         }
         catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while retrieving the occasion.");
+            _logger.LogError(ex, "An error occurred while retrieving the @event.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
 
     /// <summary>
-    /// Retrieve occasions for the connected user.
+    /// Retrieve events for the connected user.
     /// </summary>
-    /// <returns>A list of occasions associated with the connected user.</returns>
-    /// <response code="200">Occasions retrieved successfully.</response>
+    /// <returns>A list of events associated with the connected user.</returns>
+    /// <response code="200">Events retrieved successfully.</response>
     /// <response code="401">User not authenticated.</response>
     /// <response code="500">An unexpected error occurred.</response>
-    [HttpGet("my-occasions")]
+    [HttpGet("my-events")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<IEnumerable<Resource<OccasionDto>>>>> GetOccasionsForConnectedUser() {
+    public async Task<ActionResult<Resource<IEnumerable<Resource<EventDto>>>>> GetEventsForConnectedUser() {
         try {
             var connectedUser = _security.GetCurrentUser();
             if (connectedUser == null) return Unauthorized("User not authenticated");
 
-            var occasions = await _occasionService.GetOccasionsByUserId(connectedUser.UserId);
+            var occasions = await _eventService.GetEventsByUserId(connectedUser.UserId);
 
-            var resources = occasions.Select(occasion => new Resource<OccasionDto> {
+            var resources = occasions.Select(occasion => new Resource<EventDto> {
                 Data = occasion,
                 Links = new List<Link> {
                     new() {
@@ -189,11 +189,11 @@ public class OccasionController : ControllerBase {
                 }
             });
 
-            var resourceCollection = new Resource<IEnumerable<Resource<OccasionDto>>> {
+            var resourceCollection = new Resource<IEnumerable<Resource<EventDto>>> {
                 Data = resources,
                 Links = new List<Link> {
                     new() {
-                        Href = Url.Action(nameof(GetOccasionsForConnectedUser)),
+                        Href = Url.Action(nameof(GetEventsForConnectedUser)),
                         Rel = "self",
                         Method = "GET"
                     }
@@ -203,30 +203,30 @@ public class OccasionController : ControllerBase {
             return Ok(resourceCollection);
         }
         catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while retrieving occasions for the connected user.");
+            _logger.LogError(ex, "An error occurred while retrieving events for the connected user.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
 
     /// <summary>
-    /// Update an existing occasion.
+    /// Update an existing @event.
     /// </summary>
     ///  <param name="id">The stayId to search the object.</param>
-    /// <param name="request">The Occasion update request.</param>
-    /// <returns>The updated Occasion object.</returns>
-    /// <response code="200">Occasion updated successfully.</response>
+    /// <param name="request">The Event update request.</param>
+    /// <returns>The updated Event object.</returns>
+    /// <response code="200">Event updated successfully.</response>
     /// <response code="400">Invalid request data.</response>
-    /// <response code="404">Occasion not found.</response>
+    /// <response code="404">Event not found.</response>
     [HttpPut("stayId/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Resource<OccasionDto>>> Update(long id, OccasionUpdateRequest request) {
+    public async Task<ActionResult<Resource<EventDto>>> Update(long id, EventUpdateRequest request) {
         try {
-            var updatedOccasion = await _occasionService.Update(id, request);
+            var updatedEvent = await _eventService.Update(id, request);
 
-            var resource = new Resource<OccasionDto> {
-                Data = updatedOccasion,
+            var resource = new Resource<EventDto> {
+                Data = updatedEvent,
                 Links = new List<Link> {
                     new() {
                         Href = Url.Action(nameof(GetById), new { id }),
@@ -247,12 +247,12 @@ public class OccasionController : ControllerBase {
     }
 
     /// <summary>
-    /// Remove an Occasion by their ID.
+    /// Remove an Event by their ID.
     /// </summary>
-    /// <param name="id">The ID of the Occasion to remove.</param>
+    /// <param name="id">The ID of the Event to remove.</param>
     /// <returns>No content if successful.</returns>
-    /// <response code="204">Occasion removed successfully.</response>
-    /// <response code="404">Occasion not found.</response>
+    /// <response code="204">Event removed successfully.</response>
+    /// <response code="404">Event not found.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -260,14 +260,14 @@ public class OccasionController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult> Delete(Guid id) {
         try {
-            await _occasionService.Delete(id);
+            await _eventService.Delete(id);
             return NoContent();
         }
         catch (InvalidDataException ex) {
             return NotFound(ex.Message);
         }
         catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while retrieving the Occasion.");
+            _logger.LogError(ex, "An error occurred while retrieving the Event.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }

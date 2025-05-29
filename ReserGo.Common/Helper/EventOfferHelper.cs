@@ -3,9 +3,9 @@ using ReserGo.Common.Entity;
 
 namespace ReserGo.Common.Helper;
 
-public static class OccasionOfferHelper {
-    public static OccasionOfferDto ToDto(this OccasionOffer occasion) {
-        return new OccasionOfferDto {
+public static class EventOfferHelper {
+    public static EventOfferDto ToDto(this EventOffer occasion) {
+        return new EventOfferDto {
             Id = occasion.Id,
             Description = occasion.Description,
             PricePerPerson = occasion.PricePerPerson,
@@ -13,8 +13,8 @@ public static class OccasionOfferHelper {
             OfferStartDate = occasion.OfferStartDate,
             OfferEndDate = occasion.OfferEndDate,
             IsActive = occasion.IsActive,
-            OccasionId = occasion.OccasionId,
-            Occasion = occasion.Occasion.ToDto()
+            EventId = occasion.EventId,
+            Event = occasion.Event.ToDto()
         };
     }
 }

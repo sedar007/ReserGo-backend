@@ -5,7 +5,7 @@ using ReserGo.Business.Validator;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
-using ReserGo.Common.Requests.Products.Occasion;
+using ReserGo.Common.Requests.Products.Event;
 using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared;
@@ -13,14 +13,14 @@ using ReserGo.Shared.Interfaces;
 
 namespace ReserGo.Business.Implementations;
 
-public class OccasionService : IOccasionService {
+public class EventService : IEventService {
     private readonly IMemoryCache _cache;
     private readonly ILogger<UserService> _logger;
     private readonly ISecurity _security;
     private readonly IImageService _imageService;
-    private readonly IOccasionDataAccess _occasionDataAccess;
+    private readonly IEventDataAccess _occasionDataAccess;
 
-    public OccasionService(IMemoryCache cache, ILogger<UserService> logger, IOccasionDataAccess occasionDataAccess,
+    public EventService(IMemoryCache cache, ILogger<UserService> logger, IEventDataAccess occasionDataAccess,
         ISecurity security, IImageService imageService) {
         _cache = cache;
         _logger = logger;
@@ -29,16 +29,16 @@ public class OccasionService : IOccasionService {
         _occasionDataAccess = occasionDataAccess;
     }
 
-    public async Task<OccasionDto> Create(OccasionCreationRequest request) {
+    public async Task<EventDto> Create(EventCreationRequest request) {
         try {
             var occasion = await _occasionDataAccess.GetByStayId(request.StayId);
             if (occasion is not null) {
-                var errorMessage = "This occasion already exists.";
+                var errorMessage = "This @event already exists.";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
 
-            var error = OccasionValidator.GetError(request);
+            var error = EventValidator.GetError(request);
             if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
@@ -47,7 +47,7 @@ public class OccasionService : IOccasionService {
             var connectedUser = _security.GetCurrentUser();
             if (connectedUser == null) throw new UnauthorizedAccessException("User not connected");
 
-            var newOccasion = new Occasion {
+            var newEvent = new Event {
                 Name = request.Name,
                 Location = request.Location,
                 Capacity = request.Capacity,
@@ -59,17 +59,17 @@ public class OccasionService : IOccasionService {
                 LastUpdated = DateTime.UtcNow
             };
 
-            newOccasion = await _occasionDataAccess.Create(newOccasion);
+            newEvent = await _occasionDataAccess.Create(newEvent);
 
-            _logger.LogInformation("Occasion { id } created", newOccasion.Id);
+            _logger.LogInformation("Event { id } created", newEvent.Id);
 
             // Set cache
-            _cache.Set($"Occasion_GetById_{newOccasion.Id}", newOccasion.ToDto(),
+            _cache.Set($"Event_GetById_{newEvent.Id}", newEvent.ToDto(),
                 TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-            _cache.Set($"Occasion_GetByStayId_{newOccasion.StayId}", newOccasion.ToDto(),
+            _cache.Set($"Event_GetByStayId_{newEvent.StayId}", newEvent.ToDto(),
                 TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
-            return newOccasion.ToDto();
+            return newEvent.ToDto();
         }
         catch (Exception e) {
             _logger.LogError(e, e.Message);
@@ -77,23 +77,23 @@ public class OccasionService : IOccasionService {
         }
     }
 
-    public async Task<OccasionDto?> GetById(Guid id) {
+    public async Task<EventDto?> GetById(Guid id) {
         try {
-            var cacheKey = $"Occasion_GetById_{id}";
+            var cacheKey = $"Event_GetById_{id}";
 
-            if (_cache.TryGetValue(cacheKey, out OccasionDto? cachedOccasion)) {
-                _logger.LogInformation("Returning cached occasion for ID: {Id}", id);
-                return cachedOccasion;
+            if (_cache.TryGetValue(cacheKey, out EventDto? cachedEvent)) {
+                _logger.LogInformation("Returning cached @event for ID: {Id}", id);
+                return cachedEvent;
             }
 
             var occasion = await _occasionDataAccess.GetById(id);
             if (occasion is null) {
-                var errorMessage = "This occasion does not exist.";
+                var errorMessage = "This @event does not exist.";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
 
-            _logger.LogInformation("Occasion { Id } retrieved successfully", occasion.Id);
+            _logger.LogInformation("Event { Id } retrieved successfully", occasion.Id);
             var occasionDto = occasion.ToDto();
             _cache.Set(cacheKey, occasionDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
             return occasionDto;
@@ -104,23 +104,23 @@ public class OccasionService : IOccasionService {
         }
     }
 
-    public async Task<OccasionDto?> GetByStayId(long stayId) {
+    public async Task<EventDto?> GetByStayId(long stayId) {
         try {
-            var cacheKey = $"Occasion_GetByStayId_{stayId}";
+            var cacheKey = $"Event_GetByStayId_{stayId}";
 
-            if (_cache.TryGetValue(cacheKey, out OccasionDto? cachedOccasion)) {
-                _logger.LogInformation("Returning cached occasion for StayId: {StayId}", stayId);
-                return cachedOccasion;
+            if (_cache.TryGetValue(cacheKey, out EventDto? cachedEvent)) {
+                _logger.LogInformation("Returning cached @event for StayId: {StayId}", stayId);
+                return cachedEvent;
             }
 
             var occasion = await _occasionDataAccess.GetByStayId(stayId);
             if (occasion is null) {
-                var errorMessage = "This occasion does not exist.";
+                var errorMessage = "This @event does not exist.";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
 
-            _logger.LogInformation("Occasion { StayId } retrieved successfully", occasion.StayId);
+            _logger.LogInformation("Event { StayId } retrieved successfully", occasion.StayId);
             var occasionDto = occasion.ToDto();
             _cache.Set(cacheKey, occasionDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
             return occasionDto;
@@ -131,9 +131,9 @@ public class OccasionService : IOccasionService {
         }
     }
 
-    public async Task<IEnumerable<OccasionDto>> GetOccasionsByUserId(Guid userId) {
+    public async Task<IEnumerable<EventDto>> GetEventsByUserId(Guid userId) {
         try {
-            var occasions = await _occasionDataAccess.GetOccasionsByUserId(userId);
+            var occasions = await _occasionDataAccess.GetEventsByUserId(userId);
             return occasions.Select(occasion => occasion.ToDto());
         }
         catch (Exception e) {
@@ -142,12 +142,12 @@ public class OccasionService : IOccasionService {
         }
     }
 
-    public async Task<OccasionDto> Update(long stayId, OccasionUpdateRequest request) {
+    public async Task<EventDto> Update(long stayId, EventUpdateRequest request) {
         try {
             var occasion = await _occasionDataAccess.GetByStayId(stayId);
-            if (occasion is null) throw new Exception("Occasion not found");
+            if (occasion is null) throw new Exception("Event not found");
 
-            var error = OccasionValidator.GetError(request);
+            var error = EventValidator.GetError(request);
             if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
@@ -176,7 +176,7 @@ public class OccasionService : IOccasionService {
                 occasion.Picture = publicId;
             }
 
-            _logger.LogInformation("Occasion { stayId } updated successfully", occasion.StayId);
+            _logger.LogInformation("Event { stayId } updated successfully", occasion.StayId);
             await _occasionDataAccess.Update(occasion);
 
             // Invalidate cache
@@ -194,7 +194,7 @@ public class OccasionService : IOccasionService {
         try {
             var occasion = await _occasionDataAccess.GetById(id);
             if (occasion is null) {
-                var errorMessage = "Occasion not found";
+                var errorMessage = "Event not found";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
@@ -209,7 +209,7 @@ public class OccasionService : IOccasionService {
             // Invalidate cache
             RemoveCache(occasion.Id, occasion.StayId);
 
-            _logger.LogInformation("Occasion { id } deleted successfully", occasion.Id);
+            _logger.LogInformation("Event { id } deleted successfully", occasion.Id);
         }
         catch (Exception e) {
             _logger.LogError(e, e.Message);
@@ -218,7 +218,7 @@ public class OccasionService : IOccasionService {
     }
 
     private void RemoveCache(Guid id, long stayId) {
-        _cache.Remove($"Occasion_GetById_{id}");
-        _cache.Remove($"Occasion_GetByStayId_{stayId}");
+        _cache.Remove($"Event_GetById_{id}");
+        _cache.Remove($"Event_GetByStayId_{stayId}");
     }
 }

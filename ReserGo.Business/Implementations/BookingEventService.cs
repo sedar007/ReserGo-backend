@@ -3,7 +3,7 @@ using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
-using ReserGo.Common.Requests.Products.Occasion;
+using ReserGo.Common.Requests.Products.Event;
 using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Common.Response;
@@ -12,25 +12,25 @@ using ReserGo.Shared;
 
 namespace ReserGo.Business.Implementations;
 
-public class BookingOccasionService : IBookingOccasionService {
-    private readonly ILogger<BookingOccasionService> _logger;
-    private readonly IOccasionOfferService _hotelOfferService;
-    private readonly IBookingOccasionDataAccess _bookingOccasionDataAccess;
+public class BookingEventService : IBookingEventService {
+    private readonly ILogger<BookingEventService> _logger;
+    private readonly IEventOfferService _hotelOfferService;
+    private readonly IBookingEventDataAccess _bookingEventDataAccess;
     private readonly INotificationService _notificationService;
     private readonly IRoomAvailabilityService _roomAvailabilityService;
 
-    public BookingOccasionService(ILogger<BookingOccasionService> logger,
-        IOccasionOfferService hotelOfferService,
-        IBookingOccasionDataAccess bookingOccasionDataAccess, INotificationService notificationService,
+    public BookingEventService(ILogger<BookingEventService> logger,
+        IEventOfferService hotelOfferService,
+        IBookingEventDataAccess bookingEventDataAccess, INotificationService notificationService,
         IRoomAvailabilityService roomAvailabilityService) {
         _logger = logger;
         _hotelOfferService = hotelOfferService;
-        _bookingOccasionDataAccess = bookingOccasionDataAccess;
+        _bookingEventDataAccess = bookingEventDataAccess;
         _notificationService = notificationService;
         _roomAvailabilityService = roomAvailabilityService;
     }
 
-    /* public async Task<BookingResponses> CreateBooking(BookingOccasionRequest request, ConnectedUser user) {
+    /* public async Task<BookingResponses> CreateBooking(BookingEventRequest request, ConnectedUser user) {
      try {
          if (user == null) {
              _logger.LogError("User not found");
@@ -43,15 +43,15 @@ public class BookingOccasionService : IBookingOccasionService {
              throw new InvalidDataException("The room is not available for the selected dates.");
          }
 
-         var existingBookings = await _bookingOccasionDataAccess.GetBookingsByRoomId(request.RoomId);
+         var existingBookings = await _bookingEventDataAccess.GetBookingsByRoomId(request.RoomId);
          if (existingBookings.Any(b =>
                  request.StartDate.Date < b.EndDate.Date && request.EndDate.Date > b.StartDate.Date)) {
              throw new InvalidDataException("The room is already booked for the selected dates.");
          }
 
-         var reservation = new BookingOccasion {
+         var reservation = new BookingEvent {
              RoomId = request.RoomId,
-             OccasionId = availability.Occasion.Id,
+             EventId = availability.Event.Id,
              UserId = request.UserId,
              StartDate = request.StartDate,
              BookingDate = DateTime.UtcNow,
@@ -61,26 +61,26 @@ public class BookingOccasionService : IBookingOccasionService {
              CreatedAt = DateTime.UtcNow
          };
 
-         var createdReservation = await _bookingOccasionDataAccess.Create(reservation);
+         var createdReservation = await _bookingEventDataAccess.Create(reservation);
          if (createdReservation == null) {
              _logger.LogError("Booking hotel not created");
              throw new InvalidDataException("Booking hotel not created");
          }
-         var bookingOccasion = createdReservation?.ToDto();
+         var bookingEvent = createdReservation?.ToDto();
 
          var notification = new NotificationCreationRequest {
              Title = "New Reservation",
-             Message = $"New reservation made by {user.Username} for offer at {availability.Occasion.Name} " +
+             Message = $"New reservation made by {user.Username} for offer at {availability.Event.Name} " +
                        $"number of guests: {request.NumberOfGuests}",
-             Type = "Occasion",
-             Name = availability.Occasion.Name,
-             UserId = availability.Occasion.UserId,
+             Type = "Event",
+             Name = availability.Event.Name,
+             UserId = availability.Event.UserId,
          };
          var notificationDto = await _notificationService.CreateNotification(notification);
 
          return new BookingResponses {
              Notification = notificationDto,
-             Booking = bookingOccasion
+             Booking = bookingEvent
          };
      } catch (Exception e) {
          Console.WriteLine(e);
@@ -88,11 +88,11 @@ public class BookingOccasionService : IBookingOccasionService {
      }
  }*/
 
-    public async Task<IEnumerable<BookingOccasionDto>> GetBookingsByUserId(Guid userId) {
-        var bookings = await _bookingOccasionDataAccess.GetBookingsByUserId(userId);
-        return bookings.Select(b => new BookingOccasionDto {
+    public async Task<IEnumerable<BookingEventDto>> GetBookingsByUserId(Guid userId) {
+        var bookings = await _bookingEventDataAccess.GetBookingsByUserId(userId);
+        return bookings.Select(b => new BookingEventDto {
             Id = b.Id,
-            OccasionId = b.OccasionId,
+            EventId = b.EventId,
             UserId = b.UserId,
             StartDate = b.StartDate,
             EndDate = b.EndDate,
@@ -102,8 +102,8 @@ public class BookingOccasionService : IBookingOccasionService {
         });
     }
 
-    public async Task<IEnumerable<BookingOccasionDto>> GetBookingsByAdminId(Guid adminId) {
-        var bookings = await _bookingOccasionDataAccess.GetBookingsByAdminId(adminId);
+    public async Task<IEnumerable<BookingEventDto>> GetBookingsByAdminId(Guid adminId) {
+        var bookings = await _bookingEventDataAccess.GetBookingsByAdminId(adminId);
         return bookings.Select(b => b.ToDto());
     }
 }

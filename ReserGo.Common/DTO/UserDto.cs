@@ -14,7 +14,7 @@ public class UserDto {
     public string? RoleString { get; set; }
     public string? ProfilePicture { get; set; }
     public IEnumerable<BookingHotelDto> BookingsHotel { get; set; } = null!;
-    public IEnumerable<BookingOccasionDto> BookingsOccasion { get; set; } = null!;
+    public IEnumerable<BookingEventDto> BookingsEvent { get; set; } = null!;
     public IEnumerable<BookingRestaurantDto> BookingsRestaurant { get; set; } = null!;
 
     // Relation avec Login

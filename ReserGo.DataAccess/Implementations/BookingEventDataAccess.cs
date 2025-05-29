@@ -1,0 +1,68 @@
+using Microsoft.EntityFrameworkCore;
+using ReserGo.Common.Entity;
+using ReserGo.DataAccess.Interfaces;
+
+namespace ReserGo.DataAccess.Implementations;
+
+public class BookingEventDataAccess : IBookingEventDataAccess {
+    private readonly ReserGoContext _context;
+
+    public BookingEventDataAccess(ReserGoContext context) {
+        _context = context;
+    }
+
+    public async Task<BookingEvent> Create(BookingEvent bookingEvent) {
+        await _context.BookingEvent.AddAsync(bookingEvent);
+        await _context.SaveChangesAsync();
+        return bookingEvent;
+    }
+
+    public async Task<BookingEvent?> GetById(Guid id) {
+        return await _context.BookingEvent
+            //.Include(x => x.EventOffer)
+            .Include(x => x.User)
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+
+    public async Task<IEnumerable<BookingEvent>> GetBookingsByUserId(Guid userId) {
+        return await _context.BookingEvent
+            .Where(b => b.UserId == userId)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<BookingEvent>> GetBookingsByAdminId(Guid adminId) {
+        return await _context.BookingEvent
+            .Include(b => b.Event)
+            .Where(b => b.Event.UserId == adminId)
+            .ToListAsync();
+    }
+
+    public async Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId,
+        DateTime startDate, DateTime endDate) {
+        return await _context.BookingEvent
+            .Include(b => b.Event)
+            .Where(b => b.Event.UserId == adminId)
+            .Where(b => startDate.Date >= b.BookingDate && endDate.Date <= b.BookingDate)
+            .CountAsync();
+    }
+
+    public async Task<int> GetNbBookingsLast30Days(Guid adminId) {
+        var today = DateTime.UtcNow;
+        var days30Before = today.AddDays(-30);
+
+        return await _context.BookingEvent
+            .Include(b => b.Event)
+            .Where(b => b.Event.UserId == adminId)
+            .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
+            .CountAsync();
+    }
+    
+    public async Task<IEnumerable<BookingEvent>> GetBookingYearsByUserId(Guid userId) {
+        var currentYear = DateTime.UtcNow.Year;
+        return await _context.BookingEvent
+            .Include(b => b.Event)
+            .Where(b => b.Event.UserId == userId && b.BookingDate.Year == currentYear)
+            .ToListAsync();
+    }
+}

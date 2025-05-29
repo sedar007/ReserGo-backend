@@ -18,14 +18,14 @@ public class MetricsService : IMetricsService {
     private readonly IBookingRestaurantDataAccess _bookingRestaurantDataAccess;
     private readonly INotificationService _notificationService;
     private readonly IBookingHotelDataAccess _bookingHotelDataAccess;
-    private readonly IBookingOccasionDataAccess _bookingEventDataAccess;
+    private readonly IBookingEventDataAccess _bookingEventDataAccess;
 
     public MetricsService(ILogger<BookingRestaurantService> logger,
         IRestaurantOfferService restaurantOfferService,
         IBookingRestaurantDataAccess bookingRestaurantDataAccess,
         INotificationService notificationService,
         IBookingHotelDataAccess bookingHotelDataAccess,
-        IBookingOccasionDataAccess bookingEventDataAccess) {
+        IBookingEventDataAccess bookingEventDataAccess) {
         _logger = logger;
         _restaurantOfferService = restaurantOfferService;
         _bookingRestaurantDataAccess = bookingRestaurantDataAccess;
@@ -141,7 +141,7 @@ public class MetricsService : IMetricsService {
         return new Dictionary<string, Dictionary<string, int>> {
             { "Hotel", allMonths.Keys.ToDictionary(m => m, m => hotelGrouped[m]) },
             { "Restaurant", allMonths.Keys.ToDictionary(m => m, m => restaurantGrouped[m]) },
-            { "Occasion", allMonths.Keys.ToDictionary(m => m, m => occasionGrouped[m]) }
+            { "Event", allMonths.Keys.ToDictionary(m => m, m => occasionGrouped[m]) }
         };
     }
     catch (Exception e) {
@@ -171,7 +171,7 @@ public class MetricsService : IMetricsService {
                     await _bookingRestaurantDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before,
                         days30Before);
                 break;
-            case Product.Occasion:
+            case Product.Event:
                 nbBookingThisMonth = await _bookingEventDataAccess.GetNbBookingsLast30Days(adminId);
                 nbBookingLastMonth =
                     await _bookingEventDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before,

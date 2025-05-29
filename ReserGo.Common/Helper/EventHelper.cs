@@ -3,9 +3,9 @@ using ReserGo.Common.Entity;
 
 namespace ReserGo.Common.Helper;
 
-public static class OccasionHelper {
-    public static OccasionDto ToDto(this Occasion occasion) {
-        return new OccasionDto {
+public static class EventHelper {
+    public static EventDto ToDto(this Event occasion) {
+        return new EventDto {
             Id = occasion.Id,
             Name = occasion.Name,
             Capacity = occasion.Capacity,

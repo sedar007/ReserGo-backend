@@ -1,6 +1,6 @@
 namespace ReserGo.Common.DTO;
 
-public class OccasionDto {
+public class EventDto {
     public Guid Id { get; init; }
     public string Name { get; set; } = null!;
     public string Location { get; set; } = null!;

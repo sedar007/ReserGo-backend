@@ -1,6 +1,6 @@
-namespace ReserGo.Common.Requests.Products.Occasion;
+namespace ReserGo.Common.Requests.Products.Event;
 
-public class OccasionOfferUpdateRequest {
+public class EventOfferUpdateRequest {
     public string? Description { get; init; }
     public double PricePerPerson { get; init; }
     public int GuestLimit { get; init; }

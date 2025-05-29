@@ -1,11 +1,11 @@
 using ReserGo.Common.Requests.Products;
 using ReserGo.Common.Requests.Products.Hotel;
-using ReserGo.Common.Requests.Products.Occasion;
+using ReserGo.Common.Requests.Products.Event;
 
 namespace ReserGo.Business.Validator;
 
-public static class OccasionValidator {
-    public static string GetError(OccasionCreationRequest? request) {
+public static class EventValidator {
+    public static string GetError(EventCreationRequest? request) {
         if (request == null) return "Invalid request.";
         if (string.IsNullOrWhiteSpace(request.Name)) return "Name cannot be empty.";
         if (string.IsNullOrWhiteSpace(request.Location)) return "Location cannot be empty.";
@@ -13,7 +13,7 @@ public static class OccasionValidator {
         return StayIdValidator.Check(request.StayId, 3);
     }
 
-    public static string GetError(OccasionUpdateRequest? request) {
+    public static string GetError(EventUpdateRequest? request) {
         if (request == null) return "Invalid request.";
         if (string.IsNullOrWhiteSpace(request.Name)) return "Name cannot be empty.";
         if (string.IsNullOrWhiteSpace(request.Location)) return "Location cannot be empty.";

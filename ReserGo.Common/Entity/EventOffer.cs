@@ -1,6 +1,6 @@
-namespace ReserGo.Common.DTO;
+namespace ReserGo.Common.Entity;
 
-public class OccasionOfferDto {
+public class EventOffer {
     public Guid Id { get; init; }
     public string? Description { get; set; } = null!;
     public double PricePerPerson { get; set; }
@@ -8,6 +8,8 @@ public class OccasionOfferDto {
     public DateTime OfferStartDate { get; set; }
     public DateTime OfferEndDate { get; set; }
     public bool IsActive { get; set; }
-    public Guid OccasionId { get; set; }
-    public OccasionDto Occasion { get; set; } = null!;
+    public Guid EventId { get; init; }
+    public Event Event { get; init; } = null!;
+    public Guid UserId { get; init; }
+    public User User { get; init; } = null!;
 }

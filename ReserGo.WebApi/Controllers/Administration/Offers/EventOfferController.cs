@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
-using ReserGo.Common.Requests.Products.Occasion;
+using ReserGo.Common.Requests.Products.Event;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.Shared.Interfaces;
 using ReserGo.Common.Models;
@@ -9,30 +9,30 @@ using ReserGo.Common.Models;
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
 [ApiController]
-[Tags("Offers | Occasion")]
+[Tags("Offers | Event")]
 [AdminOnly]
-[Route("api/administration/offers/occasions/")]
-public class OccasionOfferController : ControllerBase {
-    private readonly ILogger<OccasionController> _logger;
-    private readonly IOccasionOfferService _occasionOfferService;
+[Route("api/administration/offers/events/")]
+public class EventOfferController : ControllerBase {
+    private readonly ILogger<EventController> _logger;
+    private readonly IEventOfferService _occasionOfferService;
     private readonly ISecurity _security;
-    private readonly IBookingOccasionService _bookingOccasionService;
+    private readonly IBookingEventService _bookingEventService;
 
-    public OccasionOfferController(ILogger<OccasionController> logger,
-        IOccasionOfferService occasionOfferService,
-        ISecurity security, IBookingOccasionService bookingOccasionService) {
+    public EventOfferController(ILogger<EventController> logger,
+        IEventOfferService occasionOfferService,
+        ISecurity security, IBookingEventService bookingEventService) {
         _logger = logger;
         _occasionOfferService = occasionOfferService;
         _security = security;
-        _bookingOccasionService = bookingOccasionService;
+        _bookingEventService = bookingEventService;
     }
 
     /// <summary>
-    /// Create a new occasion offer.
+    /// Create a new @event offer.
     /// </summary>
-    /// <param name="request">The occasion offer creation request containing necessary information.</param>
-    /// <returns>The created occasion offer object.</returns>
-    /// <response code="201">Occasion offer created successfully.</response>
+    /// <param name="request">The @event offer creation request containing necessary information.</param>
+    /// <returns>The created @event offer object.</returns>
+    /// <response code="201">Event offer created successfully.</response>
     /// <response code="400">Invalid request data.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpPost]
@@ -43,11 +43,11 @@ public class OccasionOfferController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult> Create(OccasionOfferCreationRequest request) {
+    public async Task<ActionResult> Create(EventOfferCreationRequest request) {
         try {
             var data = await _occasionOfferService.Create(request);
 
-            var resource = new Resource<OccasionOfferDto> {
+            var resource = new Resource<EventOfferDto> {
                 Data = data,
                 Links = new List<Link> {
                     new() {
@@ -74,30 +74,30 @@ public class OccasionOfferController : ControllerBase {
             return BadRequest(ex.Message);
         }
         catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while creating the occasion offer.");
+            _logger.LogError(ex, "An error occurred while creating the @event offer.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
 
 
     /// <summary>
-    /// Retrieve a occasion offer by its ID.
+    /// Retrieve a @event offer by its ID.
     /// </summary>
-    /// <param name="id">The ID of the occasion offer.</param>
-    /// <returns>The occasion offer object.</returns>
-    /// <response code="200">Occasion offer found and returned.</response>
-    /// <response code="404">Occasion offer not found.</response>
+    /// <param name="id">The ID of the @event offer.</param>
+    /// <returns>The @event offer object.</returns>
+    /// <response code="200">Event offer found and returned.</response>
+    /// <response code="404">Event offer not found.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<OccasionOfferDto>>> GetById(Guid id) {
+    public async Task<ActionResult<Resource<EventOfferDto>>> GetById(Guid id) {
         try {
             var occasionOffer = await _occasionOfferService.GetById(id);
-            if (occasionOffer == null) return NotFound($"Occasion offer with ID {id} not found.");
+            if (occasionOffer == null) return NotFound($"Event offer with ID {id} not found.");
 
-            var resource = new Resource<OccasionOfferDto> {
+            var resource = new Resource<EventOfferDto> {
                 Data = occasionOffer,
                 Links = new List<Link> {
                     new() {
@@ -124,30 +124,30 @@ public class OccasionOfferController : ControllerBase {
             return NotFound(ex.Message);
         }
         catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while retrieving the occasion offer.");
+            _logger.LogError(ex, "An error occurred while retrieving the @event offer.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
 
     /// <summary>
-    /// Retrieve occasion offers for the connected user.
+    /// Retrieve @event offers for the connected user.
     /// </summary>
-    /// <returns>A list of occasion offers associated with the connected user.</returns>
-    /// <response code="200">Occasion offers retrieved successfully.</response>
+    /// <returns>A list of @event offers associated with the connected user.</returns>
+    /// <response code="200">Event offers retrieved successfully.</response>
     /// <response code="401">User not authenticated.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpGet("my-offers")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<IEnumerable<Resource<OccasionOfferDto>>>>> GetOffersForConnectedUser() {
+    public async Task<ActionResult<Resource<IEnumerable<Resource<EventOfferDto>>>>> GetOffersForConnectedUser() {
         try {
             var connectedUser = _security.GetCurrentUser();
             if (connectedUser == null) return Unauthorized("User not authenticated");
 
-            var occasionOffers = await _occasionOfferService.GetOccasionsByUserId(connectedUser.UserId);
+            var occasionOffers = await _occasionOfferService.GetEventsByUserId(connectedUser.UserId);
 
-            var resources = occasionOffers.Select(offer => new Resource<OccasionOfferDto> {
+            var resources = occasionOffers.Select(offer => new Resource<EventOfferDto> {
                 Data = offer,
                 Links = new List<Link> {
                     new() {
@@ -168,7 +168,7 @@ public class OccasionOfferController : ControllerBase {
                 }
             });
 
-            var resourceCollection = new Resource<IEnumerable<Resource<OccasionOfferDto>>> {
+            var resourceCollection = new Resource<IEnumerable<Resource<EventOfferDto>>> {
                 Data = resources,
                 Links = new List<Link> {
                     new() {
@@ -182,29 +182,29 @@ public class OccasionOfferController : ControllerBase {
             return Ok(resourceCollection);
         }
         catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while retrieving occasion offers for the connected user.");
+            _logger.LogError(ex, "An error occurred while retrieving @event offers for the connected user.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
 
     /// <summary>
-    /// Update an existing occasion offer.
+    /// Update an existing @event offer.
     /// </summary>
-    /// <param name="id">The ID of the occasion offer to update.</param>
-    /// <param name="request">The occasion offer update request.</param>
-    /// <returns>The updated occasion offer object.</returns>
-    /// <response code="200">Occasion offer updated successfully.</response>
+    /// <param name="id">The ID of the @event offer to update.</param>
+    /// <param name="request">The @event offer update request.</param>
+    /// <returns>The updated @event offer object.</returns>
+    /// <response code="200">Event offer updated successfully.</response>
     /// <response code="400">Invalid request data.</response>
-    /// <response code="404">Occasion offer not found.</response>
+    /// <response code="404">Event offer not found.</response>
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<Resource<OccasionOfferDto>>> Update(Guid id, OccasionOfferUpdateRequest request) {
+    public async Task<ActionResult<Resource<EventOfferDto>>> Update(Guid id, EventOfferUpdateRequest request) {
         try {
             var updatedOffer = await _occasionOfferService.Update(id, request);
 
-            var resource = new Resource<OccasionOfferDto> {
+            var resource = new Resource<EventOfferDto> {
                 Data = updatedOffer,
                 Links = new List<Link> {
                     new() {
@@ -231,12 +231,12 @@ public class OccasionOfferController : ControllerBase {
     }
 
     /// <summary>
-    /// Remove a occasion offer by its ID.
+    /// Remove a @event offer by its ID.
     /// </summary>
-    /// <param name="id">The ID of the occasion offer to remove.</param>
+    /// <param name="id">The ID of the @event offer to remove.</param>
     /// <returns>No content if successful.</returns>
-    /// <response code="204">Occasion offer removed successfully.</response>
-    /// <response code="404">Occasion offer not found.</response>
+    /// <response code="204">Event offer removed successfully.</response>
+    /// <response code="404">Event offer not found.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -251,7 +251,7 @@ public class OccasionOfferController : ControllerBase {
             return NotFound(ex.Message);
         }
         catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while deleting the occasion offer.");
+            _logger.LogError(ex, "An error occurred while deleting the @event offer.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }
@@ -277,14 +277,14 @@ public class OccasionOfferController : ControllerBase {
             var admin = _security.GetCurrentUser();
             if (admin == null) return Unauthorized();
 
-            var bookings = await _bookingOccasionService.GetBookingsByAdminId(admin.UserId);
+            var bookings = await _bookingEventService.GetBookingsByAdminId(admin.UserId);
 
-            var bookingsWithLinks = bookings.Select(booking => new Resource<BookingOccasionDto> {
+            var bookingsWithLinks = bookings.Select(booking => new Resource<BookingEventDto> {
                 Data = booking,
                 Links = GenerateLinks(booking.Id)
             });
 
-            var resourceCollection = new Resource<IEnumerable<Resource<BookingOccasionDto>>> {
+            var resourceCollection = new Resource<IEnumerable<Resource<BookingEventDto>>> {
                 Data = bookingsWithLinks,
                 Links = new List<Link> {
                     new() {

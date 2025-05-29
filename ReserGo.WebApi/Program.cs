@@ -85,9 +85,9 @@ public class Program {
             builder.Services.AddScoped<IRestaurantDataAccess, RestaurantDataAccess>();
             builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 
-            // Occasion
-            builder.Services.AddScoped<IOccasionDataAccess, OccasionDataAccess>();
-            builder.Services.AddScoped<IOccasionService, OccasionService>();
+            // Event
+            builder.Services.AddScoped<IEventDataAccess, EventDataAccess>();
+            builder.Services.AddScoped<IEventService, EventService>();
 
             //Image
             builder.Services.AddScoped<IImageService, ImageService>();
@@ -100,9 +100,9 @@ public class Program {
             builder.Services.AddScoped<IRestaurantOfferDataAccess, RestaurantOfferDataAccess>();
             builder.Services.AddScoped<IRestaurantOfferService, RestaurantOfferService>();
 
-            // Occasion Offer
-            builder.Services.AddScoped<IOccasionOfferDataAccess, OccasionOfferDataAccess>();
-            builder.Services.AddScoped<IOccasionOfferService, OccasionOfferService>();
+            // Event Offer
+            builder.Services.AddScoped<IEventOfferDataAccess, EventOfferDataAccess>();
+            builder.Services.AddScoped<IEventOfferService, EventOfferService>();
 
             // Notification
             builder.Services.AddScoped<INotificationDataAccess, NotificationDataAccess>();
@@ -116,9 +116,9 @@ public class Program {
             builder.Services.AddScoped<IBookingRestaurantDataAccess, BookingRestaurantDataAccess>();
             builder.Services.AddScoped<IBookingRestaurantService, BookingRestaurantService>();
 
-            // Booking Occasion
-            builder.Services.AddScoped<IBookingOccasionDataAccess, BookingOccasionDataAccess>();
-            builder.Services.AddScoped<IBookingOccasionService, BookingOccasionService>();
+            // Booking Event
+            builder.Services.AddScoped<IBookingEventDataAccess, BookingEventDataAccess>();
+            builder.Services.AddScoped<IBookingEventService, BookingEventService>();
 
             // Metrics
             builder.Services.AddScoped<IMetricsDataAccess, MetricsDataAccess>();
