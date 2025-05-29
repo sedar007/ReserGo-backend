@@ -1,4 +1,5 @@
 using ReserGo.Common.Entity;
+using ReserGo.Common.Requests.Products.Hotel;
 
 namespace ReserGo.DataAccess.Interfaces;
 
@@ -13,4 +14,7 @@ public interface IRoomAvailabilityDataAccess {
 
     Task<IEnumerable<RoomAvailability>> GetAvailabilitiesByHotelIds(IEnumerable<Guid> hotelIds, int skip,
         int take);
+
+    Task<IEnumerable<RoomAvailability?>> GetAvailability(HotelSearchAvailabilityRequest request);
+
 }

@@ -63,12 +63,13 @@ public class HotelService : IHotelService {
 
             newHotel = await _hotelDataAccess.Create(newHotel);
 
+            var random = new Random();
             // Create Rooms
             var rooms = new List<Room>();
             for (var i = 1; i <= request.NbRoomsVip; i++)
                 rooms.Add(new Room {
                     RoomNumber = $"VIP-{i}",
-                    Capacity = 2,
+                    Capacity = random.Next(2, 5),
                     PricePerNight = request.PriceVip,
                     IsAvailable = true,
                     HotelId = newHotel.Id
@@ -77,7 +78,7 @@ public class HotelService : IHotelService {
             for (var i = 1; i <= request.NbRoomsStandard; i++)
                 rooms.Add(new Room {
                     RoomNumber = $"STD-{i}",
-                    Capacity = 2,
+                    Capacity = random.Next(1, 4),
                     PricePerNight = request.PriceStandard,
                     IsAvailable = true,
                     HotelId = newHotel.Id

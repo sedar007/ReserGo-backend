@@ -5,12 +5,13 @@ using ReserGo.Common.Requests.Products.Hotel.Rooms;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.Shared.Interfaces;
 using ReserGo.Common.Models;
+using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.Common.Response;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
 [ApiController]
 [Tags("Hotel | Rooms")]
-[AdminOnly]
 [Route("api/administration/hotels")]
 public class RoomController : ControllerBase {
     private readonly ILogger<RoomController> _logger;
@@ -34,6 +35,7 @@ public class RoomController : ControllerBase {
     /// <response code="201">Room created successfully.</response>
     /// <response code="400">Invalid request data.</response>
     /// <response code="500">An unexpected error occurred.</response>
+    [AdminOnly]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -77,6 +79,7 @@ public class RoomController : ControllerBase {
     /// <response code="200">Room found and returned.</response>
     /// <response code="404">Room not found.</response>
     /// <response code="500">An unexpected error occurred.</response>
+    [AdminOnly]
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -121,6 +124,7 @@ public class RoomController : ControllerBase {
     /// <response code="200">Rooms retrieved successfully.</response>
     /// <response code="401">User not authenticated.</response>
     /// <response code="500">An unexpected error occurred.</response>
+    [AdminOnly]
     [HttpGet("{hotelId}/rooms")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -161,6 +165,7 @@ public class RoomController : ControllerBase {
     /// <response code="200">Room updated successfully.</response>
     /// <response code="400">Invalid request data.</response>
     /// <response code="404">Room not found.</response>
+    [AdminOnly]
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -198,6 +203,7 @@ public class RoomController : ControllerBase {
     /// <response code="204">Room removed successfully.</response>
     /// <response code="404">Room not found.</response>
     /// <response code="500">An unexpected error occurred.</response>
+    [AdminOnly]
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -226,6 +232,7 @@ public class RoomController : ControllerBase {
     /// <response code="400">Invalid request data or validation error.</response>
     /// <response code="401">User not authenticated.</response>
     /// <response code="500">An unexpected error occurred.</response>
+    [AdminOnly]
     [HttpPost("{roomId}/availability")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -270,6 +277,7 @@ public class RoomController : ControllerBase {
     /// <returns>A list of room availabilities ordered by the most recent dates.</returns>
     /// <response code="200">Availabilities retrieved successfully.</response>
     /// <response code="500">An unexpected error occurred.</response>
+    [AdminOnly]
     [HttpGet("{hotelId}/rooms/availabilities")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -310,6 +318,7 @@ public class RoomController : ControllerBase {
     /// <response code="200">Availabilities retrieved successfully.</response>
     /// <response code="401">User not authenticated.</response>
     /// <response code="500">An unexpected error occurred.</response>
+    [AdminOnly]
     [HttpGet("rooms/availabilities")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -339,6 +348,47 @@ public class RoomController : ControllerBase {
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving availabilities for all hotels.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+        }
+    }
+    
+    
+    /// <summary>
+    /// Searches for room availability based on the provided criteria.
+    /// </summary>
+    /// <param name="hotelSearchAvailabilityRequest">The search criteria including arrival date and return date.</param>
+    /// <returns>
+    /// - **200 OK**: If availability is found.
+    /// - **400 Bad Request**: If the request is invalid.
+    /// - **500 Internal Server Error**: If an unexpected error occurs.
+    /// </returns>
+    /// <response code="200">Availability found and returned.</response>
+    /// <response code="400">Invalid search criteria.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("search-availability")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    public async Task<IActionResult> SearchAvailability([FromQuery] HotelSearchAvailabilityRequest hotelSearchAvailabilityRequest)
+    {
+        try {
+            var availability = await _roomAvailabilityService.SearchAvailability(hotelSearchAvailabilityRequest);
+    
+            return Ok(availability.Select(a => new Resource<RoomAvailibilityHotelResponse> {
+                Data = a,
+                Links = new List<Link> {
+                    new() {
+                        Href = Url.Action(nameof(SearchAvailability), new {
+                            hotelSearchAvailabilityRequest.ArrivalDate,
+                            hotelSearchAvailabilityRequest.ReturnDate
+                        }),
+                        Rel = "self",
+                        Method = "GET"
+                    }
+                }
+            }));
+        } catch (Exception e) {
+            _logger.LogError(e, "An error occurred while searching for availability.");
+            return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
 }

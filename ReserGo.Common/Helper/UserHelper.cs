@@ -1,15 +1,15 @@
 using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
-
+using System.Globalization;
 namespace ReserGo.Common.Helper;
 
 public static class UserHelper {
     public static UserDto ToDto(this User user) {
         return new UserDto {
             Id = user.Id,
-            FirstName = user.FirstName,
-            LastName = user.LastName,
-            Username = user.Username,
+            FirstName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.FirstName.ToLower()),
+            LastName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.LastName.ToLower()),
+            Username = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(user.Username.ToLower()),
             Email = user.Email,
             PhoneNumber = user.PhoneNumber,
             Bio = user.Bio,

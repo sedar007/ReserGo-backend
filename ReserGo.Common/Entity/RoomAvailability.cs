@@ -9,4 +9,7 @@ public class RoomAvailability {
 
     public virtual Room Room { get; set; } = null!;
     public virtual Hotel Hotel { get; set; } = null!;
+    
+    public ICollection<BookingHotel> BookingsHotels { get; set; } = new List<BookingHotel>();
+
 }

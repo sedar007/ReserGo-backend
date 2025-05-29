@@ -7,6 +7,7 @@ using ReserGo.Common.Security;
 using ReserGo.Tiers.Interfaces;
 using ReserGo.Tiers.Responses;
 using ReserGo.Common.Enum;
+using ReserGo.Common.Helper;
 
 namespace ReserGo.Business.Implementations;
 
@@ -49,10 +50,10 @@ public class GoogleService : IGoogleService {
                 Role = UserRole.Admin
             });
         }
-
+    
         var jwtToken = _security.GenerateJwtToken(user.Username, user.Id, user.Role);
         _logger.LogInformation("Google Auth successful for email: {Email}, User ID: {UserId}", response.Email, user.Id);
 
-        return new AuthenticateResponse(user, jwtToken, user.Role);
+        return new AuthenticateResponse(user.ToDto(), jwtToken, user.Role);
     }
 }

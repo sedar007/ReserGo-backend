@@ -12,8 +12,10 @@ using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared;
 using ReserGo.Common.Requests.Products.Hotel.Rooms;
 using ReserGo.Common.Security;
-
+using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.Common.Response;
 namespace ReserGo.Business.Implementations;
+
 
 public class RoomAvailabilityService : IRoomAvailabilityService {
     private readonly ILogger<UserService> _logger;
@@ -21,14 +23,17 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
     private readonly IRoomDataAccess _roomDataAccess;
     private readonly IRoomAvailabilityDataAccess _availabilityDataAccess;
     private readonly IHotelService _hotelService;
+    private readonly IImageService _imageService;
     // private readonly IMemoryCache _cache;
 
     public RoomAvailabilityService(ILogger<UserService> logger, IRoomDataAccess roomDataAccess,
-        IRoomAvailabilityDataAccess availabilityDataAccess, IHotelService hotelService, IMemoryCache cache) {
+        IRoomAvailabilityDataAccess availabilityDataAccess, IHotelService hotelService, IMemoryCache cache,
+        IImageService imageService) {
         _logger = logger;
         _roomDataAccess = roomDataAccess;
         _availabilityDataAccess = availabilityDataAccess;
         _hotelService = hotelService;
+        _imageService = imageService;
         // _cache = cache;
     }
 
@@ -219,6 +224,37 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving availabilities for UserId: {UserId}",
                 connectedUser.UserId);
+            throw;
+        }
+    }
+    
+
+    public async Task<IEnumerable<RoomAvailibilityHotelResponse>> SearchAvailability(HotelSearchAvailabilityRequest request) {
+        try {
+            var result = await _availabilityDataAccess.GetAvailability(request);
+            if (result == null || !result.Any()) {
+                _logger.LogWarning("No availabilities found for the given search criteria.");
+                return new List<RoomAvailibilityHotelResponse>();
+            }
+
+            var resultList = result.ToList();
+
+            var availableRooms = resultList
+                .Where(a => a.BookingsHotels.All(b => b.EndDate <= request.ArrivalDate || b.StartDate >= request.ReturnDate))
+                .Select(async a => new RoomAvailibilityHotelResponse {
+                    RoomId = a.RoomId,
+                    HotelId = a.HotelId,
+                    PricePerNightPerPerson = a.Room.PricePerNight,
+                    HotelName = a.Hotel.Name,
+                    RoomName = a.Room.RoomNumber,
+                    NumberOfGuests = a.Room.Capacity,
+                    ImageSrc = await _imageService.GetPicture(a.Hotel.Picture ?? " ")
+                });
+
+            return await Task.WhenAll(availableRooms);
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while searching availability.");
             throw;
         }
     }

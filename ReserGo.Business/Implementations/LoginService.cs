@@ -64,10 +64,10 @@ public class LoginService : ILoginService {
         return new AuthenticateResponse(user, _security.GenerateJwtToken(user.Username, user.Id, user.Role), user.Role);
     }
 
-    private async Task<User?> GetUser(LoginRequest request) {
+    private async Task<UserDto?> GetUser(LoginRequest request) {
         if (Utils.CheckMail(request.Login))
-            return await _userDataAccess.GetByEmail(request.Login);
-        return await _userDataAccess.GetByUsername(request.Login);
+            return (await _userDataAccess.GetByEmail(request.Login))?.ToDto();
+        return (await _userDataAccess.GetByUsername(request.Login))?.ToDto();
     }
 
     public async Task<LoginDto?> Create(string password, User user) {
