@@ -114,7 +114,7 @@ public class MetricsController : ControllerBase {
     }
     
     /// <summary>
-    /// Get the monthly bookings grouped by category (Hotel, Restaurant, Occasion).
+    /// Get the monthly bookings grouped by category (Hotel, Restaurant, Event).
     /// </summary>
     /// <returns>
     /// A dictionary where each key is a category and the value is another dictionary containing months and booking counts.

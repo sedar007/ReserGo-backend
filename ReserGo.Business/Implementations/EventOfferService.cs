@@ -1,0 +1,177 @@
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
+using ReserGo.Business.Interfaces;
+using ReserGo.Business.Validator;
+using ReserGo.Common.DTO;
+using ReserGo.Common.Entity;
+using ReserGo.Common.Helper;
+using ReserGo.Common.Requests.Products;
+using ReserGo.Common.Requests.Products.Event;
+using ReserGo.Common.Security;
+using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared.Interfaces;
+using ReserGo.Shared;
+
+namespace ReserGo.Business.Implementations;
+
+public class EventOfferService : IEventOfferService {
+    private readonly ILogger<UserService> _logger;
+    private readonly ISecurity _security;
+    private readonly IImageService _imageService;
+    private readonly IEventService _occasionService;
+    private readonly IEventOfferDataAccess _occasionOfferDataAccess;
+    private readonly IMemoryCache _cache;
+
+    public EventOfferService(ILogger<UserService> logger, IEventOfferDataAccess occasionOfferDataAccess,
+        IEventService occasionService, ISecurity security, IImageService imageService, IMemoryCache cache) {
+        _logger = logger;
+        _security = security;
+        _imageService = imageService;
+        _occasionOfferDataAccess = occasionOfferDataAccess;
+        _occasionService = occasionService;
+        _cache = cache;
+    }
+
+    public async Task<EventOfferDto> Create(EventOfferCreationRequest request) {
+        try {
+            var error = EventOfferValidator.GetError(request);
+            if (string.IsNullOrEmpty(error) == false) {
+                _logger.LogError(error);
+                throw new InvalidDataException(error);
+            }
+
+            var connectedUser = _security.GetCurrentUser();
+            if (connectedUser == null) throw new UnauthorizedAccessException("User not connected");
+
+            var occasion = await _occasionService.GetById(request.EventId);
+            if (occasion == null) {
+                var errorMessage = "Event not found";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+
+            var newEventOffer = new EventOffer {
+                Description = request.Description,
+                PricePerPerson = request.PricePerPerson,
+                GuestLimit = request.GuestLimit,
+                OfferStartDate = request.OfferStartDate,
+                OfferEndDate = request.OfferEndDate,
+                IsActive = request.IsActive,
+                EventId = occasion.Id,
+                UserId = connectedUser.UserId
+            };
+
+            newEventOffer = await _occasionOfferDataAccess.Create(newEventOffer);
+
+            // Cache the created @event offer
+            _cache.Set($"newEventOffer_{newEventOffer.Id}", newEventOffer,
+                TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+
+            _logger.LogInformation("Event Offer { id } created", newEventOffer.Id);
+            return newEventOffer.ToDto();
+        }
+        catch (Exception e) {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
+
+    public async Task<EventOfferDto?> GetById(Guid id) {
+        try {
+            if (_cache.TryGetValue($"occasionOffer_{id}", out EventOffer cachedEventOffer))
+                return cachedEventOffer.ToDto();
+
+            var occasionOffer = await _occasionOfferDataAccess.GetById(id);
+            if (occasionOffer is null) {
+                var errorMessage = "This @event offer does not exist.";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+
+            _cache.Set($"occasionOffer_{id}", occasionOffer, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+
+            _logger.LogInformation("Event Offer { id } retrieved successfully", occasionOffer.Id);
+            return occasionOffer.ToDto();
+        }
+        catch (Exception e) {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
+
+    public async Task<IEnumerable<EventOfferDto>> GetEventsByUserId(Guid userId) {
+        try {
+            var cacheKey = $"occasionOffers_user_{userId}";
+
+            if (_cache.TryGetValue(cacheKey, out IEnumerable<EventOfferDto> cachedEventOffers))
+                return cachedEventOffers;
+
+            var occasionOffers = await _occasionOfferDataAccess.GetEventsOfferByUserId(userId);
+            IEnumerable<EventOfferDto> occasionOfferDtos =
+                occasionOffers.Select(occasionOffer => occasionOffer.ToDto());
+
+            _cache.Set(cacheKey, occasionOfferDtos, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+
+            return occasionOfferDtos;
+        }
+        catch (Exception e) {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
+
+    public async Task<EventOfferDto> Update(Guid id, EventOfferUpdateRequest request) {
+        try {
+            var occasionOffer = await _occasionOfferDataAccess.GetById(id);
+            if (occasionOffer is null) throw new Exception("Event offer not found");
+
+            var error = EventOfferValidator.GetError(request);
+            if (string.IsNullOrEmpty(error) == false) {
+                _logger.LogError(error);
+                throw new InvalidDataException(error);
+            }
+
+            occasionOffer.Description = request.Description;
+            occasionOffer.PricePerPerson = request.PricePerPerson;
+            occasionOffer.GuestLimit = request.GuestLimit;
+            occasionOffer.OfferStartDate = request.OfferStartDate;
+            occasionOffer.OfferEndDate = request.OfferEndDate;
+            occasionOffer.IsActive = request.IsActive;
+
+            occasionOffer = await _occasionOfferDataAccess.Update(occasionOffer);
+
+            // Update cache
+            _cache.Set($"occasion_offer_{occasionOffer.Id}", occasionOffer,
+                TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+
+            _logger.LogInformation("Event Offer { stayId } updated successfully", occasionOffer.Id);
+            return occasionOffer.ToDto();
+        }
+        catch (Exception e) {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
+
+    public async Task Delete(Guid id) {
+        try {
+            var occasionOffer = await _occasionOfferDataAccess.GetById(id);
+            if (occasionOffer is null) {
+                var errorMessage = "Event offer not found";
+                _logger.LogError(errorMessage);
+                throw new InvalidDataException(errorMessage);
+            }
+
+            await _occasionOfferDataAccess.Delete(occasionOffer);
+
+            // Remove from cache
+            _cache.Remove($"occasion_offer_{occasionOffer.Id}");
+
+            _logger.LogInformation("Event Offer { id } deleted successfully", occasionOffer.Id);
+        }
+        catch (Exception e) {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
+}

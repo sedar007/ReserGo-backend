@@ -38,18 +38,18 @@ public static class BookingHelper {
         };
     }
 
-    public static BookingOccasionDto ToDto(this BookingOccasion bookingOccasion) {
-        return new BookingOccasionDto {
-            Id = bookingOccasion.Id,
-            UserId = bookingOccasion.UserId,
-            Price = bookingOccasion.Price,
-            NumberOfGuests = bookingOccasion.NumberOfGuests,
-            IsConfirmed = bookingOccasion.IsConfirmed,
-            BookingDate = bookingOccasion.BookingDate,
-            OccasionId = bookingOccasion.OccasionId,
-            StartDate = bookingOccasion.StartDate,
-            EndDate = bookingOccasion.EndDate,
-            Occasion = bookingOccasion?.Occasion?.ToDto()
+    public static BookingEventDto ToDto(this BookingEvent bookingEvent) {
+        return new BookingEventDto {
+            Id = bookingEvent.Id,
+            UserId = bookingEvent.UserId,
+            Price = bookingEvent.Price,
+            NumberOfGuests = bookingEvent.NumberOfGuests,
+            IsConfirmed = bookingEvent.IsConfirmed,
+            BookingDate = bookingEvent.BookingDate,
+            EventId = bookingEvent.EventId,
+            StartDate = bookingEvent.StartDate,
+            EndDate = bookingEvent.EndDate,
+            Event = bookingEvent?.Event?.ToDto()
         };
     }
 }

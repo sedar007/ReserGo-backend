@@ -12,15 +12,15 @@ public class ReserGoContext : DbContext {
     public DbSet<Hotel> Hotel { get; set; }
     public DbSet<Room> Room { get; set; }
     public DbSet<RoomAvailability> RoomAvailability { get; set; }
-    public DbSet<Occasion> Occasion { get; set; }
+    public DbSet<Event> Event { get; set; }
     public DbSet<Restaurant> Restaurant { get; set; }
     public DbSet<HotelOffer> HotelOffer { get; set; }
     public DbSet<RestaurantOffer> RestaurantOffer { get; set; }
-    public DbSet<OccasionOffer> OccasionOffer { get; set; }
+    public DbSet<EventOffer> EventOffer { get; set; }
     public DbSet<Notification> Notifications { get; set; }
 
     public DbSet<BookingHotel> BookingHotel { get; set; }
-    public DbSet<BookingOccasion> BookingOccasion { get; set; }
+    public DbSet<BookingEvent> BookingEvent { get; set; }
     public DbSet<BookingRestaurant> BookingRestaurant { get; set; }
     public DbSet<Address> Addresses { get; set; }
 
@@ -56,7 +56,7 @@ public class ReserGoContext : DbContext {
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<User>()
-            .HasMany(u => u.BookingsOccasion)
+            .HasMany(u => u.BookingsEvent)
             .WithOne(w => w.User)
             .HasForeignKey(w => w.UserId)
             .OnDelete(DeleteBehavior.Cascade);
@@ -83,7 +83,7 @@ public class ReserGoContext : DbContext {
 
         // Config relation User-Events
         modelBuilder.Entity<User>()
-            .HasMany(u => u.Occasions)
+            .HasMany(u => u.Events)
             .WithOne(r => r.User)
             .HasForeignKey(r => r.UserId)
             .OnDelete(DeleteBehavior.Cascade);
@@ -109,9 +109,9 @@ public class ReserGoContext : DbContext {
             .HasForeignKey(ro => ro.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // Config relation User-OccasionOffer
+        // Config relation User-EventOffer
         modelBuilder.Entity<User>()
-            .HasMany(u => u.OccasionOffers)
+            .HasMany(u => u.EventOffers)
             .WithOne(oo => oo.User)
             .HasForeignKey(oo => oo.UserId)
             .OnDelete(DeleteBehavior.Cascade);
@@ -150,9 +150,9 @@ public class ReserGoContext : DbContext {
             .IsUnique();
 
 
-        modelBuilder.Entity<Occasion>()
+        modelBuilder.Entity<Event>()
             .HasKey(o => o.Id);
-        modelBuilder.Entity<Occasion>()
+        modelBuilder.Entity<Event>()
             .HasIndex(o => o.StayId)
             .IsUnique();
 
@@ -196,28 +196,28 @@ public class ReserGoContext : DbContext {
         modelBuilder.Entity<Address>()
             .HasKey(a => a.Id);
 
-        // Config OccasionOffer
-        modelBuilder.Entity<OccasionOffer>()
+        // Config EventOffer
+        modelBuilder.Entity<EventOffer>()
             .HasKey(oo => oo.Id);
-        modelBuilder.Entity<OccasionOffer>()
-            .HasOne(oo => oo.Occasion)
-            .WithMany(o => o.OccasionOffers)
-            .HasForeignKey(oo => oo.OccasionId)
+        modelBuilder.Entity<EventOffer>()
+            .HasOne(oo => oo.Event)
+            .WithMany(o => o.EventOffers)
+            .HasForeignKey(oo => oo.EventId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        // BookingOccasion
-        modelBuilder.Entity<BookingOccasion>()
+        // BookingEvent
+        modelBuilder.Entity<BookingEvent>()
             .HasKey(b => b.Id);
 
-        modelBuilder.Entity<BookingOccasion>()
+        modelBuilder.Entity<BookingEvent>()
             .HasOne(b => b.User)
-            .WithMany(u => u.BookingsOccasion)
+            .WithMany(u => u.BookingsEvent)
             .HasForeignKey(b => b.UserId);
 
-        modelBuilder.Entity<BookingOccasion>()
-            .HasOne(b => b.Occasion)
-            .WithMany(h => h.BookingsOccasion)
-            .HasForeignKey(b => b.OccasionId);
+        modelBuilder.Entity<BookingEvent>()
+            .HasOne(b => b.Event)
+            .WithMany(h => h.BookingsEvent)
+            .HasForeignKey(b => b.EventId);
 
         // BookingRestaurant
         modelBuilder.Entity<BookingRestaurant>()
