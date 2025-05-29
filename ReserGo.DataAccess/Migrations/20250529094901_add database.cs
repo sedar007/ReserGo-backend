@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ReserGo.DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class addDatabase : Migration
+    public partial class adddatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -48,6 +48,30 @@ namespace ReserGo.DataAccess.Migrations
                     table.PrimaryKey("PK_Addresses", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Addresses_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Event",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    StayId = table.Column<long>(type: "bigint", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Location = table.Column<string>(type: "text", nullable: false),
+                    Capacity = table.Column<int>(type: "integer", nullable: false),
+                    Picture = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LastUpdated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Event", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Event_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -127,30 +151,6 @@ namespace ReserGo.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Occasion",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    StayId = table.Column<long>(type: "bigint", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    Location = table.Column<string>(type: "text", nullable: false),
-                    Capacity = table.Column<int>(type: "integer", nullable: false),
-                    Picture = table.Column<string>(type: "text", nullable: true),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastUpdated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Occasion", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Occasion_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Restaurant",
                 columns: table => new
                 {
@@ -169,6 +169,68 @@ namespace ReserGo.DataAccess.Migrations
                     table.PrimaryKey("PK_Restaurant", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Restaurant_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BookingEvent",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    EventId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Price = table.Column<double>(type: "double precision", nullable: true),
+                    BookingDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    NumberOfGuests = table.Column<int>(type: "integer", nullable: false),
+                    IsConfirmed = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookingEvent", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BookingEvent_Event_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Event",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BookingEvent_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "EventOffer",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    PricePerPerson = table.Column<double>(type: "double precision", nullable: false),
+                    GuestLimit = table.Column<int>(type: "integer", nullable: false),
+                    OfferStartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    OfferEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
+                    EventId = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EventOffer", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_EventOffer_Event_EventId",
+                        column: x => x.EventId,
+                        principalTable: "Event",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_EventOffer_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
@@ -231,67 +293,6 @@ namespace ReserGo.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BookingOccasion",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    OccasionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    BookingDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
-                    VipAccess = table.Column<bool>(type: "boolean", nullable: false),
-                    LastUpdated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BookingOccasion", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_BookingOccasion_Occasion_OccasionId",
-                        column: x => x.OccasionId,
-                        principalTable: "Occasion",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_BookingOccasion_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OccasionOffer",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    OfferTitle = table.Column<string>(type: "text", nullable: false),
-                    Description = table.Column<string>(type: "text", nullable: false),
-                    Price = table.Column<double>(type: "double precision", nullable: false),
-                    NumberOfGuests = table.Column<int>(type: "integer", nullable: false),
-                    OfferStartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    OfferEndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    OccasionId = table.Column<Guid>(type: "uuid", nullable: false),
-                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OccasionOffer", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OccasionOffer_Occasion_OccasionId",
-                        column: x => x.OccasionId,
-                        principalTable: "Occasion",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OccasionOffer_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RestaurantOffer",
                 columns: table => new
                 {
@@ -333,10 +334,10 @@ namespace ReserGo.DataAccess.Migrations
                     EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     HotelOfferId = table.Column<Guid>(type: "uuid", nullable: true),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    BookingDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Price = table.Column<double>(type: "double precision", nullable: true),
+                    BookingDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     NumberOfGuests = table.Column<int>(type: "integer", nullable: false),
-                    IsConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    IsConfirmed = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -399,12 +400,14 @@ namespace ReserGo.DataAccess.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     RestaurantOfferId = table.Column<Guid>(type: "uuid", nullable: false),
-                    RestaurantId = table.Column<Guid>(type: "uuid", nullable: true),
+                    RestaurantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StartDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    EndDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    BookingDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Price = table.Column<double>(type: "double precision", nullable: true),
+                    BookingDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     NumberOfGuests = table.Column<int>(type: "integer", nullable: false),
-                    IsConfirmed = table.Column<bool>(type: "boolean", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    IsConfirmed = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -419,7 +422,8 @@ namespace ReserGo.DataAccess.Migrations
                         name: "FK_BookingRestaurant_Restaurant_RestaurantId",
                         column: x => x.RestaurantId,
                         principalTable: "Restaurant",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_BookingRestaurant_Users_UserId",
                         column: x => x.UserId,
@@ -433,6 +437,16 @@ namespace ReserGo.DataAccess.Migrations
                 table: "Addresses",
                 column: "UserId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BookingEvent_EventId",
+                table: "BookingEvent",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BookingEvent_UserId",
+                table: "BookingEvent",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BookingHotel_HotelId",
@@ -455,16 +469,6 @@ namespace ReserGo.DataAccess.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BookingOccasion_OccasionId",
-                table: "BookingOccasion",
-                column: "OccasionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_BookingOccasion_UserId",
-                table: "BookingOccasion",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_BookingRestaurant_RestaurantId",
                 table: "BookingRestaurant",
                 column: "RestaurantId");
@@ -477,6 +481,27 @@ namespace ReserGo.DataAccess.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_BookingRestaurant_UserId",
                 table: "BookingRestaurant",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Event_StayId",
+                table: "Event",
+                column: "StayId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Event_UserId",
+                table: "Event",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventOffer_EventId",
+                table: "EventOffer",
+                column: "EventId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_EventOffer_UserId",
+                table: "EventOffer",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -509,27 +534,6 @@ namespace ReserGo.DataAccess.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Notifications_UserId",
                 table: "Notifications",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Occasion_StayId",
-                table: "Occasion",
-                column: "StayId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Occasion_UserId",
-                table: "Occasion",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OccasionOffer_OccasionId",
-                table: "OccasionOffer",
-                column: "OccasionId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OccasionOffer_UserId",
-                table: "OccasionOffer",
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
@@ -578,22 +582,22 @@ namespace ReserGo.DataAccess.Migrations
                 name: "Addresses");
 
             migrationBuilder.DropTable(
+                name: "BookingEvent");
+
+            migrationBuilder.DropTable(
                 name: "BookingHotel");
 
             migrationBuilder.DropTable(
-                name: "BookingOccasion");
+                name: "BookingRestaurant");
 
             migrationBuilder.DropTable(
-                name: "BookingRestaurant");
+                name: "EventOffer");
 
             migrationBuilder.DropTable(
                 name: "Login");
 
             migrationBuilder.DropTable(
                 name: "Notifications");
-
-            migrationBuilder.DropTable(
-                name: "OccasionOffer");
 
             migrationBuilder.DropTable(
                 name: "RoomAvailability");
@@ -605,7 +609,7 @@ namespace ReserGo.DataAccess.Migrations
                 name: "RestaurantOffer");
 
             migrationBuilder.DropTable(
-                name: "Occasion");
+                name: "Event");
 
             migrationBuilder.DropTable(
                 name: "Room");
