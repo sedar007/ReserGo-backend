@@ -13,7 +13,9 @@ using ReserGo.Shared;
 using ReserGo.Common.Requests.Products.Hotel.Rooms;
 using ReserGo.Common.Security;
 using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.Common.Response;
 namespace ReserGo.Business.Implementations;
+
 
 public class RoomAvailabilityService : IRoomAvailabilityService {
     private readonly ILogger<UserService> _logger;
@@ -224,20 +226,29 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
     }
     
 
-    public async Task<IEnumerable<RoomAvailabilityDto>> SearchAvailability(HotelSearchAvailabilityRequest request) {
+    public async Task<IEnumerable<RoomAvailibilityHotelResponse>> SearchAvailability(HotelSearchAvailabilityRequest request) {
         try {
             var result = await _availabilityDataAccess.GetAvailability(request);
             if (result == null || !result.Any()) {
                 _logger.LogWarning("No availabilities found for the given search criteria.");
-                return new List<RoomAvailabilityDto>();
+                return new List<RoomAvailibilityHotelResponse>();
             }
 
             var resultList = result.ToList();
 
             var availableRooms = resultList
                 .Where(a => a.BookingsHotels.All(b => b.EndDate <= request.ArrivalDate || b.StartDate >= request.ReturnDate))
-                .Select(a => a.ToDto())
+                .Select(a => new RoomAvailibilityHotelResponse {
+                    RoomId = a.RoomId,
+                    HotelId = a.HotelId,
+                    PricePerNightPerPerson = a.Room.PricePerNight,
+                    HotelName = a.Hotel.Name,
+                    RoomName = a.Room.RoomNumber,
+                    NumberOfGuests = a.Room.Capacity,
+                    ImageSrc = a.Hotel.Picture
+                })
                 .ToList();
+           
 
             return availableRooms;
         }

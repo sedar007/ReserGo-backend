@@ -6,6 +6,7 @@ using ReserGo.WebAPI.Attributes;
 using ReserGo.Shared.Interfaces;
 using ReserGo.Common.Models;
 using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.Common.Response;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
@@ -372,7 +373,7 @@ public class RoomController : ControllerBase {
         try {
             var availability = await _roomAvailabilityService.SearchAvailability(hotelSearchAvailabilityRequest);
     
-            return Ok(availability.Select(a => new Resource<RoomAvailabilityDto> {
+            return Ok(availability.Select(a => new Resource<RoomAvailibilityHotelResponse> {
                 Data = a,
                 Links = new List<Link> {
                     new() {
