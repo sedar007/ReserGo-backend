@@ -23,14 +23,17 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
     private readonly IRoomDataAccess _roomDataAccess;
     private readonly IRoomAvailabilityDataAccess _availabilityDataAccess;
     private readonly IHotelService _hotelService;
+    private readonly IImageService _imageService;
     // private readonly IMemoryCache _cache;
 
     public RoomAvailabilityService(ILogger<UserService> logger, IRoomDataAccess roomDataAccess,
-        IRoomAvailabilityDataAccess availabilityDataAccess, IHotelService hotelService, IMemoryCache cache) {
+        IRoomAvailabilityDataAccess availabilityDataAccess, IHotelService hotelService, IMemoryCache cache,
+        IImageService imageService) {
         _logger = logger;
         _roomDataAccess = roomDataAccess;
         _availabilityDataAccess = availabilityDataAccess;
         _hotelService = hotelService;
+        _imageService = imageService;
         // _cache = cache;
     }
 
@@ -238,22 +241,20 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
 
             var availableRooms = resultList
                 .Where(a => a.BookingsHotels.All(b => b.EndDate <= request.ArrivalDate || b.StartDate >= request.ReturnDate))
-                .Select(a => new RoomAvailibilityHotelResponse {
+                .Select(async a => new RoomAvailibilityHotelResponse {
                     RoomId = a.RoomId,
                     HotelId = a.HotelId,
                     PricePerNightPerPerson = a.Room.PricePerNight,
                     HotelName = a.Hotel.Name,
                     RoomName = a.Room.RoomNumber,
                     NumberOfGuests = a.Room.Capacity,
-                    ImageSrc = a.Hotel.Picture
-                })
-                .ToList();
-           
+                    ImageSrc = await _imageService.GetPicture(a.Hotel.Picture ?? " ")
+                });
 
-            return availableRooms;
+            return await Task.WhenAll(availableRooms);
         }
         catch (Exception ex) {
-            
+            _logger.LogError(ex, "An error occurred while searching availability.");
             throw;
         }
     }
