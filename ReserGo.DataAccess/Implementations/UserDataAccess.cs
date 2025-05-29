@@ -17,11 +17,11 @@ public class UserDataAccess : IUserDataAccess {
     }
 
     public async Task<User?> GetByEmail(string email) {
-        return await _context.Users.FirstOrDefaultAsync(x => x.Email == email);
+        return await _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == email.ToLower());
     }
 
     public async Task<User?> GetByUsername(string username) {
-        return await _context.Users.FirstOrDefaultAsync(x => x.Username == username);
+        return await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower() == username.ToLower());
     }
 
     public async Task<User> Create(User user) {
