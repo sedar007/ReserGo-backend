@@ -1,6 +1,7 @@
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products.Hotel.Rooms;
 using ReserGo.Common.Security;
+using ReserGo.Common.Requests.Products.Hotel;
 
 namespace ReserGo.Business.Interfaces;
 
@@ -16,4 +17,7 @@ public interface IRoomAvailabilityService {
 
 
     Task<RoomAvailabilityDto> GetAvailabilityByRoomId(Guid roomId);
+    Task<IEnumerable<RoomAvailabilityDto>> SearchAvailability(HotelSearchAvailabilityRequest request);
+
+
 }

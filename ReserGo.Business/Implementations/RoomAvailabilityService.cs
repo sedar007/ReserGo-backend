@@ -12,7 +12,7 @@ using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared;
 using ReserGo.Common.Requests.Products.Hotel.Rooms;
 using ReserGo.Common.Security;
-
+using ReserGo.Common.Requests.Products.Hotel;
 namespace ReserGo.Business.Implementations;
 
 public class RoomAvailabilityService : IRoomAvailabilityService {
@@ -219,6 +219,30 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving availabilities for UserId: {UserId}",
                 connectedUser.UserId);
+            throw;
+        }
+    }
+    
+
+    public async Task<IEnumerable<RoomAvailabilityDto>> SearchAvailability(HotelSearchAvailabilityRequest request) {
+        try {
+            var result = await _availabilityDataAccess.GetAvailability(request);
+            if (result == null || !result.Any()) {
+                _logger.LogWarning("No availabilities found for the given search criteria.");
+                return new List<RoomAvailabilityDto>();
+            }
+
+            var resultList = result.ToList();
+
+            var availableRooms = resultList
+                .Where(a => a.BookingsHotels.All(b => b.EndDate <= request.ArrivalDate || b.StartDate >= request.ReturnDate))
+                .Select(a => a.ToDto())
+                .ToList();
+
+            return availableRooms;
+        }
+        catch (Exception ex) {
+            
             throw;
         }
     }

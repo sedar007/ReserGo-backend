@@ -120,6 +120,9 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<double?>("Price")
                         .HasColumnType("double precision");
 
+                    b.Property<Guid>("RoomAvailabilityId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("RoomId")
                         .HasColumnType("uuid");
 
@@ -134,6 +137,8 @@ namespace ReserGo.DataAccess.Migrations
                     b.HasIndex("HotelId");
 
                     b.HasIndex("HotelOfferId");
+
+                    b.HasIndex("RoomAvailabilityId");
 
                     b.HasIndex("RoomId");
 
@@ -649,6 +654,12 @@ namespace ReserGo.DataAccess.Migrations
                         .WithMany("Bookings")
                         .HasForeignKey("HotelOfferId");
 
+                    b.HasOne("ReserGo.Common.Entity.RoomAvailability", "RoomAvailability")
+                        .WithMany("BookingsHotels")
+                        .HasForeignKey("RoomAvailabilityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ReserGo.Common.Entity.Room", "Room")
                         .WithMany()
                         .HasForeignKey("RoomId")
@@ -664,6 +675,8 @@ namespace ReserGo.DataAccess.Migrations
                     b.Navigation("Hotel");
 
                     b.Navigation("Room");
+
+                    b.Navigation("RoomAvailability");
 
                     b.Navigation("User");
                 });
@@ -868,6 +881,11 @@ namespace ReserGo.DataAccess.Migrations
             modelBuilder.Entity("ReserGo.Common.Entity.RestaurantOffer", b =>
                 {
                     b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("ReserGo.Common.Entity.RoomAvailability", b =>
+                {
+                    b.Navigation("BookingsHotels");
                 });
 
             modelBuilder.Entity("ReserGo.Common.Entity.User", b =>

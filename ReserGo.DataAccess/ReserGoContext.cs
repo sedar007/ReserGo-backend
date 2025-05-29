@@ -277,5 +277,11 @@ public class ReserGoContext : DbContext {
             .HasIndex(ra => new
                 { ra.RoomId, ra.StartDate, ra.EndDate }) // Index pour éviter les conflits de disponibilité
             .IsUnique();
+        
+        modelBuilder.Entity<RoomAvailability>()
+            .HasMany(ra => ra.BookingsHotels)
+            .WithOne(bh => bh.RoomAvailability)
+            .HasForeignKey(bh => bh.RoomAvailabilityId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
