@@ -5,6 +5,7 @@ using ReserGo.Common.Models;
 using ReserGo.Common.Requests.User;
 using ReserGo.Common.Enum;
 using ReserGo.Shared.Interfaces;
+using ReserGo.Shared;
 
 namespace ReserGo.WebAPI.Controllers.Helper;
 
@@ -95,6 +96,7 @@ public static class UserControllerHelper {
         try {
             ValidateUserAccess(userId, security);
             await userService.Delete(userId);
+            controller.Response.Cookies.Delete(Consts.AuthToken);
             return controller.NoContent();
         }
         catch (UnauthorizedAccessException ex) {
