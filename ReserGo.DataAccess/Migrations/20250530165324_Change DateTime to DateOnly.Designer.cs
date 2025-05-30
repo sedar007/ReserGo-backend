@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReserGo.DataAccess;
@@ -11,9 +12,11 @@ using ReserGo.DataAccess;
 namespace ReserGo.DataAccess.Migrations
 {
     [DbContext(typeof(ReserGoContext))]
-    partial class ReserGoContextModelSnapshot : ModelSnapshot
+    [Migration("20250530165324_Change DateTime to DateOnly")]
+    partial class ChangeDateTimetoDateOnly
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,8 +66,8 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateOnly>("EndDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("EventId")
                         .HasColumnType("uuid");
@@ -78,8 +81,8 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<double?>("Price")
                         .HasColumnType("double precision");
 
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -156,8 +159,8 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateOnly>("Date")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsConfirmed")
                         .HasColumnType("boolean");
@@ -173,6 +176,9 @@ namespace ReserGo.DataAccess.Migrations
 
                     b.Property<Guid>("RestaurantOfferId")
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -245,11 +251,11 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<DateOnly>("OfferEndDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("OfferEndDate")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateOnly>("OfferStartDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("OfferStartDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<double>("PricePerPerson")
                         .HasColumnType("double precision");
@@ -330,11 +336,11 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<int>("NumberOfRooms")
                         .HasColumnType("integer");
 
-                    b.Property<DateOnly>("OfferEndDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("OfferEndDate")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateOnly>("OfferStartDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("OfferStartDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("OfferTitle")
                         .IsRequired()
@@ -485,11 +491,11 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<DateOnly>("OfferEndDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("OfferEndDate")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateOnly>("OfferStartDate")
-                        .HasColumnType("date");
+                    b.Property<DateTime>("OfferStartDate")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<double?>("PricePerPerson")
                         .HasColumnType("double precision");

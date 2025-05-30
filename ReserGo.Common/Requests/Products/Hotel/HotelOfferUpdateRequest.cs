@@ -6,7 +6,7 @@ public class HotelOfferUpdateRequest {
     public double PricePerNight { get; init; }
     public int NumberOfGuests { get; init; }
     public int NumberOfRooms { get; init; }
-    public DateTime OfferStartDate { get; init; }
-    public DateTime OfferEndDate { get; init; }
+    public DateOnly OfferStartDate { get; init; }
+    public DateOnly OfferEndDate { get; init; }
     public bool IsActive { get; init; }
 }

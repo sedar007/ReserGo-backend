@@ -63,25 +63,25 @@ public class RestaurantOfferService : IRestaurantOfferService {
                 throw new InvalidDataException(errorMessage);
             }
 
-            if (request.OfferStartDate.Date < DateTime.UtcNow.Date) {
+            if (request.OfferStartDate < DateOnly.FromDateTime(DateTime.UtcNow)) {
                 var errorMessage = "Offer start date must be greater than or equal to today";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
 
-            if (request.OfferEndDate.Date < request.OfferStartDate.Date) {
+            if (request.OfferEndDate < request.OfferStartDate) {
                 var errorMessage = "Offer end date must be greater than or equal to offer start date";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
 
-            if (request.OfferEndDate.Date < DateTime.UtcNow.Date) {
+            if (request.OfferEndDate < DateOnly.FromDateTime(DateTime.UtcNow)) {
                 var errorMessage = "Offer end date must be greater than or equal to today";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
 
-            if (request.OfferStartDate.Date > request.OfferEndDate.Date) {
+            if (request.OfferStartDate > request.OfferEndDate) {
                 var errorMessage = "Offer start date must be less than or equal to offer end date";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);

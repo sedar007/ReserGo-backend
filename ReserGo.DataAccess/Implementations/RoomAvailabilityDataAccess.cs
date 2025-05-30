@@ -69,8 +69,8 @@ public class RoomAvailabilityDataAccess : IRoomAvailabilityDataAccess {
             .Include(ra => ra.Room)
             .Include(ra => ra.Hotel)
             .Include(a => a.BookingsHotels)
-            .Where(ra => ra.StartDate.Date <= request.ArrivalDate.Date 
-                         && request.ReturnDate.Date <= ra.EndDate.Date && ra.Room.Capacity >= request.NumberOfPeople / request.NumberOfRooms)
+            .Where(ra => ra.StartDate <= request.ArrivalDate 
+                         && request.ReturnDate <= ra.EndDate && ra.Room.Capacity >= request.NumberOfPeople / request.NumberOfRooms)
             .ToListAsync();
     }
     

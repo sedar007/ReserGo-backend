@@ -68,7 +68,7 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
             var existingAvailability = await _availabilityDataAccess.GetByRoomId(roomId);
             RoomAvailability availabilityResponse;
 
-            if (existingAvailability == null || existingAvailability.EndDate < DateTime.UtcNow)
+            if (existingAvailability == null || existingAvailability.EndDate < DateOnly.FromDateTime(DateTime.UtcNow))
                 availabilityResponse = await CreateNewAvailability(roomId, request);
             else
                 availabilityResponse = await ExtendExistingAvailability(existingAvailability, request);
@@ -124,7 +124,7 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
             throw new InvalidDataException("Start date must be before end date.");
         }
 
-        if (request.StartDate.Date < DateTime.UtcNow.Date) {
+        if (request.StartDate < DateOnly.FromDateTime(DateTime.UtcNow)) {
             _logger.LogWarning("Start date cannot be before today. StartDate: {StartDate}", request.StartDate);
             throw new InvalidDataException("Start date cannot be before today.");
         }

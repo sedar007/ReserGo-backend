@@ -16,8 +16,7 @@ public static class BookingHelper {
             RestaurantOfferId = bookingRestaurant.RestaurantOfferId,
             RestaurantOffer = bookingRestaurant.RestaurantOffer?.ToDto(),
             Restaurant = bookingRestaurant?.Restaurant?.ToDto(),
-            StartDate = bookingRestaurant.StartDate,
-            EndDate = bookingRestaurant.EndDate
+            Date = bookingRestaurant.Date
         };
     }
 

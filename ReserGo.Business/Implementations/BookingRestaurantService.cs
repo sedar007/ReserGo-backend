@@ -92,8 +92,7 @@ public class BookingRestaurantService : IBookingRestaurantService {
             Id = b.Id,
             RestaurantId = b.RestaurantId,
             UserId = b.UserId,
-            StartDate = b.StartDate,
-            EndDate = b.EndDate,
+            Date = b.Date,
             NumberOfGuests = b.NumberOfGuests,
             IsConfirmed = b.IsConfirmed,
             BookingDate = b.BookingDate

@@ -5,8 +5,8 @@ public class RestaurantOfferDto {
     public string? Description { get; set; } = null!;
     public double? PricePerPerson { get; set; }
     public int GuestLimit { get; set; }
-    public DateTime OfferStartDate { get; set; }
-    public DateTime OfferEndDate { get; set; }
+    public DateOnly OfferStartDate { get; set; }
+    public DateOnly OfferEndDate { get; set; }
     public bool IsActive { get; set; }
     public Guid RestaurantId { get; set; }
     public RestaurantDto Restaurant { get; set; } = null!;
