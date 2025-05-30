@@ -49,7 +49,7 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
         return await _context.BookingHotel
             .Include(b => b.Hotel)
             .Where(b => b.Hotel.UserId == adminId)
-            .Where(b => startDate.Date >= b.BookingDate && endDate.Date <= b.BookingDate)
+            .Where(b => b.BookingDate >= startDate.Date && b.BookingDate <= endDate.Date)
             .CountAsync();
     }
 
