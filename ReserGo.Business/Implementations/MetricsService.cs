@@ -161,21 +161,16 @@ public class MetricsService : IMetricsService {
 
         switch (types) {
             case Product.Hotel:
-                nbBookingThisMonth = await _bookingHotelDataAccess.GetNbBookingsLast30Days(adminId);
-                nbBookingLastMonth =
-                    await _bookingHotelDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days30Before, today);
+                nbBookingThisMonth = await _bookingHotelDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days30Before, today);
+                nbBookingLastMonth = await _bookingHotelDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before, days30Before);
                 break;
             case Product.Restaurant:
-                nbBookingThisMonth = await _bookingRestaurantDataAccess.GetNbBookingsLast30Days(adminId);
-                nbBookingLastMonth =
-                    await _bookingRestaurantDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before,
-                        days30Before);
+                nbBookingThisMonth = await _bookingRestaurantDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days30Before, today);
+                nbBookingLastMonth = await _bookingRestaurantDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before, days30Before);
                 break;
             case Product.Event:
-                nbBookingThisMonth = await _bookingEventDataAccess.GetNbBookingsLast30Days(adminId);
-                nbBookingLastMonth =
-                    await _bookingEventDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before,
-                        days30Before);
+                nbBookingThisMonth = await _bookingEventDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days30Before, today);
+                nbBookingLastMonth = await _bookingEventDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before, days30Before);
                 break;
             default:
                 throw new InvalidDataException("Invalid product type specified.");
@@ -187,10 +182,12 @@ public class MetricsService : IMetricsService {
         if (nbBookingLastMonth > 0) {
             statsPercent = (double)(nbBookingThisMonth - nbBookingLastMonth) / nbBookingLastMonth * 100;
             up = nbBookingThisMonth > nbBookingLastMonth;
-        }
-        else if (nbBookingThisMonth > 0) {
+        } else if (nbBookingLastMonth == 0 && nbBookingThisMonth > 0) {
             statsPercent = 100;
             up = true;
+        } else if (nbBookingLastMonth == 0 && nbBookingThisMonth == 0) {
+            statsPercent = 0;
+            up = null;
         }
 
         return new MetricsResponse {
