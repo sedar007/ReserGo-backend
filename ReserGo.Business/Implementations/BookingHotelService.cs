@@ -37,7 +37,7 @@ public class BookingHotelService : IBookingHotelService {
                 throw new InvalidDataException(Consts.UserNotFound);
             }
 
-            var availability = await _roomAvailabilityService.GetAvailabilityByRoomId(request.RoomId);
+            var availability = await _roomAvailabilityService.GetAvailabilityByRoomId(request.RoomId, request.StartDate, request.EndDate);
 
             if (availability == null || availability.StartDate > request.StartDate || 
                 availability.EndDate < request.EndDate || 

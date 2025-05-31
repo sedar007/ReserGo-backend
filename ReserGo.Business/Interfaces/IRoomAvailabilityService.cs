@@ -17,7 +17,7 @@ public interface IRoomAvailabilityService {
         int take);
 
 
-    Task<RoomAvailabilityDto> GetAvailabilityByRoomId(Guid roomId);
+    Task<RoomAvailabilityDto> GetAvailabilityByRoomId(Guid roomId, DateOnly startDate, DateOnly endDate);
     Task<IEnumerable<RoomAvailibilityHotelResponse>> SearchAvailability(HotelSearchAvailabilityRequest request);
 
 

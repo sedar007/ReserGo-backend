@@ -89,7 +89,7 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
         }
     }
 
-    public async Task<RoomAvailabilityDto> GetAvailabilityByRoomId(Guid roomId) {
+    public async Task<RoomAvailabilityDto> GetAvailabilityByRoomId(Guid roomId, DateOnly startDate, DateOnly endDate) {
         try {
             //  var cacheKey = $"availability_{id}";
 
@@ -97,19 +97,27 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
                   _logger.LogInformation("Returning cached availability for ID: {Id}", id);
                   return cachedAvailability;
               }*/
-
-            var availability = await _availabilityDataAccess.GetByRoomId(roomId);
-            if (availability == null) {
-                var errorMessage = "This availability does not exist.";
-                _logger.LogError(errorMessage);
-                throw new InvalidDataException(errorMessage);
+            
+            var result =  await _availabilityDataAccess.GetAvailabilitiesByRoomIdDate(roomId, startDate, endDate);
+            
+            if(result == null || !result.Any()) {
+                _logger.LogWarning("No availability found for RoomId: {RoomId} between {StartDate} and {EndDate}",
+                    roomId, startDate, endDate);
+                throw new InvalidDataException("No availability found for the specified room and dates.");
+            }
+            
+            var availableRooms = result
+                .Where(a => a.BookingsHotels.All(b => b.EndDate <= startDate || b.StartDate >= endDate))
+                .ToList();
+            
+            if(availableRooms.Count == 0) {
+                _logger.LogWarning("No available rooms found for RoomId: {RoomId} between {StartDate} and {EndDate}",
+                    roomId, startDate, endDate);
+                throw new InvalidDataException("No available rooms found for the specified dates.");
             }
 
-            var availabilityDto = availability.ToDto();
-            // _cache.Set(cacheKey, availabilityDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-            _logger.LogInformation("Availability { id } retrieved successfully", roomId);
-
-            return availabilityDto;
+            return availableRooms.FirstOrDefault()?.ToDto() ??
+                   throw new InvalidDataException("No available rooms found for the specified dates.");
         }
         catch (Exception e) {
             _logger.LogError(e, e.Message);
@@ -239,20 +247,17 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
 
             var resultList = result.ToList();
 
-            var availableRooms = resultList
-                .Where(a => a.BookingsHotels.All(b => b.EndDate <= request.ArrivalDate || b.StartDate >= request.ReturnDate))
-                .Select(async a => new RoomAvailibilityHotelResponse {
-                    RoomId = a.RoomId,
-                    HotelId = a.HotelId,
-                    Description = a.Description ?? string.Empty,
-                    PricePerNightPerPerson = a.Room.PricePerNight,
-                    HotelName = a.Hotel.Name,
-                    RoomName = a.Room.RoomNumber,
-                    NumberOfGuests = a.Room.Capacity,
-                    ImageSrc = await _imageService.GetPicture(a.Hotel.Picture ?? " ")
-                });
+            var response = await Task.WhenAll(resultList
+                .GroupBy(a => a.HotelId)
+                .Select(async group => new RoomAvailibilityHotelResponse {
+                    HotelId = group.Key,
+                    HotelName = group.First().Hotel.Name,
+                    Rooms = await Task.WhenAll(group
+                        .Where(a => a.BookingsHotels.All(b => b.EndDate <= request.ArrivalDate || b.StartDate >= request.ReturnDate)) // Filter available rooms
+                        .Select(async a => a.Room.ToDto()))
+                }));
 
-            return await Task.WhenAll(availableRooms);
+            return response;
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while searching availability.");
