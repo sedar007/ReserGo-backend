@@ -4,6 +4,7 @@ public class RestaurantOffer {
     public Guid Id { get; init; }
     public string? Description { get; set; } = null!;
     public double? PricePerPerson { get; set; }
+    public int GuestNumber { get; set; } = 0;
     public int GuestLimit { get; set; }
     public DateOnly OfferStartDate { get; set; }
     public DateOnly OfferEndDate { get; set; }
@@ -14,4 +15,5 @@ public class RestaurantOffer {
     public User User { get; init; } = null!;
 
     public ICollection<BookingRestaurant> Bookings { get; set; } = new List<BookingRestaurant>();
+
 }

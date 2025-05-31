@@ -4,6 +4,7 @@ namespace ReserGo.Common.DTO;
 
 public class RoomAvailabilityDto {
     public Guid Id { get; set; }
+    public string? Description { get; set; } = null!;
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
 

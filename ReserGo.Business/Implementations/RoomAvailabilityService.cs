@@ -244,6 +244,7 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
                 .Select(async a => new RoomAvailibilityHotelResponse {
                     RoomId = a.RoomId,
                     HotelId = a.HotelId,
+                    Description = a.Description ?? string.Empty,
                     PricePerNightPerPerson = a.Room.PricePerNight,
                     HotelName = a.Hotel.Name,
                     RoomName = a.Room.RoomNumber,

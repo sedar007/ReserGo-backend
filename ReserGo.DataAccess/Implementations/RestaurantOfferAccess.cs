@@ -2,6 +2,8 @@
 using ReserGo.Common.Entity;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Common.Requests.Products.Restaurant;
+using ReserGo.Common.Response;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -37,4 +39,18 @@ public class RestaurantOfferDataAccess : IRestaurantOfferDataAccess {
         _context.RestaurantOffer.Remove(restaurant);
         await _context.SaveChangesAsync();
     }
+    
+    public async Task<IEnumerable<RestaurantOffer>> SearchAvailability(RestaurantSearchAvailabilityRequest request) {
+        return await _context.RestaurantOffer
+            .Include(o => o.Restaurant)
+            .Where(o => o.OfferStartDate <= request.Date &&
+                        o.OfferEndDate >= request.Date &&
+                        o.GuestLimit - o.GuestNumber >= request.NumberOfGuests &&
+                        (string.IsNullOrEmpty(request.CuisineType) || o.Restaurant.CuisineType.Contains(request.CuisineType, StringComparison.OrdinalIgnoreCase)))
+            
+            .ToListAsync();
+    }
+    
+    
+ 
 }

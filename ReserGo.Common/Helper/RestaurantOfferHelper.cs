@@ -9,6 +9,7 @@ public static class RestaurantOfferHelper {
             Id = restaurant.Id,
             Description = restaurant.Description,
             PricePerPerson = restaurant.PricePerPerson,
+            GuestNumber = restaurant.GuestNumber,
             GuestLimit = restaurant.GuestLimit,
             OfferStartDate = restaurant.OfferStartDate,
             OfferEndDate = restaurant.OfferEndDate,

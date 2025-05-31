@@ -39,6 +39,11 @@ public class BookingRestaurantService : IBookingRestaurantService {
                 _logger.LogError("Restaurant offer not found for id { id }", request.RestaurantOfferId);
                 throw new InvalidDataException("Restaurant offer not found");
             }
+            var remainingCapacity = restaurantOffer.GuestLimit - restaurantOffer.GuestNumber;
+            if (request.NumberOfGuests > remainingCapacity) {
+                _logger.LogError("Booking exceeds the remaining capacity for offer { id }", restaurantOffer.Id);
+                throw new InvalidDataException($"Cannot book {request.NumberOfGuests} guests. Only {remainingCapacity} spots are available.");
+            }
 
             var bookingRestaurant = new BookingRestaurant {
                 RestaurantOfferId = restaurantOffer.Id,

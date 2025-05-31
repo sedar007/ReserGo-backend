@@ -4,9 +4,9 @@ public class RoomAvailability {
     public Guid Id { get; set; }
     public Guid RoomId { get; set; }
     public Guid HotelId { get; set; }
+    public string? Description { get; set; } = null!;
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
-
     public virtual Room Room { get; set; } = null!;
     public virtual Hotel Hotel { get; set; } = null!;
     
