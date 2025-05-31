@@ -46,8 +46,9 @@ public class RestaurantOfferDataAccess : IRestaurantOfferDataAccess {
             .Where(o => o.OfferStartDate <= request.Date &&
                         o.OfferEndDate >= request.Date &&
                         o.GuestLimit - o.GuestNumber >= request.NumberOfGuests &&
-                        (string.IsNullOrEmpty(request.CuisineType) || o.Restaurant.CuisineType.Contains(request.CuisineType, StringComparison.OrdinalIgnoreCase)))
-            
+                        (string.IsNullOrEmpty(request.CuisineType) ||
+                         (o.Restaurant.CuisineType != null && 
+                          o.Restaurant.CuisineType.ToLower().Contains(request.CuisineType.ToLower()))))
             .ToListAsync();
     }
     

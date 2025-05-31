@@ -139,6 +139,7 @@ public class RestaurantOfferService : IRestaurantOfferService {
                 .Where(o => o.GuestLimit - o.GuestNumber >= request.NumberOfGuests)
                 .Select(o => new RestaurantAvailabilityResponse {
                     RestaurantOfferId = o.Id,
+                    TypeOfCuisine = o.Restaurant.CuisineType,
                     RestaurantName = o.Restaurant.Name,
                     PricePerGuest = o.PricePerPerson ?? 0,
                     AvailableCapacity = o.GuestLimit - o.GuestNumber,
