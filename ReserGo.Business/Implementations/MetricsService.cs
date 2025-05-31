@@ -61,9 +61,9 @@ public class MetricsService : IMetricsService {
             var eventBookings = await _bookingEventDataAccess.GetBookingYearsByUserId(userId);
 
             var allBookings = hotelBookings
-                .Select(b => new { b.BookingDate, b.Price })
-                .Concat(restaurantBookings.Select(b => new { b.BookingDate, b.Price }))
-                .Concat(eventBookings.Select(b => new { b.BookingDate, b.Price }));
+                .Select(b => new { b.BookingDate, b.PriceTotal })
+                .Concat(restaurantBookings.Select(b => new { b.BookingDate, b.PriceTotal }))
+                .Concat(eventBookings.Select(b => new { b.BookingDate, b.PriceTotal }));
 
             var currentYear = DateTime.UtcNow.Year;
 
@@ -76,7 +76,7 @@ public class MetricsService : IMetricsService {
                 .GroupBy(b => b.BookingDate.ToString("MMMM", CultureInfo.InvariantCulture))
                 .ToDictionary(
                     g => g.Key,
-                    g => g.Sum(b => b.Price).GetValueOrDefault()
+                    g => g.Sum(b => b.PriceTotal)
                 );
             
             foreach (var month in allMonths.Keys.ToList()) {

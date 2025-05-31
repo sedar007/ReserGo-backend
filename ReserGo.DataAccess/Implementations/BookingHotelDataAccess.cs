@@ -68,6 +68,7 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
         var currentYear = DateTime.UtcNow.Year;
         return await _context.BookingHotel
             .Include(b => b.Hotel)
+            .Include(b=> b.BookingDate)
             .Where(b => b.Hotel.UserId == userId && b.BookingDate.Year == currentYear)
             .ToListAsync();
     }

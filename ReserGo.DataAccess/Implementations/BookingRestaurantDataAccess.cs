@@ -29,7 +29,7 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
         return await _context.BookingRestaurant
             .Include(b => b.RestaurantOffer)
             .Where(b => b.RestaurantOffer.UserId == adminId)
-            .Where(b => startDate.Date >= b.BookingDate && endDate.Date <= b.BookingDate)
+            .Where(b => b.BookingDate >= startDate.Date && b.BookingDate <= endDate.Date)
             .CountAsync();
     }
 

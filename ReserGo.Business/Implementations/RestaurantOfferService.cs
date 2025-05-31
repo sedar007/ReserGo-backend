@@ -79,7 +79,7 @@ public class RestaurantOfferService : IRestaurantOfferService {
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
-
+    
             if (request.OfferEndDate < DateOnly.FromDateTime(DateTime.UtcNow)) {
                 var errorMessage = "Offer end date must be greater than or equal to today";
                 _logger.LogError(errorMessage);
@@ -140,8 +140,8 @@ public class RestaurantOfferService : IRestaurantOfferService {
                 .Select(o => new RestaurantAvailabilityResponse {
                     RestaurantOfferId = o.Id,
                     TypeOfCuisine = o.Restaurant.CuisineType,
-                    RestaurantName = o.Restaurant.Name,
-                    PricePerGuest = o.PricePerPerson ?? 0,
+                    RestaurantName = o.Restaurant.Name, 
+                    PricePerGuest = o.PricePerPerson,
                     AvailableCapacity = o.GuestLimit - o.GuestNumber,
                     ImageSrc = _imageService.GetPicture(o.Restaurant.Picture ?? " ").Result
                 });

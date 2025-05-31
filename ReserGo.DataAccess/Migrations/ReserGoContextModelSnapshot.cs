@@ -75,7 +75,10 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<int>("NumberOfGuests")
                         .HasColumnType("integer");
 
-                    b.Property<double?>("Price")
+                    b.Property<double>("PricePerPerson")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("PriceTotal")
                         .HasColumnType("double precision");
 
                     b.Property<DateOnly>("StartDate")
@@ -117,7 +120,10 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<int>("NumberOfGuests")
                         .HasColumnType("integer");
 
-                    b.Property<double?>("Price")
+                    b.Property<double>("PricePerPerson")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("PriceTotal")
                         .HasColumnType("double precision");
 
                     b.Property<Guid>("RoomAvailabilityId")
@@ -165,7 +171,10 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<int>("NumberOfGuests")
                         .HasColumnType("integer");
 
-                    b.Property<double?>("Price")
+                    b.Property<double>("PricePerPerson")
+                        .HasColumnType("double precision");
+
+                    b.Property<double>("PriceTotal")
                         .HasColumnType("double precision");
 
                     b.Property<Guid>("RestaurantId")
@@ -494,7 +503,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<DateOnly>("OfferStartDate")
                         .HasColumnType("date");
 
-                    b.Property<double?>("PricePerPerson")
+                    b.Property<double>("PricePerPerson")
                         .HasColumnType("double precision");
 
                     b.Property<Guid>("RestaurantId")

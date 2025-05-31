@@ -15,7 +15,9 @@ public class RestaurantOfferDataAccess : IRestaurantOfferDataAccess {
     }
 
     public async Task<RestaurantOffer?> GetById(Guid id) {
-        return await _context.RestaurantOffer.Include(h => h.Restaurant).FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.RestaurantOffer
+            .Include(h => h.Restaurant)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<IEnumerable<RestaurantOffer>> GetRestaurantsOfferByUserId(Guid userId) {

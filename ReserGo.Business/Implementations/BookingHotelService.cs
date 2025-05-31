@@ -56,7 +56,8 @@ public class BookingHotelService : IBookingHotelService {
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
                 NumberOfGuests = request.NumberOfGuests,
-                Price = price,
+                PriceTotal = price,
+                PricePerPerson = (double)availability.Room.PricePerNight,
                 IsConfirmed = request.IsConfirmed,
                 RoomAvailabilityId = availability.Id,
                 BookingDate = DateTime.UtcNow
