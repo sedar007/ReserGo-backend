@@ -52,7 +52,7 @@ public class BookingHotelService : IBookingHotelService {
             var reservation = new BookingHotel {
                 RoomId = request.RoomId,
                 HotelId = availability.Hotel.Id,
-                UserId = request.UserId,
+                UserId = user.UserId,
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
                 NumberOfGuests = request.NumberOfGuests,
