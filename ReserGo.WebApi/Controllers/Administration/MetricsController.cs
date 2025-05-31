@@ -90,17 +90,17 @@ public class MetricsController : ControllerBase {
     /// <response code="200">Metrics retrieved successfully.</response>
     /// <response code="401">User not authenticated.</response>
     /// <response code="500">An unexpected error occurred.</response>
-    [HttpGet("{types}/nbBookingsLast30Days")]
+    [HttpGet("{type}/nbBookingsLast30Days")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<MetricsResponse>> GetBookingMetrics(Product types) {
+    public async Task<ActionResult<MetricsResponse>> GetBookingMetrics(Product type) {
         try {
             var admin = _security.GetCurrentUser();
             if (admin == null) return Unauthorized("User not authenticated.");
 
-            var metrics = await _metricsService.GetNbBookingsLast30Days(admin.UserId, types);
+            var metrics = await _metricsService.GetNbBookingsLast30Days(admin.UserId, type);
             return Ok(metrics);
         }
         catch (InvalidDataException ex) {
