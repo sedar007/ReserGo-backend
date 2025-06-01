@@ -11,6 +11,8 @@ using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared.Interfaces;
 using ReserGo.Shared;
+using ReserGo.Common.Response;
+using ReserGo.Common.Requests.Products.Event;
 
 namespace ReserGo.Business.Implementations;
 
@@ -21,15 +23,19 @@ public class EventOfferService : IEventOfferService {
     private readonly IEventService _occasionService;
     private readonly IEventOfferDataAccess _occasionOfferDataAccess;
     private readonly IMemoryCache _cache;
+    private readonly IEventOfferDataAccess _eventOfferDataAccess;
 
     public EventOfferService(ILogger<UserService> logger, IEventOfferDataAccess occasionOfferDataAccess,
-        IEventService occasionService, ISecurity security, IImageService imageService, IMemoryCache cache) {
+        IEventService occasionService, ISecurity security, IImageService imageService, 
+        IMemoryCache cache,
+        IEventOfferDataAccess eventOfferDataAccess) {
         _logger = logger;
         _security = security;
         _imageService = imageService;
         _occasionOfferDataAccess = occasionOfferDataAccess;
         _occasionService = occasionService;
         _cache = cache;
+        _eventOfferDataAccess = eventOfferDataAccess;
     }
 
     public async Task<EventOfferDto> Create(EventOfferCreationRequest request) {
@@ -52,7 +58,7 @@ public class EventOfferService : IEventOfferService {
 
             var newEventOffer = new EventOffer {
                 Description = request.Description,
-                PricePerPerson = request.PricePerPerson,
+                PricePerDay = request.PricePerDay,
                 GuestLimit = request.GuestLimit,
                 OfferStartDate = request.OfferStartDate,
                 OfferEndDate = request.OfferEndDate,
@@ -101,7 +107,9 @@ public class EventOfferService : IEventOfferService {
 
     public async Task<IEnumerable<EventOfferDto>> GetEventsByUserId(Guid userId) {
         try {
+            
             var cacheKey = $"occasionOffers_user_{userId}";
+            _cache.Remove($"occasionOffers_user_{userId}");
 
             if (_cache.TryGetValue(cacheKey, out IEnumerable<EventOfferDto> cachedEventOffers))
                 return cachedEventOffers;
@@ -132,7 +140,7 @@ public class EventOfferService : IEventOfferService {
             }
 
             occasionOffer.Description = request.Description;
-            occasionOffer.PricePerPerson = request.PricePerPerson;
+            occasionOffer.PricePerDay = request.PricePerDay;
             occasionOffer.GuestLimit = request.GuestLimit;
             occasionOffer.OfferStartDate = request.OfferStartDate;
             occasionOffer.OfferEndDate = request.OfferEndDate;
@@ -171,6 +179,32 @@ public class EventOfferService : IEventOfferService {
         }
         catch (Exception e) {
             _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
+    
+    public async Task<IEnumerable<EventAvailabilityResponse>> SearchAvailability(EventSearchAvailabilityRequest request) {
+        try {
+            var result = await _eventOfferDataAccess.SearchAvailability(request);
+            if (result == null || !result.Any()) {
+                _logger.LogWarning("No event offers found for the given search criteria.");
+                return new List<EventAvailabilityResponse>();
+            }
+            
+            var availableOffers = result
+                .Where(o => o.GuestLimit - o.GuestNumber >= request.NumberOfGuests)
+                .Select(o => new EventAvailabilityResponse {
+                    EventOfferId = o.Id,
+                    EventName = o.Event.Name, 
+                    PricePerDay = o.PricePerDay,
+                    AvailableCapacity = o.GuestLimit - o.GuestNumber,
+                    ImageSrc = _imageService.GetPicture(o.Event.Picture ?? " ").Result
+                });
+
+            return availableOffers;
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while searching event availability.");
             throw;
         }
     }

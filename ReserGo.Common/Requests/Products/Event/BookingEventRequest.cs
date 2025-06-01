@@ -1,0 +1,9 @@
+namespace ReserGo.Common.Requests.Products.Event;
+
+public class BookingEventRequest {
+    public Guid EventOfferId { get; set; }
+    public int NumberOfGuests { get; set; }
+    public DateOnly StartDate { get; set; }
+    public DateOnly EndDate { get; set; }
+    public bool IsConfirmed { get; set; }
+}

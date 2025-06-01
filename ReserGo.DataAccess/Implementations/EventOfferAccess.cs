@@ -2,6 +2,7 @@
 using ReserGo.Common.Entity;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Common.Requests.Products.Event;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -13,7 +14,10 @@ public class EventOfferDataAccess : IEventOfferDataAccess {
     }
 
     public async Task<EventOffer?> GetById(Guid id) {
-        return await _context.EventOffer.Include(h => h.Event).FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.EventOffer
+            .Include(h => h.Event)
+            .Include(x => x.User)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<IEnumerable<EventOffer>> GetEventsOfferByUserId(Guid userId) {
@@ -37,4 +41,17 @@ public class EventOfferDataAccess : IEventOfferDataAccess {
         _context.EventOffer.Remove(@event);
         await _context.SaveChangesAsync();
     }
+    
+    public async Task<IEnumerable<EventOffer>> SearchAvailability(EventSearchAvailabilityRequest request) {
+        return await _context.EventOffer
+            .Include(o => o.Event)
+            .Include(o => o.Bookings)
+            .Where(o => o.OfferStartDate <= request.StartDate &&
+                        o.OfferEndDate >= request.EndDate &&
+                        o.GuestLimit >= request.NumberOfGuests &&
+                        !o.Bookings.Any(b => b.StartDate <= request.EndDate &&
+                                             b.EndDate >= request.StartDate))
+            .ToListAsync();
+    }
+    
 }

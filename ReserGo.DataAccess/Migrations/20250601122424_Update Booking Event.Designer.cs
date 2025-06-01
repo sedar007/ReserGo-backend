@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ReserGo.DataAccess;
@@ -11,9 +12,11 @@ using ReserGo.DataAccess;
 namespace ReserGo.DataAccess.Migrations
 {
     [DbContext(typeof(ReserGoContext))]
-    partial class ReserGoContextModelSnapshot : ModelSnapshot
+    [Migration("20250601122424_Update Booking Event")]
+    partial class UpdateBookingEvent
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -63,7 +66,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<DateTime>("BookingDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateOnly>("EndDate")
+                    b.Property<DateOnly>("Date")
                         .HasColumnType("date");
 
                     b.Property<Guid>("EventId")
@@ -78,17 +81,11 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<int>("NumberOfGuests")
                         .HasColumnType("integer");
 
-                    b.Property<double>("PricePerDay")
-                        .HasColumnType("double precision");
-
                     b.Property<double>("PricePerPerson")
                         .HasColumnType("double precision");
 
                     b.Property<double>("PriceTotal")
                         .HasColumnType("double precision");
-
-                    b.Property<DateOnly>("StartDate")
-                        .HasColumnType("date");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid");
@@ -271,7 +268,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<DateOnly>("OfferStartDate")
                         .HasColumnType("date");
 
-                    b.Property<double>("PricePerDay")
+                    b.Property<double>("PricePerPerson")
                         .HasColumnType("double precision");
 
                     b.Property<Guid>("UserId")

@@ -4,7 +4,6 @@ public abstract class BookingDto {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
     public DateTime BookingDate { get; set; }
-    public double PricePerPerson { get; set; }
     public double PriceTotal { get; set; }
     
     public int NumberOfGuests { get; set; }
