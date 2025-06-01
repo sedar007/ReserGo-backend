@@ -252,6 +252,7 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
                 .Select(async group => new RoomAvailibilityHotelResponse {
                     HotelId = group.Key,
                     HotelName = group.First().Hotel.Name,
+                    ImageSrc = await _imageService.GetPicture(group.First().Hotel.Picture),
                     Rooms = await Task.WhenAll(group
                         .Where(a => a.BookingsHotels.All(b => b.EndDate <= request.ArrivalDate || b.StartDate >= request.ReturnDate)) // Filter available rooms
                         .Select(async a => a.Room.ToDto()))
