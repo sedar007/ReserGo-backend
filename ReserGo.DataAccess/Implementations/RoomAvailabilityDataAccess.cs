@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
-using ReserGo.DataAccess.Interfaces;
 using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.DataAccess.Interfaces;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -10,11 +10,6 @@ public class RoomAvailabilityDataAccess : IRoomAvailabilityDataAccess {
 
     public RoomAvailabilityDataAccess(ReserGoContext context) {
         _context = context;
-    }
-
-    public async Task<RoomAvailability?> GetById(Guid id) {
-        return await _context.RoomAvailability.Include(x => x.Room).Include(x => x.Hotel)
-            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<RoomAvailability> Create(RoomAvailability roomAvailability) {
@@ -36,11 +31,6 @@ public class RoomAvailabilityDataAccess : IRoomAvailabilityDataAccess {
         await _context.SaveChangesAsync();
         return await GetById(updatedData.Entity.Id) ??
                throw new NullReferenceException("Error updating RoomAvailability");
-    }
-
-    public async Task Delete(RoomAvailability roomAvailability) {
-        _context.RoomAvailability.Remove(roomAvailability);
-        await _context.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<RoomAvailability>> GetAvailabilitiesByHotelId(Guid hotelId, int skip, int take) {
@@ -65,26 +55,35 @@ public class RoomAvailabilityDataAccess : IRoomAvailabilityDataAccess {
             .Take(take)
             .ToListAsync();
     }
-    
-    public async Task<IEnumerable<RoomAvailability>> GetAvailabilitiesByRoomIdDate(Guid roomId, DateOnly startDate, DateOnly endDate) {
+
+    public async Task<IEnumerable<RoomAvailability>> GetAvailabilitiesByRoomIdDate(Guid roomId, DateOnly startDate,
+        DateOnly endDate) {
         return await _context.RoomAvailability
             .Include(ra => ra.Room)
             .Include(ra => ra.Hotel)
             .Include(a => a.BookingsHotels)
-            .Where(ra => ra.Room.Id == roomId&& ra.StartDate <= startDate
-                         && endDate <= ra.EndDate)
+            .Where(ra => ra.Room.Id == roomId && ra.StartDate <= startDate
+                                              && endDate <= ra.EndDate)
             .ToListAsync();
     }
-    
+
     public async Task<IEnumerable<RoomAvailability>> GetAvailability(HotelSearchAvailabilityRequest request) {
         return await _context.RoomAvailability
             .Include(ra => ra.Room)
             .Include(ra => ra.Hotel)
             .Include(a => a.BookingsHotels)
-            .Where(ra => ra.StartDate <= request.ArrivalDate 
+            .Where(ra => ra.StartDate <= request.ArrivalDate
                          && request.ReturnDate <= ra.EndDate && ra.Room.Capacity >= request.NumberOfPeople)
             .ToListAsync();
     }
-    
 
+    public async Task<RoomAvailability?> GetById(Guid id) {
+        return await _context.RoomAvailability.Include(x => x.Room).Include(x => x.Hotel)
+            .FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+    public async Task Delete(RoomAvailability roomAvailability) {
+        _context.RoomAvailability.Remove(roomAvailability);
+        await _context.SaveChangesAsync();
+    }
 }

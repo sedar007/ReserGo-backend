@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using ReserGo.Common.DTO;
-using ReserGo.Common.Requests.User;
 using ReserGo.Common.Enum;
+using ReserGo.Common.Requests.User;
 
 namespace ReserGo.Business.Interfaces;
 

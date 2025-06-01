@@ -1,26 +1,21 @@
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using ReserGo.Business.Interfaces;
-using ReserGo.Business.Validator;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
-using ReserGo.Common.Enum;
 using ReserGo.Common.Helper;
-using ReserGo.Common.Requests.User;
-using ReserGo.DataAccess.Interfaces;
-using ReserGo.Shared;
 using ReserGo.Common.Requests.Notification;
+using ReserGo.DataAccess.Interfaces;
 
 namespace ReserGo.Business.Implementations;
 
 public class NotificationService : INotificationService {
+    private readonly IMemoryCache _cache;
+    private readonly IImageService _imageService;
     private readonly ILogger<UserService> _logger;
     private readonly ILoginService _loginService;
-    private readonly IUserDataAccess _userDataAccess;
-    private readonly IImageService _imageService;
-    private readonly IMemoryCache _cache;
     private readonly INotificationDataAccess _notificationDataAccess;
+    private readonly IUserDataAccess _userDataAccess;
 
     public NotificationService(ILogger<UserService> logger, IUserDataAccess userDataAccess,
         ILoginService loginService, IImageService imageService, IMemoryCache cache,

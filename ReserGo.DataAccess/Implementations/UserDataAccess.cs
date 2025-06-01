@@ -1,6 +1,5 @@
-﻿using ReserGo.Common.Entity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Microsoft.EntityFrameworkCore;
+using ReserGo.Common.Entity;
 using ReserGo.DataAccess.Interfaces;
 
 namespace ReserGo.DataAccess.Implementations;
@@ -25,7 +24,7 @@ public class UserDataAccess : IUserDataAccess {
     }
 
     public async Task<User> Create(User user) {
-        EntityEntry<User> newData = _context.Users.Add(user);
+        var newData = _context.Users.Add(user);
         await _context.SaveChangesAsync();
         return await GetByEmail(newData.Entity.Email) ?? throw new NullReferenceException("Error creating new user.");
     }

@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
-using ReserGo.Common.Requests.Products.Event;
-using ReserGo.WebAPI.Attributes;
-using ReserGo.Shared.Interfaces;
 using ReserGo.Common.Models;
+using ReserGo.Common.Requests.Products.Event;
+using ReserGo.Shared.Interfaces;
+using ReserGo.WebAPI.Attributes;
+using ReserGo.Shared;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
@@ -13,12 +14,12 @@ namespace ReserGo.WebAPI.Controllers.Administration.Products;
 [AdminOnly]
 [Route("api/administration/offers/events/")]
 public class EventOfferController : ControllerBase {
-    private readonly ILogger<EventController> _logger;
+    private readonly IBookingEventService _bookingEventService;
+    private readonly ILogger<EventOfferController> _logger;
     private readonly IEventOfferService _occasionOfferService;
     private readonly ISecurity _security;
-    private readonly IBookingEventService _bookingEventService;
 
-    public EventOfferController(ILogger<EventController> logger,
+    public EventOfferController(ILogger<EventOfferController> logger,
         IEventOfferService occasionOfferService,
         ISecurity security, IBookingEventService bookingEventService) {
         _logger = logger;
@@ -28,7 +29,7 @@ public class EventOfferController : ControllerBase {
     }
 
     /// <summary>
-    /// Create a new @event offer.
+    ///     Create a new @event offer.
     /// </summary>
     /// <param name="request">The @event offer creation request containing necessary information.</param>
     /// <returns>The created @event offer object.</returns>
@@ -75,13 +76,13 @@ public class EventOfferController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while creating the @event offer.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 
 
     /// <summary>
-    /// Retrieve a @event offer by its ID.
+    ///     Retrieve a @event offer by its ID.
     /// </summary>
     /// <param name="id">The ID of the @event offer.</param>
     /// <returns>The @event offer object.</returns>
@@ -125,12 +126,12 @@ public class EventOfferController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving the @event offer.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 
     /// <summary>
-    /// Retrieve @event offers for the connected user.
+    ///     Retrieve @event offers for the connected user.
     /// </summary>
     /// <returns>A list of @event offers associated with the connected user.</returns>
     /// <response code="200">Event offers retrieved successfully.</response>
@@ -183,12 +184,12 @@ public class EventOfferController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving @event offers for the connected user.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 
     /// <summary>
-    /// Update an existing @event offer.
+    ///     Update an existing @event offer.
     /// </summary>
     /// <param name="id">The ID of the @event offer to update.</param>
     /// <param name="request">The @event offer update request.</param>
@@ -231,7 +232,7 @@ public class EventOfferController : ControllerBase {
     }
 
     /// <summary>
-    /// Remove a @event offer by its ID.
+    ///     Remove a @event offer by its ID.
     /// </summary>
     /// <param name="id">The ID of the @event offer to remove.</param>
     /// <returns>No content if successful.</returns>
@@ -252,7 +253,7 @@ public class EventOfferController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while deleting the @event offer.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 
@@ -299,7 +300,7 @@ public class EventOfferController : ControllerBase {
         }
         catch (Exception e) {
             _logger.LogError(e, "An unexpected error occurred while retrieving bookings for admin offers");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 

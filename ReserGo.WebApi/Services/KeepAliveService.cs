@@ -1,10 +1,10 @@
 namespace ReserGo.WebAPI.Services;
 
 public class KeepAliveService : IHostedService, IDisposable {
-    private Timer _timer;
     private readonly HttpClient _httpClient;
-    private readonly string _url;
     private readonly ILogger<KeepAliveService> _logger;
+    private readonly string _url;
+    private Timer _timer;
 
 
     public KeepAliveService(IConfiguration configuration, ILogger<KeepAliveService> logger) {
@@ -14,9 +14,19 @@ public class KeepAliveService : IHostedService, IDisposable {
         _logger.LogInformation($"Keep-alive URL: {_url}");
     }
 
+    public void Dispose() {
+        _timer?.Dispose();
+        _httpClient?.Dispose();
+    }
+
     public Task StartAsync(CancellationToken cancellationToken) {
         _logger.LogInformation("Keep-alive service started");
         _timer = new Timer(SendKeepAliveRequest, null, TimeSpan.Zero, TimeSpan.FromMinutes(14));
+        return Task.CompletedTask;
+    }
+
+    public Task StopAsync(CancellationToken cancellationToken) {
+        _timer?.Change(Timeout.Infinite, 0);
         return Task.CompletedTask;
     }
 
@@ -31,15 +41,5 @@ public class KeepAliveService : IHostedService, IDisposable {
         catch (Exception ex) {
             _logger.LogError($"Exception in keep-alive: {ex.Message}");
         }
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken) {
-        _timer?.Change(Timeout.Infinite, 0);
-        return Task.CompletedTask;
-    }
-
-    public void Dispose() {
-        _timer?.Dispose();
-        _httpClient?.Dispose();
     }
 }

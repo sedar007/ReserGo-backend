@@ -1,5 +1,3 @@
-using ReserGo.Common.Entity;
-
 namespace ReserGo.Common.DTO;
 
 public class RoomAvailabilityDto {

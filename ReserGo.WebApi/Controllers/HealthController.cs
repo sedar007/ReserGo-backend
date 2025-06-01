@@ -6,7 +6,7 @@ namespace ReserGo.WebAPI.Controllers;
 [Route("")]
 public class HealthController : ControllerBase {
     /// <summary>
-    /// Checks the health status of the API.
+    ///     Checks the health status of the API.
     /// </summary>
     /// <returns>A message indicating that the API is online.</returns>
     [HttpGet("health")]

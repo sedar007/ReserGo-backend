@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared.Exceptions;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -12,13 +13,15 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
     }
 
     public async Task<BookingRestaurant> Create(BookingRestaurant bookingRestaurant) {
-        await _context.BookingRestaurant.AddAsync(bookingRestaurant);
+        var data = await _context.BookingRestaurant.AddAsync(bookingRestaurant);
         await _context.SaveChangesAsync();
-        return bookingRestaurant;
+        return await GetById(data.Entity.Id) ??
+               throw new CreateException("Error creating new booking restaurant.");
     }
 
     public async Task<BookingRestaurant?> GetById(Guid id) {
         return await _context.BookingRestaurant
+            .Include(x => x.Restaurant)
             .Include(x => x.RestaurantOffer)
             .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == id);
@@ -32,17 +35,17 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
             .Where(b => b.BookingDate >= startDate && b.BookingDate <= endDate)
             .CountAsync();
     }
-    
-   /* public async Task<int> GetNbBookingsLast30Days(Guid adminId) {
-        var today = DateTime.UtcNow;
-        var days30Before = today.AddDays(-30);
 
-        return await _context.BookingRestaurant
-            .Include(b => b.RestaurantOffer)
-            .Where(b => b.RestaurantOffer.UserId == adminId)
-            .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
-            .CountAsync();
-    } */
+    /* public async Task<int> GetNbBookingsLast30Days(Guid adminId) {
+         var today = DateTime.UtcNow;
+         var days30Before = today.AddDays(-30);
+
+         return await _context.BookingRestaurant
+             .Include(b => b.RestaurantOffer)
+             .Where(b => b.RestaurantOffer.UserId == adminId)
+             .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
+             .CountAsync();
+     } */
 
     public async Task<IEnumerable<BookingRestaurant>> GetBookingsByUserId(Guid userId) {
         return await _context.BookingRestaurant
@@ -56,7 +59,7 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
             .Where(b => b.Restaurant.UserId == adminId)
             .ToListAsync();
     }
-    
+
     public async Task<IEnumerable<BookingRestaurant>> GetBookingYearsByUserId(Guid userId) {
         var currentYear = DateTime.UtcNow.Year;
         return await _context.BookingRestaurant

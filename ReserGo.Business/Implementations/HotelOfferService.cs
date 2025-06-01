@@ -5,22 +5,20 @@ using ReserGo.Business.Validator;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
-using ReserGo.Common.Requests.Products;
 using ReserGo.Common.Requests.Products.Hotel;
-using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
-using ReserGo.Shared.Interfaces;
 using ReserGo.Shared;
+using ReserGo.Shared.Interfaces;
 
 namespace ReserGo.Business.Implementations;
 
 public class HotelOfferService : IHotelOfferService {
+    private readonly IMemoryCache _cache;
+    private readonly IHotelOfferDataAccess _hotelOfferDataAccess;
+    private readonly IHotelService _hotelService;
+    private readonly IImageService _imageService;
     private readonly ILogger<UserService> _logger;
     private readonly ISecurity _security;
-    private readonly IImageService _imageService;
-    private readonly IHotelService _hotelService;
-    private readonly IHotelOfferDataAccess _hotelOfferDataAccess;
-    private readonly IMemoryCache _cache;
 
     public HotelOfferService(ILogger<UserService> logger, IHotelOfferDataAccess hotelOfferDataAccess,
         IHotelService hotelService, ISecurity security, IImageService imageService, IMemoryCache cache) {
@@ -71,11 +69,12 @@ public class HotelOfferService : IHotelOfferService {
                 cachedHotelOffers ??= new List<HotelOfferDto>();
                 cachedHotelOffers.Add(newHotelOffer.ToDto());
                 _cache.Set(cacheKey, cachedHotelOffers, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-            } else {
+            }
+            else {
                 var newCacheList = new List<HotelOfferDto> { newHotelOffer.ToDto() };
                 _cache.Set(cacheKey, newCacheList, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
             }
-            
+
 
             _logger.LogInformation("Hotel Offer { id } created", newHotelOffer.Id);
             return newHotelOffer.ToDto();
@@ -88,11 +87,9 @@ public class HotelOfferService : IHotelOfferService {
 
     public async Task<HotelOfferDto?> GetById(Guid id) {
         try {
-            if (_cache.TryGetValue($"hotelOffer_{id}", out HotelOffer? cachedHotelOffer)) {
-                if (cachedHotelOffer != null) {
+            if (_cache.TryGetValue($"hotelOffer_{id}", out HotelOffer? cachedHotelOffer))
+                if (cachedHotelOffer != null)
                     return cachedHotelOffer.ToDto();
-                }
-            }
 
             var hotelOffer = await _hotelOfferDataAccess.GetById(id);
             if (hotelOffer is null) {
@@ -115,15 +112,13 @@ public class HotelOfferService : IHotelOfferService {
     public async Task<IEnumerable<HotelOfferDto>> GetHotelsByUserId(Guid userId) {
         try {
             var cacheKey = string.Format(Consts.CacheKeyHotelOffers, userId);
-            
-            if (_cache.TryGetValue(cacheKey, out List<HotelOfferDto>? cachedHotelOffers)) {
-                if (cachedHotelOffers != null) {
+
+            if (_cache.TryGetValue(cacheKey, out List<HotelOfferDto>? cachedHotelOffers))
+                if (cachedHotelOffers != null)
                     return cachedHotelOffers;
-                }
-            }
 
             var hotelOffers = await _hotelOfferDataAccess.GetHotelsOfferByUserId(userId);
-            IEnumerable<HotelOfferDto> hotelOfferDtos = hotelOffers.Select(hotelOffer => hotelOffer.ToDto());
+            var hotelOfferDtos = hotelOffers.Select(hotelOffer => hotelOffer.ToDto());
 
             _cache.Set(cacheKey, hotelOfferDtos, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 

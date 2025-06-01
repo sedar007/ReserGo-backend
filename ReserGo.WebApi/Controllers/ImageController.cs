@@ -1,9 +1,6 @@
+using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Shared.Interfaces;
-using ReserGo.Common.Security;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-
 
 namespace ReserGo.WebAPI.Controllers;
 
@@ -21,7 +18,7 @@ public class ImageController : ControllerBase {
     }
 
     /// <summary>
-    /// Retrieves the image URL for the given public ID.
+    ///     Retrieves the image URL for the given public ID.
     /// </summary>
     /// <param name="publicId">The public ID of the image.</param>
     /// <returns>The URL of the image.</returns>
@@ -45,7 +42,7 @@ public class ImageController : ControllerBase {
     }
 
     /// <summary>
-    /// Uploads an image and returns its URL.
+    ///     Uploads an image and returns its URL.
     /// </summary>
     /// <param name="file">The image file to upload.</param>
     /// <param name="userId">The ID of the user uploading the image.</param>
@@ -76,7 +73,7 @@ public class ImageController : ControllerBase {
     }
 
     /// <summary>
-    /// Uploads an image and returns its URL.
+    ///     Uploads an image and returns its URL.
     /// </summary>
     /// <param name="file">The image file to upload.</param>
     /// <returns>The URL of the uploaded image.</returns>

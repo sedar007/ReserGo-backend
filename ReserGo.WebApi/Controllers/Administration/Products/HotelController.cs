@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
-using ReserGo.Common.Requests.Products.Hotel;
-using ReserGo.WebAPI.Attributes;
-using ReserGo.Shared.Interfaces;
 using ReserGo.Common.Models;
+using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.Shared.Interfaces;
+using ReserGo.WebAPI.Attributes;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
@@ -13,8 +13,8 @@ namespace ReserGo.WebAPI.Controllers.Administration.Products;
 [AdminOnly]
 [Route("api/administration/products/hotels/")]
 public class HotelController : ControllerBase {
-    private readonly ILogger<HotelController> _logger;
     private readonly IHotelService _hotelService;
+    private readonly ILogger<HotelController> _logger;
     private readonly ISecurity _security;
 
     public HotelController(ILogger<HotelController> logger, IHotelService hotelService, ISecurity security) {
@@ -24,7 +24,7 @@ public class HotelController : ControllerBase {
     }
 
     /// <summary>
-    /// Create a new hotel.
+    ///     Create a new hotel.
     /// </summary>
     /// <param name="request">The hotel creation request containing necessary information.</param>
     /// <returns>The created hotel object.</returns>
@@ -67,7 +67,7 @@ public class HotelController : ControllerBase {
     }
 
     /// <summary>
-    /// Retrieve an hotel by their ID.
+    ///     Retrieve an hotel by their ID.
     /// </summary>
     /// <param name="id">The ID of the hotel.</param>
     /// <returns>The hotel object.</returns>
@@ -111,7 +111,7 @@ public class HotelController : ControllerBase {
     }
 
     /// <summary>
-    /// Retrieve an hotel by their StayId.
+    ///     Retrieve an hotel by their StayId.
     /// </summary>
     /// <param name="id">The StayId of the hotel.</param>
     /// <returns>The hotel object.</returns>
@@ -155,7 +155,7 @@ public class HotelController : ControllerBase {
     }
 
     /// <summary>
-    /// Retrieve hotels for the connected user.
+    ///     Retrieve hotels for the connected user.
     /// </summary>
     /// <returns>A list of hotels associated with the connected user.</returns>
     /// <response code="200">Hotels retrieved successfully.</response>
@@ -209,9 +209,9 @@ public class HotelController : ControllerBase {
 
 
     /// <summary>
-    /// Update an existing hotel.
+    ///     Update an existing hotel.
     /// </summary>
-    ///  <param name="id">The stayId to search the object.</param>
+    /// <param name="id">The stayId to search the object.</param>
     /// <param name="request">The hotel update request.</param>
     /// <returns>The updated hotel object.</returns>
     /// <response code="200">Hotel updated successfully.</response>
@@ -247,7 +247,7 @@ public class HotelController : ControllerBase {
     }
 
     /// <summary>
-    /// Remove an hotel by their ID.
+    ///     Remove an hotel by their ID.
     /// </summary>
     /// <param name="id">The ID of the hotel to remove.</param>
     /// <returns>No content if successful.</returns>

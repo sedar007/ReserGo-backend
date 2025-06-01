@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
+using ReserGo.Common.Enum;
 using ReserGo.Common.Models;
 using ReserGo.Common.Requests.User;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.WebAPI.Controllers.Helper;
-using ReserGo.Common.Enum;
 
 namespace ReserGo.WebAPI.Controllers.Administration.User;
 
@@ -15,8 +15,8 @@ namespace ReserGo.WebAPI.Controllers.Administration.User;
 public class UserController : ControllerBase {
     private readonly ILogger<UserController> _logger;
     private readonly ISecurity _security;
-    private readonly IUserService _userService;
     private readonly UserRole _userRole;
+    private readonly IUserService _userService;
 
     public UserController(ILogger<UserController> logger, ISecurity security, IUserService userService) {
         _logger = logger;

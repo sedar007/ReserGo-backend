@@ -1,7 +1,7 @@
+using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.Common.Response;
 using ReserGo.Common.Security;
-using ReserGo.Common.DTO;
 
 namespace ReserGo.Business.Interfaces;
 

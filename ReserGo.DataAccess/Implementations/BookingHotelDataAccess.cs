@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ReserGo.DataAccess.Interfaces;
 
 namespace ReserGo.DataAccess.Implementations;
@@ -13,12 +12,12 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
     }
 
     public async Task<BookingHotel> Create(BookingHotel bookingHotel) {
-        EntityEntry<BookingHotel> newData = _context.BookingHotel.Add(bookingHotel);
+        var newData = _context.BookingHotel.Add(bookingHotel);
         await _context.SaveChangesAsync();
-        return await GetById(newData.Entity.Id) ?? throw new NullReferenceException("Error creating new booking hotel.");
-
+        return await GetById(newData.Entity.Id) ??
+               throw new NullReferenceException("Error creating new booking hotel.");
     }
-    
+
 
     public async Task<BookingHotel?> GetById(Guid id) {
         return await _context.BookingHotel
@@ -57,7 +56,7 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
             .Where(b => b.BookingDate >= startDate && b.BookingDate <= endDate)
             .CountAsync();
     }
-    
+
     public async Task<IEnumerable<BookingHotel>> GetBookingYearsByUserId(Guid userId) {
         var currentYear = DateTime.UtcNow.Year;
         return await _context.BookingHotel

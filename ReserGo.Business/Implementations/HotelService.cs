@@ -5,22 +5,19 @@ using ReserGo.Business.Validator;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
-using ReserGo.Common.Requests.Products;
 using ReserGo.Common.Requests.Products.Hotel;
-using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared.Interfaces;
-using ReserGo.Common.Requests.Products.Hotel.Rooms;
 
 namespace ReserGo.Business.Implementations;
 
 public class HotelService : IHotelService {
-    private readonly ILogger<UserService> _logger;
-    private readonly ISecurity _security;
-    private readonly IImageService _imageService;
-    private readonly IHotelDataAccess _hotelDataAccess;
     private readonly IMemoryCache _cache;
+    private readonly IHotelDataAccess _hotelDataAccess;
+    private readonly IImageService _imageService;
+    private readonly ILogger<UserService> _logger;
     private readonly IRoomDataAccess _roomDataAccess;
+    private readonly ISecurity _security;
 
     public HotelService(ILogger<UserService> logger, IHotelDataAccess hotelDataAccess, ISecurity security,
         IImageService imageService, IMemoryCache cache, IRoomDataAccess roomDataAccess) {

@@ -1,21 +1,20 @@
 using Microsoft.Extensions.Logging;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.Entity;
-using ReserGo.DataAccess.Interfaces;
-using ReserGo.Shared.Interfaces;
-using ReserGo.Common.Security;
-using ReserGo.Tiers.Interfaces;
-using ReserGo.Tiers.Responses;
 using ReserGo.Common.Enum;
 using ReserGo.Common.Helper;
+using ReserGo.Common.Security;
+using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared.Interfaces;
+using ReserGo.Tiers.Interfaces;
 
 namespace ReserGo.Business.Implementations;
 
 public class GoogleService : IGoogleService {
-    private readonly ILogger<GoogleService> _logger;
-    private readonly IUserDataAccess _userDataAccess;
-    private readonly ISecurity _security;
     private readonly IGoogleAuthService _gooleAuthService;
+    private readonly ILogger<GoogleService> _logger;
+    private readonly ISecurity _security;
+    private readonly IUserDataAccess _userDataAccess;
 
     public GoogleService(ILogger<GoogleService> logger, IGoogleAuthService gooleAuthService,
         IUserDataAccess userDataAccess, ISecurity security) {
@@ -50,7 +49,7 @@ public class GoogleService : IGoogleService {
                 Role = UserRole.Admin
             });
         }
-    
+
         var jwtToken = _security.GenerateJwtToken(user.Username, user.Id, user.Role);
         _logger.LogInformation("Google Auth successful for email: {Email}, User ID: {UserId}", response.Email, user.Id);
 

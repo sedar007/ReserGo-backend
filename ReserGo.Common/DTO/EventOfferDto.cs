@@ -12,5 +12,4 @@ public class EventOfferDto {
     public Guid EventId { get; set; }
     public EventDto Event { get; set; } = null!;
     public Guid UserId { get; set; }
-
 }

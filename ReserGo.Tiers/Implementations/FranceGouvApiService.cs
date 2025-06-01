@@ -1,13 +1,14 @@
-﻿using ReserGo.Tiers.Interfaces;
+﻿using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using ReserGo.Tiers.Interfaces;
 
 namespace ReserGo.Tiers.Implementations;
 
 public class FranceGouvApiService : IFranceGouvApiService {
-    private readonly ILogger<FranceGouvApiService> _logger;
-    private readonly HttpClient _httpClient;
     private readonly string? _api;
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<FranceGouvApiService> _logger;
 
     public FranceGouvApiService(IConfiguration configuration, ILogger<FranceGouvApiService> logger,
         HttpClient httpClient) {
@@ -22,12 +23,12 @@ public class FranceGouvApiService : IFranceGouvApiService {
             _logger.LogError("FranceGouv API URL is not configured.");
             throw new InvalidOperationException("FranceGouv API URL is not configured.");
         }
-        
+
         if (string.IsNullOrWhiteSpace(query) || query.Length < 3) {
             _logger.LogWarning("Invalid query: Query must be at least 3 characters long.");
             return new List<string>();
         }
-        
+
         var encodedQuery = Uri.EscapeDataString(query);
         var requestUrl = _api.Replace("{encodedQuery}", encodedQuery);
 
@@ -44,7 +45,7 @@ public class FranceGouvApiService : IFranceGouvApiService {
             var content = await response.Content.ReadAsStringAsync();
             _logger.LogInformation("Successfully received response from FranceGouv API.");
 
-            var jsonResponse = System.Text.Json.JsonDocument.Parse(content);
+            var jsonResponse = JsonDocument.Parse(content);
 
             if (!jsonResponse.RootElement.TryGetProperty("features", out var features)) {
                 _logger.LogWarning("Response does not contain 'features' property.");

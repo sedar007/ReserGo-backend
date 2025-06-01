@@ -9,7 +9,6 @@ public class RoomAvailability {
     public DateOnly EndDate { get; set; }
     public virtual Room Room { get; init; } = null!;
     public virtual Hotel Hotel { get; init; } = null!;
-    
-    public ICollection<BookingHotel> BookingsHotels { get; init; } = new List<BookingHotel>();
 
+    public ICollection<BookingHotel> BookingsHotels { get; init; } = new List<BookingHotel>();
 }

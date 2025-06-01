@@ -1,21 +1,21 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using ReserGo.Common.Requests.Security;
+using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
-using ReserGo.Common.Security;
-using ReserGo.Shared.Interfaces;
-using ReserGo.Shared;
-using ReserGo.Common.Response;
 using ReserGo.Common.Models;
+using ReserGo.Common.Requests.Security;
+using ReserGo.Common.Response;
+using ReserGo.Common.Security;
+using ReserGo.Shared;
+using ReserGo.Shared.Interfaces;
 
 namespace ReserGo.WebAPI.Controllers.Security.Admin;
 
 [ApiController]
 [Route("api/auth")]
 public class LoginController : ControllerBase {
+    private readonly ILogger<LoginController> _logger;
     private readonly ILoginService _loginService;
     private readonly ISecurity _security;
-    private readonly ILogger<LoginController> _logger;
 
     public LoginController(ILoginService loginService, ILogger<LoginController> logger, ISecurity security) {
         _loginService = loginService;
@@ -24,14 +24,14 @@ public class LoginController : ControllerBase {
     }
 
     /// <summary>
-    /// Authenticates a user and returns a login response with HATEOAS links.
+    ///     Authenticates a user and returns a login response with HATEOAS links.
     /// </summary>
     /// <param name="request">The login request containing user credentials.</param>
     /// <returns>
-    /// A 200 OK response with the login details and HATEOAS links if successful.
-    /// A 401 Unauthorized response if the credentials are invalid.
-    /// A 400 Bad Request response if the request is malformed.
-    /// A 500 Internal Server Error response if an unexpected error occurs.
+    ///     A 200 OK response with the login details and HATEOAS links if successful.
+    ///     A 401 Unauthorized response if the credentials are invalid.
+    ///     A 400 Bad Request response if the request is malformed.
+    ///     A 500 Internal Server Error response if an unexpected error occurs.
     /// </returns>
     [HttpPost("login")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -97,11 +97,11 @@ public class LoginController : ControllerBase {
     }
 
     /// <summary>
-    /// Retrieves the current authenticated user's information with HATEOAS links.
+    ///     Retrieves the current authenticated user's information with HATEOAS links.
     /// </summary>
     /// <returns>
-    /// A 200 OK response with the user information and HATEOAS links if authenticated.
-    /// A 401 Unauthorized response if the user is not authenticated.
+    ///     A 200 OK response with the user information and HATEOAS links if authenticated.
+    ///     A 401 Unauthorized response if the user is not authenticated.
     /// </returns>
     [HttpGet("me")]
     [Authorize]
@@ -131,10 +131,10 @@ public class LoginController : ControllerBase {
     }
 
     /// <summary>
-    /// Logs out the current user by deleting the authentication token cookie.
+    ///     Logs out the current user by deleting the authentication token cookie.
     /// </summary>
     /// <returns>
-    /// A 200 OK response with a success message and HATEOAS links.
+    ///     A 200 OK response with a success message and HATEOAS links.
     /// </returns>
     [HttpPost("logout")]
     [Authorize]

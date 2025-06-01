@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ReserGo.DataAccess.Interfaces;
 
 namespace ReserGo.DataAccess.Implementations;
@@ -21,7 +20,7 @@ public class RoomDataAccess : IRoomDataAccess {
     }
 
     public async Task<Room> Create(Room room) {
-        EntityEntry<Room> newData = _context.Room.Add(room);
+        var newData = _context.Room.Add(room);
         await _context.SaveChangesAsync();
         return await GetById(newData.Entity.Id) ??
                throw new NullReferenceException("Error creating new room.");

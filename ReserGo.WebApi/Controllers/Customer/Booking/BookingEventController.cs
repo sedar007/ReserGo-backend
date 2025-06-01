@@ -1,28 +1,29 @@
 using Microsoft.AspNetCore.Mvc;
-using ReserGo.Business.Interfaces;
-using ReserGo.Common.Requests.Products.Event;
-using ReserGo.WebAPI.Attributes;
-using ReserGo.Shared.Interfaces;
-using ReserGo.WebAPI.Controllers.Administration.Products;
 using Microsoft.AspNetCore.SignalR;
-using ReserGo.WebAPI.Hubs;
+using ReserGo.Business.Interfaces;
 using ReserGo.Common.Models;
+using ReserGo.Common.Requests.Products.Event;
 using ReserGo.Common.Response;
 using ReserGo.Shared;
+using ReserGo.Shared.Interfaces;
+using ReserGo.WebAPI.Attributes;
+using ReserGo.WebAPI.Controllers.Administration.Products;
+using ReserGo.WebAPI.Hubs;
+
 namespace ReserGo.WebAPI.Controllers.Customer.Booking;
 
 [ApiController]
 [Tags("Booking | Event")]
 [Route("api/customer/booking/events/")]
 public class BookingEventController : ControllerBase {
-    private readonly ILogger<EventController> _logger;
-    private readonly ISecurity _security;
     private readonly IBookingEventService _bookingEventService;
-    private readonly IHubContext<NotificationHub> _notificationHub;
     private readonly IEventOfferService _eventOfferService;
+    private readonly ILogger<BookingEventController> _logger;
+    private readonly IHubContext<NotificationHub> _notificationHub;
+    private readonly ISecurity _security;
 
-    public BookingEventController(ILogger<EventController> logger,
-        ISecurity security, IBookingEventService bookingEventService, 
+    public BookingEventController(ILogger<BookingEventController> logger,
+        ISecurity security, IBookingEventService bookingEventService,
         IHubContext<NotificationHub> notificationHub,
         IEventOfferService eventOfferService) {
         _logger = logger;
@@ -56,8 +57,6 @@ public class BookingEventController : ControllerBase {
         var user = _security.GetCurrentUser();
         if (user == null) return Unauthorized();
         try {
-            
-
             var responses = await _bookingEventService.CreateBooking(request, user);
             var notification = responses.Notification;
 
@@ -126,26 +125,27 @@ public class BookingEventController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     } */
-    
-    /// <summary>
-    /// Searches for event availability based on the provided criteria.
-    /// </summary>
-    /// <param name="eventSearchAvailabilityRequest">The search criteria including date and number of guests.</param>
-    /// <returns>
-    /// - **200 OK**: If availability is found.
-    /// - **400 Bad Request**: If the request is invalid.
-    /// - **500 Internal Server Error**: If an unexpected error occurs.
-    /// </returns>
-    /// <response code="200">Availability found and returned.</response>
-    /// <response code="400">Invalid search criteria.</response>
-    /// <response code="500">An unexpected error occurred.</response>
-    [HttpGet("search-availability")]
+
+/// <summary>
+///     Searches for event availability based on the provided criteria.
+/// </summary>
+/// <param name="eventSearchAvailabilityRequest">The search criteria including date and number of guests.</param>
+/// <returns>
+///     - **200 OK**: If availability is found.
+///     - **400 Bad Request**: If the request is invalid.
+///     - **500 Internal Server Error**: If an unexpected error occurs.
+/// </returns>
+/// <response code="200">Availability found and returned.</response>
+/// <response code="400">Invalid search criteria.</response>
+/// <response code="500">An unexpected error occurred.</response>
+[HttpGet("search-availability")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SearchAvailability([FromQuery] EventSearchAvailabilityRequest eventSearchAvailabilityRequest) {
-        try { 
-            var availabilityList = (await _eventOfferService.SearchAvailability(eventSearchAvailabilityRequest));
+    public async Task<IActionResult> SearchAvailability(
+        [FromQuery] EventSearchAvailabilityRequest eventSearchAvailabilityRequest) {
+        try {
+            var availabilityList = await _eventOfferService.SearchAvailability(eventSearchAvailabilityRequest);
 
             return Ok(availabilityList.Select(a => new Resource<EventAvailabilityResponse> {
                 Data = a,
@@ -162,15 +162,14 @@ public class BookingEventController : ControllerBase {
                 }
             }));
         }
-        catch(InvalidDataException e) {
+        catch (InvalidDataException e) {
             _logger.LogError(e, "Invalid data provided for event availability search.");
             return BadRequest(e.Message);
         }
-        
+
         catch (Exception e) {
             _logger.LogError(e, "An error occurred while searching for event availability.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-    
 }

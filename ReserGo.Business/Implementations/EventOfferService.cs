@@ -5,28 +5,25 @@ using ReserGo.Business.Validator;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
-using ReserGo.Common.Requests.Products;
 using ReserGo.Common.Requests.Products.Event;
-using ReserGo.Common.Security;
-using ReserGo.DataAccess.Interfaces;
-using ReserGo.Shared.Interfaces;
-using ReserGo.Shared;
 using ReserGo.Common.Response;
-using ReserGo.Common.Requests.Products.Event;
+using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared;
+using ReserGo.Shared.Interfaces;
 
 namespace ReserGo.Business.Implementations;
 
 public class EventOfferService : IEventOfferService {
-    private readonly ILogger<UserService> _logger;
-    private readonly ISecurity _security;
-    private readonly IImageService _imageService;
-    private readonly IEventService _occasionService;
-    private readonly IEventOfferDataAccess _occasionOfferDataAccess;
     private readonly IMemoryCache _cache;
     private readonly IEventOfferDataAccess _eventOfferDataAccess;
+    private readonly IImageService _imageService;
+    private readonly ILogger<EventOfferService> _logger;
+    private readonly IEventOfferDataAccess _occasionOfferDataAccess;
+    private readonly IEventService _occasionService;
+    private readonly ISecurity _security;
 
-    public EventOfferService(ILogger<UserService> logger, IEventOfferDataAccess occasionOfferDataAccess,
-        IEventService occasionService, ISecurity security, IImageService imageService, 
+    public EventOfferService(ILogger<EventOfferService> logger, IEventOfferDataAccess occasionOfferDataAccess,
+        IEventService occasionService, ISecurity security, IImageService imageService,
         IMemoryCache cache,
         IEventOfferDataAccess eventOfferDataAccess) {
         _logger = logger;
@@ -39,7 +36,6 @@ public class EventOfferService : IEventOfferService {
     }
 
     public async Task<EventOfferDto> Create(EventOfferCreationRequest request) {
-        try {
             var error = EventOfferValidator.GetError(request);
             if (string.IsNullOrEmpty(error) == false) {
                 _logger.LogError(error);
@@ -75,15 +71,9 @@ public class EventOfferService : IEventOfferService {
 
             _logger.LogInformation("Event Offer { id } created", newEventOffer.Id);
             return newEventOffer.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
     }
 
     public async Task<EventOfferDto?> GetById(Guid id) {
-        try {
             if (_cache.TryGetValue($"occasionOffer_{id}", out EventOffer cachedEventOffer))
                 return cachedEventOffer.ToDto();
 
@@ -98,16 +88,9 @@ public class EventOfferService : IEventOfferService {
 
             _logger.LogInformation("Event Offer { id } retrieved successfully", occasionOffer.Id);
             return occasionOffer.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
     }
 
     public async Task<IEnumerable<EventOfferDto>> GetEventsByUserId(Guid userId) {
-        try {
-            
             var cacheKey = $"occasionOffers_user_{userId}";
             _cache.Remove($"occasionOffers_user_{userId}");
 
@@ -115,21 +98,15 @@ public class EventOfferService : IEventOfferService {
                 return cachedEventOffers;
 
             var occasionOffers = await _occasionOfferDataAccess.GetEventsOfferByUserId(userId);
-            IEnumerable<EventOfferDto> occasionOfferDtos =
+            var occasionOfferDtos =
                 occasionOffers.Select(occasionOffer => occasionOffer.ToDto());
 
             _cache.Set(cacheKey, occasionOfferDtos, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
             return occasionOfferDtos;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
     }
 
     public async Task<EventOfferDto> Update(Guid id, EventOfferUpdateRequest request) {
-        try {
             var occasionOffer = await _occasionOfferDataAccess.GetById(id);
             if (occasionOffer is null) throw new Exception("Event offer not found");
 
@@ -154,15 +131,9 @@ public class EventOfferService : IEventOfferService {
 
             _logger.LogInformation("Event Offer { stayId } updated successfully", occasionOffer.Id);
             return occasionOffer.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
     }
 
     public async Task Delete(Guid id) {
-        try {
             var occasionOffer = await _occasionOfferDataAccess.GetById(id);
             if (occasionOffer is null) {
                 var errorMessage = "Event offer not found";
@@ -176,36 +147,26 @@ public class EventOfferService : IEventOfferService {
             _cache.Remove($"occasion_offer_{occasionOffer.Id}");
 
             _logger.LogInformation("Event Offer { id } deleted successfully", occasionOffer.Id);
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
     }
-    
-    public async Task<IEnumerable<EventAvailabilityResponse>> SearchAvailability(EventSearchAvailabilityRequest request) {
-        try {
+
+    public async Task<IEnumerable<EventAvailabilityResponse>>
+        SearchAvailability(EventSearchAvailabilityRequest request) {
             var result = await _eventOfferDataAccess.SearchAvailability(request);
             if (result == null || !result.Any()) {
                 _logger.LogWarning("No event offers found for the given search criteria.");
                 return new List<EventAvailabilityResponse>();
             }
-            
+
             var availableOffers = result
                 .Where(o => o.GuestLimit - o.GuestNumber >= request.NumberOfGuests)
                 .Select(o => new EventAvailabilityResponse {
                     EventOfferId = o.Id,
-                    EventName = o.Event.Name, 
+                    EventName = o.Event.Name,
                     PricePerDay = o.PricePerDay,
                     AvailableCapacity = o.GuestLimit - o.GuestNumber,
                     ImageSrc = _imageService.GetPicture(o.Event.Picture ?? " ").Result
                 });
 
             return availableOffers;
-        }
-        catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while searching event availability.");
-            throw;
-        }
     }
 }

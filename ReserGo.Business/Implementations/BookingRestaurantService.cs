@@ -1,22 +1,22 @@
 using Microsoft.Extensions.Logging;
 using ReserGo.Business.Interfaces;
+using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
+using ReserGo.Common.Requests.Notification;
 using ReserGo.Common.Requests.Products.Restaurant;
+using ReserGo.Common.Response;
 using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
-using ReserGo.Common.Response;
-using ReserGo.Common.Requests.Notification;
 using ReserGo.Shared;
-using ReserGo.Common.DTO;
 
 namespace ReserGo.Business.Implementations;
 
 public class BookingRestaurantService : IBookingRestaurantService {
-    private readonly ILogger<BookingRestaurantService> _logger;
-    private readonly IRestaurantOfferService _restaurantOfferService;
     private readonly IBookingRestaurantDataAccess _bookingRestaurantDataAccess;
+    private readonly ILogger<BookingRestaurantService> _logger;
     private readonly INotificationService _notificationService;
+    private readonly IRestaurantOfferService _restaurantOfferService;
 
     public BookingRestaurantService(ILogger<BookingRestaurantService> logger,
         IRestaurantOfferService restaurantOfferService,
@@ -39,12 +39,14 @@ public class BookingRestaurantService : IBookingRestaurantService {
                 _logger.LogError("Restaurant offer not found for id { id }", request.RestaurantOfferId);
                 throw new InvalidDataException("Restaurant offer not found");
             }
+
             var remainingCapacity = restaurantOffer.GuestLimit - restaurantOffer.GuestNumber;
             if (request.NumberOfGuests > remainingCapacity) {
                 _logger.LogError("Booking exceeds the remaining capacity for offer { id }", restaurantOffer.Id);
-                throw new InvalidDataException($"Cannot book {request.NumberOfGuests} guests. Only {remainingCapacity} spots are available.");
+                throw new InvalidDataException(
+                    $"Cannot book {request.NumberOfGuests} guests. Only {remainingCapacity} spots are available.");
             }
-            
+
 
             var priceTotal = request.NumberOfGuests * restaurantOffer.PricePerPerson;
             var bookingRestaurant = new BookingRestaurant {
@@ -52,18 +54,19 @@ public class BookingRestaurantService : IBookingRestaurantService {
                 RestaurantId = restaurantOffer.Restaurant.Id,
                 UserId = user.UserId,
                 Date = request.Date,
-                PricePerPerson =  restaurantOffer.PricePerPerson,
+                PricePerPerson = restaurantOffer.PricePerPerson,
                 PriceTotal = priceTotal,
                 NumberOfGuests = request.NumberOfGuests,
-                IsConfirmed = request.IsConfirmed,
+                IsConfirmed = true,
                 BookingDate = DateOnly.FromDateTime(DateTime.UtcNow)
             };
-            
+
             _logger.LogInformation("Creating booking restaurant for user { id }", user.UserId);
             bookingRestaurant = await _bookingRestaurantDataAccess.Create(bookingRestaurant);
 
             if (bookingRestaurant == null) throw new InvalidDataException("Booking restaurant not created");
-
+            restaurantOffer.GuestNumber += request.NumberOfGuests;
+            restaurantOffer = await _restaurantOfferService.Update(restaurantOffer);
             if (restaurantOffer.Restaurant.Name == null) {
                 _logger.LogError("Restaurant name is not available for offer {id}", restaurantOffer.Id);
                 throw new InvalidDataException("Restaurant name is not available.");

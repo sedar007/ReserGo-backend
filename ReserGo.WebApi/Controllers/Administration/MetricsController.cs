@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
-
 using ReserGo.Business.Interfaces;
-using ReserGo.WebAPI.Attributes;
-using ReserGo.Shared.Interfaces;
-using ReserGo.WebAPI.Controllers.Administration.Products;
-using ReserGo.Common.Response;
 using ReserGo.Common.Enum;
+using ReserGo.Common.Response;
+using ReserGo.Shared.Interfaces;
+using ReserGo.WebAPI.Attributes;
+using ReserGo.WebAPI.Controllers.Administration.Products;
 
 namespace ReserGo.WebAPI.Controllers.Administration;
 
@@ -15,8 +14,8 @@ namespace ReserGo.WebAPI.Controllers.Administration;
 [Route("api/administration/metrics/")]
 public class MetricsController : ControllerBase {
     private readonly ILogger<HotelController> _logger;
-    private readonly ISecurity _security;
     private readonly IMetricsService _metricsService;
+    private readonly ISecurity _security;
 
     public MetricsController(ILogger<HotelController> logger,
         ISecurity security,
@@ -25,11 +24,12 @@ public class MetricsController : ControllerBase {
         _security = security;
         _metricsService = metricsService;
     }
+
     /// <summary>
-    /// Retrieves monthly sales data for the authenticated user.
+    ///     Retrieves monthly sales data for the authenticated user.
     /// </summary>
     /// <returns>
-    /// A dictionary where the keys are month names and the values are the sales totals rounded to two decimal places.
+    ///     A dictionary where the keys are month names and the values are the sales totals rounded to two decimal places.
     /// </returns>
     /// <response code="200">Monthly sales data retrieved successfully.</response>
     /// <response code="401">User not authenticated.</response>
@@ -50,13 +50,13 @@ public class MetricsController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-    
+
     /// <summary>
-    /// Get the percentage change in bookings over the last 30 days compared to the previous 30 days.
+    ///     Get the percentage change in bookings over the last 30 days compared to the previous 30 days.
     /// </summary>
     /// <returns>
-    /// A response containing the number of bookings in the last 30 days, 
-    /// the percentage change, and whether the trend is upward or downward.
+    ///     A response containing the number of bookings in the last 30 days,
+    ///     the percentage change, and whether the trend is upward or downward.
     /// </returns>
     /// <response code="200">Metrics retrieved successfully.</response>
     /// <response code="401">User not authenticated.</response>
@@ -83,12 +83,12 @@ public class MetricsController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-    
+
     /// <summary>
-    /// Get the monthly bookings grouped by category (Hotel, Restaurant, Event).
+    ///     Get the monthly bookings grouped by category (Hotel, Restaurant, Event).
     /// </summary>
     /// <returns>
-    /// A dictionary where each key is a category and the value is another dictionary containing months and booking counts.
+    ///     A dictionary where each key is a category and the value is another dictionary containing months and booking counts.
     /// </returns>
     /// <response code="200">Monthly bookings by category retrieved successfully.</response>
     /// <response code="401">User not authenticated.</response>
@@ -110,5 +110,4 @@ public class MetricsController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
         }
     }
-    
 }

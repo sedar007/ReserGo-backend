@@ -8,6 +8,9 @@ public static class Consts {
     public const int CacheDurationMinutes = 30;
     public const int CookiesExpiration = 30;
     public const string ReceiveNotification = "ReceiveNotification";
+    public const string UnexpectedError = "An unexpected error occurred.";
+    public const string UserNotExist = "This user does not exist.";
+    
 
 
     // User Message
@@ -17,13 +20,11 @@ public static class Consts {
     // Restaurant Offer
     // Cache
     public const string RestaurantOffersUserIdCacheKey = "restaurantOffers_user_";
+
     public const string RestaurantOffersCacheKey = "restaurantOffers_";
+
     //public const string CacheKeyAvailabilitiesUser = "availabilities_user_{0}_{1}_{2}";
     public const string CacheKeyAvailabilitiesHotel = "availabilities_hotel_{0}_{1}_{2}";
     public const string CacheKeyHotelOffers = "hotelOffers_{0}";
     public const string CacheKeyAvailabilitiesRoom = "availabilities_room_{0}_{1}_{2}";
-
-    
-    
-        
 }

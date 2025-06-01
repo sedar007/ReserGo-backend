@@ -1,8 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using ReserGo.DataAccess.Interfaces;
 using ReserGo.Common.Requests.Products.Event;
+using ReserGo.DataAccess.Interfaces;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -25,7 +24,7 @@ public class EventOfferDataAccess : IEventOfferDataAccess {
     }
 
     public async Task<EventOffer> Create(EventOffer user) {
-        EntityEntry<EventOffer> newData = _context.EventOffer.Add(user);
+        var newData = _context.EventOffer.Add(user);
         await _context.SaveChangesAsync();
         return await GetById(newData.Entity.Id) ??
                throw new NullReferenceException("Error creating new @event offer.");
@@ -41,7 +40,7 @@ public class EventOfferDataAccess : IEventOfferDataAccess {
         _context.EventOffer.Remove(@event);
         await _context.SaveChangesAsync();
     }
-    
+
     public async Task<IEnumerable<EventOffer>> SearchAvailability(EventSearchAvailabilityRequest request) {
         return await _context.EventOffer
             .Include(o => o.Event)
@@ -53,5 +52,4 @@ public class EventOfferDataAccess : IEventOfferDataAccess {
                                              b.EndDate >= request.StartDate))
             .ToListAsync();
     }
-    
 }

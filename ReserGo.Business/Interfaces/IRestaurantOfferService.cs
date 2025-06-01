@@ -1,6 +1,7 @@
 using ReserGo.Common.DTO;
 using ReserGo.Common.Requests.Products.Restaurant;
 using ReserGo.Common.Response;
+
 namespace ReserGo.Business.Interfaces;
 
 public interface IRestaurantOfferService {

@@ -1,19 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
-using ReserGo.Business.Interfaces;
-using ReserGo.Common.Requests.Products.Hotel;
-using ReserGo.WebAPI.Attributes;
-using ReserGo.Shared.Interfaces;
-using ReserGo.WebAPI.Controllers.Administration.Products;
 using Microsoft.AspNetCore.SignalR;
-using ReserGo.WebAPI.Hubs;
-using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
-using ReserGo.Common.Requests.Products.Hotel;
-using ReserGo.WebAPI.Attributes;
-using ReserGo.Shared.Interfaces;
-using ReserGo.WebAPI.Controllers.Administration.Products;
 using ReserGo.Common.Models;
+using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.Shared.Interfaces;
+using ReserGo.WebAPI.Attributes;
+using ReserGo.WebAPI.Controllers.Administration.Products;
+using ReserGo.WebAPI.Hubs;
 
 namespace ReserGo.WebAPI.Controllers.Customer.Booking;
 
@@ -22,10 +16,10 @@ namespace ReserGo.WebAPI.Controllers.Customer.Booking;
 [ClientOnly]
 [Route("api/customer/booking/hotels/")]
 public class BookingHotelController : ControllerBase {
-    private readonly ILogger<HotelController> _logger;
-    private readonly ISecurity _security;
     private readonly IBookingHotelService _bookingHotelService;
+    private readonly ILogger<HotelController> _logger;
     private readonly IHubContext<NotificationHub> _notificationHub;
+    private readonly ISecurity _security;
 
     public BookingHotelController(ILogger<HotelController> logger,
         ISecurity security, IBookingHotelService bookingHotelService, IHubContext<NotificationHub> notificationHub) {

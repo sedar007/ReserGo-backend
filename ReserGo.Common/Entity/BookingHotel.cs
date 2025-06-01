@@ -10,8 +10,7 @@ public class BookingHotel : Booking {
 
     public virtual Room Room { get; set; } = null!;
     public virtual Hotel Hotel { get; set; } = null!;
-    
+
     public Guid RoomAvailabilityId { get; set; }
     public virtual RoomAvailability RoomAvailability { get; set; } = null!;
-
 }

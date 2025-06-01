@@ -1,6 +1,6 @@
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 using ReserGo.Business.Interfaces;
 using ReserGo.Business.Validator;
 using ReserGo.Common.DTO;
@@ -14,11 +14,11 @@ using ReserGo.Shared;
 namespace ReserGo.Business.Implementations;
 
 public class UserService : IUserService {
+    private readonly IMemoryCache _cache;
+    private readonly IImageService _imageService;
     private readonly ILogger<UserService> _logger;
     private readonly ILoginService _loginService;
     private readonly IUserDataAccess _userDataAccess;
-    private readonly IImageService _imageService;
-    private readonly IMemoryCache _cache;
 
     public UserService(ILogger<UserService> logger, IUserDataAccess userDataAccess,
         ILoginService loginService, IImageService imageService, IMemoryCache cache) {
@@ -30,7 +30,7 @@ public class UserService : IUserService {
     }
 
     public async Task<UserDto> Create(UserCreationRequest request, UserRole role) {
-        try {
+       
             var userByUsername = await _userDataAccess.GetByUsername(request.Username);
             if (userByUsername is not null) {
                 var errorMessage = "This username is already in use.";
@@ -64,15 +64,11 @@ public class UserService : IUserService {
 
             _logger.LogInformation("User { id } created", newUser.Id);
             return newUser.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<UserDto?> GetById(Guid id) {
-        try {
+       
             var cacheKey = $"GetById_{id}";
 
             if (_cache.TryGetValue(cacheKey, out UserDto? cachedUser)) {
@@ -82,7 +78,7 @@ public class UserService : IUserService {
 
             var user = await _userDataAccess.GetById(id);
             if (user is null) {
-                var errorMessage = "This user does not exist.";
+                var errorMessage = Consts.UserNotExist;
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
@@ -91,17 +87,13 @@ public class UserService : IUserService {
             var userDto = user.ToDto();
             _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
             return userDto;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<string> GetProfilePicture(Guid userId) {
         var user = await GetById(userId);
         if (user is null) {
-            var errorMessage = "This user does not exist.";
+            var errorMessage = Consts.UserNotExist;
             _logger.LogError(errorMessage);
             throw new InvalidDataException(errorMessage);
         }
@@ -116,7 +108,7 @@ public class UserService : IUserService {
 
 
     public async Task<UserDto?> GetByEmail(string email) {
-        try {
+       
             var cacheKey = $"GetByEmail_{email}";
 
             if (_cache.TryGetValue(cacheKey, out UserDto? cachedUser)) {
@@ -126,25 +118,21 @@ public class UserService : IUserService {
 
             var user = await _userDataAccess.GetByEmail(email);
             if (user is null) {
-                var errorMessage = "This user does not exist.";
+                var errorMessage = Consts.UserNotExist;
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
 
-            _logger.LogInformation("User {id} retrieved successfully", user.Id);
+            _logger.LogInformation("User {Id} retrieved successfully", user.Id);
             var userDto = user.ToDto();
             _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
             return userDto;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<UserDto?> GetByUsername(string username) {
-        try {
+       
             var cacheKey = $"GetByUsername_{username}";
 
             if (_cache.TryGetValue(cacheKey, out UserDto? cachedUser)) {
@@ -154,7 +142,7 @@ public class UserService : IUserService {
 
             var user = await _userDataAccess.GetByUsername(username);
             if (user is null) {
-                var errorMessage = "This user does not exist.";
+                var errorMessage = Consts.UserNotExist;
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
@@ -165,15 +153,11 @@ public class UserService : IUserService {
             _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
             return userDto;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+       
     }
 
     public async Task Delete(Guid id) {
-        try {
+       
             var user = await _userDataAccess.GetById(id);
             if (user is null) {
                 var errorMessage = "User not found";
@@ -193,15 +177,11 @@ public class UserService : IUserService {
 
             RemoveCache(id, email, username);
             _logger.LogInformation("User { id } deleted successfully", userId);
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<UserDto> UpdateUser(Guid id, UserUpdateRequest request) {
-        try {
+        
             var user = await _userDataAccess.GetById(id);
             if (user is null) throw new Exception("User not found");
 
@@ -252,11 +232,6 @@ public class UserService : IUserService {
             await _userDataAccess.Update(user);
             RemoveCache(user.Id, user.Email, user.Username);
             return user.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
     }
 
     public async Task<string> UpdateProfilePicture(Guid userId, IFormFile file) {
@@ -264,9 +239,8 @@ public class UserService : IUserService {
 
         var user = await _userDataAccess.GetById(userId);
         if (user is null) {
-            var errorMessage = "This user does not exist.";
-            _logger.LogError(errorMessage);
-            throw new InvalidDataException(errorMessage);
+            _logger.LogError(Consts.UserNotExist);
+            throw new InvalidDataException(Consts.UserNotExist);
         }
 
         var oldPublicId = user.ProfilePicture;

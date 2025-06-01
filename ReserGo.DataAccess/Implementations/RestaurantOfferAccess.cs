@@ -1,9 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using ReserGo.DataAccess.Interfaces;
 using ReserGo.Common.Requests.Products.Restaurant;
-using ReserGo.Common.Response;
+using ReserGo.DataAccess.Interfaces;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -32,16 +30,17 @@ public class RestaurantOfferDataAccess : IRestaurantOfferDataAccess {
     }
 
     public async Task<RestaurantOffer> Update(RestaurantOffer restaurantOffer) {
-        _context.RestaurantOffer.Update(restaurantOffer);
+        var data = _context.RestaurantOffer.Update(restaurantOffer);
         await _context.SaveChangesAsync();
-        return restaurantOffer;
+        return await GetById(data.Entity.Id) ??
+               throw new NullReferenceException("Error updating restaurant offer.");
     }
 
     public async Task Delete(RestaurantOffer restaurant) {
         _context.RestaurantOffer.Remove(restaurant);
         await _context.SaveChangesAsync();
     }
-    
+
     public async Task<IEnumerable<RestaurantOffer>> SearchAvailability(RestaurantSearchAvailabilityRequest request) {
         return await _context.RestaurantOffer
             .Include(o => o.Restaurant)
@@ -49,11 +48,8 @@ public class RestaurantOfferDataAccess : IRestaurantOfferDataAccess {
                         o.OfferEndDate >= request.Date &&
                         o.GuestLimit - o.GuestNumber >= request.NumberOfGuests &&
                         (string.IsNullOrEmpty(request.CuisineType) ||
-                         (o.Restaurant.CuisineType != null && 
+                         (o.Restaurant.CuisineType != null &&
                           o.Restaurant.CuisineType.ToLower().Contains(request.CuisineType.ToLower()))))
             .ToListAsync();
     }
-    
-    
- 
 }

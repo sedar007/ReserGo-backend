@@ -7,9 +7,9 @@ using ReserGo.Tiers.Interfaces;
 namespace ReserGo.Business.Implementations;
 
 public class ImageService : IImageService {
-    private readonly ILogger<ImageService> _logger;
-    private readonly ICloudinaryService _cloudinary;
     private readonly IMemoryCache _cache;
+    private readonly ICloudinaryService _cloudinary;
+    private readonly ILogger<ImageService> _logger;
 
     public ImageService(ILogger<ImageService> logger, ICloudinaryService cloudinary, IMemoryCache cache) {
         _logger = logger;

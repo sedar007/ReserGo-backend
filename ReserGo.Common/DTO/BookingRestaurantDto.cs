@@ -6,7 +6,7 @@ public class BookingRestaurantDto : BookingDto {
     public double PricePerPerson { get; set; }
 
     public Guid RestaurantOfferId { get; set; }
-    public RestaurantOfferDto? RestaurantOffer { get; set; }
+    public RestaurantOfferDto RestaurantOffer { get; set; } = null!;
 
     public virtual RestaurantDto Restaurant { get; set; } = null!;
 }

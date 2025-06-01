@@ -1,4 +1,5 @@
 using ReserGo.Common.DTO;
+
 namespace ReserGo.Common.Response;
 
 public class RoomAvailibilityHotelResponse {

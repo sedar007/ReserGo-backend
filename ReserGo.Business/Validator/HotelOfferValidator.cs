@@ -1,4 +1,3 @@
-using ReserGo.Common.Requests.Products;
 using ReserGo.Common.Requests.Products.Hotel;
 
 namespace ReserGo.Business.Validator;
@@ -29,10 +28,12 @@ public static class HotelOfferValidator {
         if (request.OfferEndDate == default) return "Offer end date is invalid.";
         if (request.OfferStartDate >= request.OfferEndDate) return "Offer start date must be before end date.";
         if (request.IsActive == null) return "IsActive cannot be null.";
-        if (request.IsActive != null && request.IsActive == false && request.OfferEndDate < DateOnly.FromDateTime(DateTime.Now))
+        if (request.IsActive != null && request.IsActive == false &&
+            request.OfferEndDate < DateOnly.FromDateTime(DateTime.Now))
             return "Cannot deactivate an expired offer.";
         if (request.OfferEndDate < DateOnly.FromDateTime(DateTime.Now)) return "Offer end date cannot be in the past.";
-        if (request.OfferStartDate < DateOnly.FromDateTime(DateTime.Now)) return "Offer start date cannot be in the past.";
+        if (request.OfferStartDate < DateOnly.FromDateTime(DateTime.Now))
+            return "Offer start date cannot be in the past.";
         if (request.OfferStartDate >= request.OfferEndDate) return "Offer start date must be before end date.";
         return "";
     }

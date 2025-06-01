@@ -1,12 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
-using ReserGo.Common.Requests.Products.Hotel;
-using ReserGo.WebAPI.Attributes;
-using ReserGo.Shared.Interfaces;
-using ReserGo.WebAPI.Controllers.Administration.Products;
 using ReserGo.Common.Models;
-
+using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.Shared.Interfaces;
+using ReserGo.WebAPI.Attributes;
+using ReserGo.WebAPI.Controllers.Administration.Products;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Offers;
 
@@ -15,10 +14,10 @@ namespace ReserGo.WebAPI.Controllers.Administration.Offers;
 [AdminOnly]
 [Route("api/administration/offers/hotels/")]
 public class HotelOfferController : ControllerBase {
-    private readonly ILogger<HotelController> _logger;
-    private readonly IHotelOfferService _hotelOfferService;
-    private readonly ISecurity _security;
     private readonly IBookingHotelService _bookingHotelService;
+    private readonly IHotelOfferService _hotelOfferService;
+    private readonly ILogger<HotelController> _logger;
+    private readonly ISecurity _security;
 
     public HotelOfferController(ILogger<HotelController> logger, IHotelOfferService hotelOfferService,
         ISecurity security, IBookingHotelService bookingHotelService) {
@@ -29,7 +28,7 @@ public class HotelOfferController : ControllerBase {
     }
 
     /// <summary>
-    /// Create a new hotel offer.
+    ///     Create a new hotel offer.
     /// </summary>
     /// <param name="request">The hotel offer creation request containing necessary information.</param>
     /// <returns>The created hotel offer object.</returns>
@@ -76,7 +75,7 @@ public class HotelOfferController : ControllerBase {
 
 
     /// <summary>
-    /// Retrieve a hotel offer by its ID.
+    ///     Retrieve a hotel offer by its ID.
     /// </summary>
     /// <param name="id">The ID of the hotel offer.</param>
     /// <returns>The hotel offer object.</returns>
@@ -126,7 +125,7 @@ public class HotelOfferController : ControllerBase {
     }
 
     /// <summary>
-    /// Retrieve hotel offers for the connected user.
+    ///     Retrieve hotel offers for the connected user.
     /// </summary>
     /// <returns>A list of hotel offers associated with the connected user.</returns>
     /// <response code="200">Hotel offers retrieved successfully.</response>
@@ -184,7 +183,7 @@ public class HotelOfferController : ControllerBase {
     }
 
     /// <summary>
-    /// Update an existing hotel offer.
+    ///     Update an existing hotel offer.
     /// </summary>
     /// <param name="id">The ID of the hotel offer to update.</param>
     /// <param name="request">The hotel offer update request.</param>
@@ -227,7 +226,7 @@ public class HotelOfferController : ControllerBase {
     }
 
     /// <summary>
-    /// Remove a hotel offer by its ID.
+    ///     Remove a hotel offer by its ID.
     /// </summary>
     /// <param name="id">The ID of the hotel offer to remove.</param>
     /// <returns>No content if successful.</returns>

@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
-using ReserGo.Common.Requests.Products.Hotel;
-using ReserGo.WebAPI.Attributes;
 using ReserGo.Shared.Interfaces;
+using ReserGo.WebAPI.Attributes;
 using ReserGo.WebAPI.Controllers.Administration.Products;
-using ReserGo.Common.Models;
-
 
 namespace ReserGo.WebAPI.Controllers.Administration.Notification;
 

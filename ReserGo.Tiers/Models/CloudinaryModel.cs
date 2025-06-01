@@ -1,6 +1,6 @@
+using CloudinaryDotNet;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using CloudinaryDotNet;
 
 namespace ReserGo.Tiers.Models;
 

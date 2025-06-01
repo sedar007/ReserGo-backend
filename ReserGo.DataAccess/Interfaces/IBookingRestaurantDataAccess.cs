@@ -1,6 +1,6 @@
-namespace ReserGo.DataAccess.Interfaces;
+using ReserGo.Common.Entity;
 
-using Common.Entity;
+namespace ReserGo.DataAccess.Interfaces;
 
 public interface IBookingRestaurantDataAccess {
     Task<BookingRestaurant> Create(BookingRestaurant bookingRestaurant);

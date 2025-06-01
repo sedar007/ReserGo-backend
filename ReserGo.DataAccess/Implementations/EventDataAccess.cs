@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ReserGo.DataAccess.Interfaces;
 
 namespace ReserGo.DataAccess.Implementations;
@@ -25,7 +24,7 @@ public class EventDataAccess : IEventDataAccess {
     }
 
     public async Task<Event> Create(Event user) {
-        EntityEntry<Event> newData = _context.Event.Add(user);
+        var newData = _context.Event.Add(user);
         await _context.SaveChangesAsync();
         return await GetByStayId(newData.Entity.StayId) ??
                throw new NullReferenceException("Error creating new @event.");

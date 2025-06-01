@@ -1,6 +1,6 @@
-﻿using ReserGo.DataAccess.Interfaces;
+﻿using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
-using Microsoft.EntityFrameworkCore;
+using ReserGo.DataAccess.Interfaces;
 
 namespace ReserGo.DataAccess.Implementations;
 

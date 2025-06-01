@@ -6,7 +6,6 @@ using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
 using ReserGo.Common.Requests.Products.Restaurant;
-using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared;
 using ReserGo.Shared.Interfaces;
@@ -14,11 +13,11 @@ using ReserGo.Shared.Interfaces;
 namespace ReserGo.Business.Implementations;
 
 public class RestaurantService : IRestaurantService {
-    private readonly ISecurity _security;
     private readonly IMemoryCache _cache;
-    private readonly ILogger<UserService> _logger;
     private readonly IImageService _imageService;
+    private readonly ILogger<UserService> _logger;
     private readonly IRestaurantDataAccess _restaurantDataAccess;
+    private readonly ISecurity _security;
 
     public RestaurantService(IMemoryCache cache, ILogger<UserService> logger,
         IRestaurantDataAccess restaurantDataAccess, ISecurity security, IImageService imageService) {

@@ -3,18 +3,18 @@ using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
-using ReserGo.DataAccess.Interfaces;
-using ReserGo.Shared.Interfaces;
-using ReserGo.Common.Security;
 using ReserGo.Common.Requests.Security;
+using ReserGo.Common.Security;
+using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared;
+using ReserGo.Shared.Interfaces;
 
 namespace ReserGo.Business.Implementations;
 
 public class LoginService : ILoginService {
-    private readonly ISecurity _security;
     private readonly ILogger<LoginService> _logger;
     private readonly ILoginDataAccess _loginDataAccess;
+    private readonly ISecurity _security;
     private readonly IUserDataAccess _userDataAccess;
 
     public LoginService(ILogger<LoginService> logger, ISecurity security, ILoginDataAccess loginDataAccess,
@@ -64,12 +64,6 @@ public class LoginService : ILoginService {
         return new AuthenticateResponse(user, _security.GenerateJwtToken(user.Username, user.Id, user.Role), user.Role);
     }
 
-    private async Task<UserDto?> GetUser(LoginRequest request) {
-        if (Utils.CheckMail(request.Login))
-            return (await _userDataAccess.GetByEmail(request.Login))?.ToDto();
-        return (await _userDataAccess.GetByUsername(request.Login))?.ToDto();
-    }
-
     public async Task<LoginDto?> Create(string password, User user) {
         // User validation
         if (user == null || user.Id == Guid.Empty) {
@@ -102,5 +96,11 @@ public class LoginService : ILoginService {
 
         _logger.LogInformation("User {Username} created successfully", user.Username);
         return createdLogin.ToDto();
+    }
+
+    private async Task<UserDto?> GetUser(LoginRequest request) {
+        if (Utils.CheckMail(request.Login))
+            return (await _userDataAccess.GetByEmail(request.Login))?.ToDto();
+        return (await _userDataAccess.GetByUsername(request.Login))?.ToDto();
     }
 }

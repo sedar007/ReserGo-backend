@@ -1,15 +1,16 @@
+using System.Net;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
-using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using ReserGo.Tiers.Interfaces;
 using ReserGo.Tiers.Models;
 
 namespace ReserGo.Tiers.Implementations;
 
 public class CloudinaryService : ICloudinaryService {
-    private readonly ILogger<CloudinaryService> _logger;
     private readonly Cloudinary _cloudinary;
+    private readonly ILogger<CloudinaryService> _logger;
 
     public CloudinaryService(ILogger<CloudinaryService> logger, CloudinaryModel cloudinary) {
         _logger = logger;
@@ -33,7 +34,7 @@ public class CloudinaryService : ICloudinaryService {
         };
 
         var result = await _cloudinary.DestroyAsync(deleteParams);
-        if (result.StatusCode != System.Net.HttpStatusCode.OK) {
+        if (result.StatusCode != HttpStatusCode.OK) {
             _logger.LogWarning("Failed to delete image with publicId: {PublicId}", publicId);
             return false;
         }
@@ -49,7 +50,7 @@ public class CloudinaryService : ICloudinaryService {
         var folderPath = $"admin/{userId}";
         var createFolderResult = await _cloudinary.CreateFolderAsync(folderPath);
 
-        if (createFolderResult.StatusCode != System.Net.HttpStatusCode.OK) {
+        if (createFolderResult.StatusCode != HttpStatusCode.OK) {
             _logger.LogWarning("Failed to create folder: {Folder}", folderPath);
             return null;
         }

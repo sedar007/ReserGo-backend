@@ -14,8 +14,8 @@ public static class BookingHelper {
             IsConfirmed = bookingRestaurant.IsConfirmed,
             BookingDate = bookingRestaurant.BookingDate,
             RestaurantOfferId = bookingRestaurant.RestaurantOfferId,
-            RestaurantOffer = bookingRestaurant.RestaurantOffer?.ToDto(),
-            Restaurant = bookingRestaurant?.Restaurant?.ToDto(),
+            RestaurantOffer = bookingRestaurant.RestaurantOffer.ToDto(),
+            Restaurant = bookingRestaurant.Restaurant.ToDto(),
             Date = bookingRestaurant.Date
         };
     }

@@ -1,6 +1,6 @@
-namespace ReserGo.DataAccess.Interfaces;
+using ReserGo.Common.Entity;
 
-using Common.Entity;
+namespace ReserGo.DataAccess.Interfaces;
 
 public interface IBookingEventDataAccess {
     Task<BookingEvent> Create(BookingEvent bookingEvent);
@@ -10,6 +10,6 @@ public interface IBookingEventDataAccess {
 
 
     Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId, DateOnly startDate, DateOnly endDate);
-    
+
     Task<BookingEvent?> GetById(Guid id);
 }

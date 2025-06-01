@@ -6,7 +6,6 @@ using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
 using ReserGo.Common.Requests.Products.Event;
-using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared;
 using ReserGo.Shared.Interfaces;
@@ -15,10 +14,10 @@ namespace ReserGo.Business.Implementations;
 
 public class EventService : IEventService {
     private readonly IMemoryCache _cache;
-    private readonly ILogger<UserService> _logger;
-    private readonly ISecurity _security;
     private readonly IImageService _imageService;
+    private readonly ILogger<UserService> _logger;
     private readonly IEventDataAccess _occasionDataAccess;
+    private readonly ISecurity _security;
 
     public EventService(IMemoryCache cache, ILogger<UserService> logger, IEventDataAccess occasionDataAccess,
         ISecurity security, IImageService imageService) {

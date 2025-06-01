@@ -5,5 +5,4 @@ public class BookingEventRequest {
     public int NumberOfGuests { get; set; }
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
-    public bool IsConfirmed { get; set; }
 }

@@ -1,26 +1,26 @@
+using System.Reflection;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.HttpOverrides;
-using System.Reflection;
 using NLog;
 using NLog.Web;
-using ReserGo.DataAccess.Interfaces;
-using ReserGo.DataAccess.Implementations;
-using ReserGo.Shared.Interfaces;
-using ReserGo.Shared.Implementations;
-using ReserGo.Business.Interfaces;
 using ReserGo.Business.Implementations;
+using ReserGo.Business.Interfaces;
 using ReserGo.Common.Security;
-using ReserGo.Tiers.Interfaces;
-using ReserGo.Tiers.Implementations;
-using ReserGo.Tiers.Models;
 using ReserGo.DataAccess;
+using ReserGo.DataAccess.Implementations;
+using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared;
-using ReserGo.WebAPI.Services;
+using ReserGo.Shared.Implementations;
+using ReserGo.Shared.Interfaces;
+using ReserGo.Tiers.Implementations;
+using ReserGo.Tiers.Interfaces;
+using ReserGo.Tiers.Models;
 using ReserGo.WebAPI.Hubs;
+using ReserGo.WebAPI.Services;
 
 namespace ReserGo.WebAPI;
 
