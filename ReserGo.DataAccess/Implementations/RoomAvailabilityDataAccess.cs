@@ -60,7 +60,7 @@ public class RoomAvailabilityDataAccess : IRoomAvailabilityDataAccess {
             .Include(ra => ra.Room)
             .Include(ra => ra.Hotel)
             .Where(ra => hotelIds.Contains(ra.HotelId))
-            .OrderBy(ra => ra.StartDate)
+            .OrderByDescending(ra => ra.StartDate)
             .Skip(skip)
             .Take(take)
             .ToListAsync();
@@ -76,7 +76,7 @@ public class RoomAvailabilityDataAccess : IRoomAvailabilityDataAccess {
             .ToListAsync();
     }
     
-    public async Task<IEnumerable<RoomAvailability?>> GetAvailability(HotelSearchAvailabilityRequest request) {
+    public async Task<IEnumerable<RoomAvailability>> GetAvailability(HotelSearchAvailabilityRequest request) {
         return await _context.RoomAvailability
             .Include(ra => ra.Room)
             .Include(ra => ra.Hotel)

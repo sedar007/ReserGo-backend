@@ -66,8 +66,16 @@ public class HotelOfferService : IHotelOfferService {
             newHotelOffer = await _hotelOfferDataAccess.Create(newHotelOffer);
 
             // Cache the created hotel offer
-            _cache.Set($"newHotelOffer_{newHotelOffer.Id}", newHotelOffer,
-                TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+            var cacheKey = string.Format(Consts.CacheKeyHotelOffers, connectedUser.UserId);
+            if (_cache.TryGetValue(cacheKey, out List<HotelOfferDto>? cachedHotelOffers)) {
+                cachedHotelOffers ??= new List<HotelOfferDto>();
+                cachedHotelOffers.Add(newHotelOffer.ToDto());
+                _cache.Set(cacheKey, cachedHotelOffers, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+            } else {
+                var newCacheList = new List<HotelOfferDto> { newHotelOffer.ToDto() };
+                _cache.Set(cacheKey, newCacheList, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+            }
+            
 
             _logger.LogInformation("Hotel Offer { id } created", newHotelOffer.Id);
             return newHotelOffer.ToDto();
@@ -80,8 +88,11 @@ public class HotelOfferService : IHotelOfferService {
 
     public async Task<HotelOfferDto?> GetById(Guid id) {
         try {
-            if (_cache.TryGetValue($"hotelOffer_{id}", out HotelOffer cachedHotelOffer))
-                return cachedHotelOffer.ToDto();
+            if (_cache.TryGetValue($"hotelOffer_{id}", out HotelOffer? cachedHotelOffer)) {
+                if (cachedHotelOffer != null) {
+                    return cachedHotelOffer.ToDto();
+                }
+            }
 
             var hotelOffer = await _hotelOfferDataAccess.GetById(id);
             if (hotelOffer is null) {
@@ -103,10 +114,13 @@ public class HotelOfferService : IHotelOfferService {
 
     public async Task<IEnumerable<HotelOfferDto>> GetHotelsByUserId(Guid userId) {
         try {
-            var cacheKey = $"hotelOffers_user_{userId}";
-
-            if (_cache.TryGetValue(cacheKey, out IEnumerable<HotelOfferDto> cachedHotelOffers))
-                return cachedHotelOffers;
+            var cacheKey = string.Format(Consts.CacheKeyHotelOffers, userId);
+            
+            if (_cache.TryGetValue(cacheKey, out List<HotelOfferDto>? cachedHotelOffers)) {
+                if (cachedHotelOffers != null) {
+                    return cachedHotelOffers;
+                }
+            }
 
             var hotelOffers = await _hotelOfferDataAccess.GetHotelsOfferByUserId(userId);
             IEnumerable<HotelOfferDto> hotelOfferDtos = hotelOffers.Select(hotelOffer => hotelOffer.ToDto());

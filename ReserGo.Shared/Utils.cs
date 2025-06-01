@@ -1,3 +1,5 @@
+using ReserGo.Common.Security;
+using Microsoft.Extensions.Logging;
 namespace ReserGo.Shared;
 
 public static class Utils {
@@ -10,6 +12,13 @@ public static class Utils {
         }
         catch (FormatException) {
             return false;
+        }
+    }
+    
+    public static void IsAuthorized(ConnectedUser connectedUser, ILogger logger) {
+        if (connectedUser == null) {
+            logger.LogWarning("User not connected.");
+            throw new UnauthorizedAccessException("User not connected.");
         }
     }
 }

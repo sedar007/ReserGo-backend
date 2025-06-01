@@ -6,9 +6,9 @@ using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Controllers.Administration.Products;
 using Microsoft.AspNetCore.SignalR;
 using ReserGo.WebAPI.Hubs;
-using ReserGo.Common.DTO;
 using ReserGo.Common.Models;
 using ReserGo.Common.Response;
+using ReserGo.Shared;
 namespace ReserGo.WebAPI.Controllers.Customer.Booking;
 
 [ApiController]
@@ -53,15 +53,16 @@ public class BookingEventController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<IActionResult> CreateReservation([FromBody] BookingEventRequest request) {
+        var user = _security.GetCurrentUser();
+        if (user == null) return Unauthorized();
         try {
-            var user = _security.GetCurrentUser();
-            if (user == null) return Unauthorized();
+            
 
             var responses = await _bookingEventService.CreateBooking(request, user);
             var notification = responses.Notification;
 
             await _notificationHub.Clients.User(notification.UserId.ToString())
-                .SendAsync("ReceiveNotification", notification.Message);
+                .SendAsync(Consts.ReceiveNotification, notification.Message);
             var bookingEventService = responses.Booking;
 
             return CreatedAtAction(nameof(CreateReservation), bookingEventService);
@@ -79,7 +80,7 @@ public class BookingEventController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-
+/*
     /// <summary>
     ///     Retrieve all bookings for the current user.
     /// </summary>
@@ -101,32 +102,30 @@ public class BookingEventController : ControllerBase {
             var user = _security.GetCurrentUser();
             if (user == null) return Unauthorized();
 
-           /* var bookings = await _bookingEventService.GetBookingsByUserId(user.UserId);
+           var bookings = await _bookingEventService.GetBookingsByUserId(user.UserId);
+              var bookingsWithLinks = bookings.Select(booking => new Resource<BookingEventDto> {
+                  Data = booking,
+                  Links = GenerateLinks(booking.Id)
+              });
 
-            var bookingsWithLinks = bookings.Select(booking => new Resource<BookingEventDto> {
-                Data = booking,
-                Links = GenerateLinks(booking.Id)
-            });
+              var resourceCollection = new Resource<IEnumerable<Resource<BookingEventDto>>> {
+                  Data = bookingsWithLinks,
+                  Links = new List<Link> {
+                      new() {
+                          Href = Url.Action(nameof(GetMyBookings)),
+                          Rel = "self",
+                          Method = "GET"
+                      }
+                  }
+              };
 
-            var resourceCollection = new Resource<IEnumerable<Resource<BookingEventDto>>> {
-                Data = bookingsWithLinks,
-                Links = new List<Link> {
-                    new() {
-                        Href = Url.Action(nameof(GetMyBookings)),
-                        Rel = "self",
-                        Method = "GET"
-                    }
-                }
-            };
-
-            return Ok(resourceCollection);*/
-           return Ok(1);
+            return Ok(resourceCollection);
         }
         catch (Exception e) {
             _logger.LogError(e, "An unexpected error occurred while retrieving bookings");
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
-    }
+    } */
     
     /// <summary>
     /// Searches for event availability based on the provided criteria.
@@ -144,12 +143,11 @@ public class BookingEventController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SearchAvailability([FromQuery] EventSearchAvailabilityRequest eventSearchAvailabilityRequest)
-    {
+    public async Task<IActionResult> SearchAvailability([FromQuery] EventSearchAvailabilityRequest eventSearchAvailabilityRequest) {
         try { 
-            var availability = await _eventOfferService.SearchAvailability(eventSearchAvailabilityRequest);
+            var availabilityList = (await _eventOfferService.SearchAvailability(eventSearchAvailabilityRequest));
 
-            return Ok(availability.Select(a => new Resource<EventAvailabilityResponse> {
+            return Ok(availabilityList.Select(a => new Resource<EventAvailabilityResponse> {
                 Data = a,
                 Links = new List<Link> {
                     new() {
@@ -157,35 +155,22 @@ public class BookingEventController : ControllerBase {
                             eventSearchAvailabilityRequest.StartDate,
                             eventSearchAvailabilityRequest.EndDate,
                             eventSearchAvailabilityRequest.NumberOfGuests
-                        }),
+                        }) ?? throw new InvalidOperationException("Failed to generate URL for SearchAvailability."),
                         Rel = "self",
                         Method = "GET"
                     }
                 }
             }));
-        } catch (Exception e) {
+        }
+        catch(InvalidDataException e) {
+            _logger.LogError(e, "Invalid data provided for event availability search.");
+            return BadRequest(e.Message);
+        }
+        
+        catch (Exception e) {
             _logger.LogError(e, "An error occurred while searching for event availability.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-
-    private List<Link> GenerateLinks(Guid bookingId) {
-        return new List<Link> {
-            new() {
-                Href = Url.Action(nameof(GetMyBookings), new { id = bookingId }),
-                Rel = "self",
-                Method = "GET"
-            },
-            new() {
-                Href = Url.Action(nameof(CreateReservation), new { id = bookingId }),
-                Rel = "create",
-                Method = "POST"
-            },
-            new() {
-                Href = Url.Action("DeleteBooking", new { id = bookingId }),
-                Rel = "delete",
-                Method = "DELETE"
-            }
-        };
-    }
+    
 }
