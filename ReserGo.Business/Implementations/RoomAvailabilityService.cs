@@ -206,10 +206,10 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
                         .Where(a => a.BookingsHotels.All(b => b.EndDate <= request.ArrivalDate || b.StartDate >= request.ReturnDate))
                         .Select(async a => await Task.FromResult(a.Room.ToDto())))
 
-                }));
-
-            return response;
-        
+                })
+            );
+            
+            return response.Where(r => r.Rooms.Any());
     }
 
     private void DeleteCache(Guid userId) {
