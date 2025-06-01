@@ -25,7 +25,9 @@ public class RoomAvailabilityDataAccess : IRoomAvailabilityDataAccess {
     }
 
     public async Task<RoomAvailability?> GetByRoomId(Guid roomId) {
-        return await _context.RoomAvailability.Include(x => x.Room).Include(x => x.Hotel)
+        return await _context.RoomAvailability
+            .Include(x => x.Room)
+            .Include(x => x.Hotel)
             .FirstOrDefaultAsync(x => x.RoomId == roomId);
     }
 
@@ -64,13 +66,23 @@ public class RoomAvailabilityDataAccess : IRoomAvailabilityDataAccess {
             .ToListAsync();
     }
     
+    public async Task<IEnumerable<RoomAvailability>> GetAvailabilitiesByRoomIdDate(Guid roomId, DateOnly startDate, DateOnly endDate) {
+        return await _context.RoomAvailability
+            .Include(ra => ra.Room)
+            .Include(ra => ra.Hotel)
+            .Include(a => a.BookingsHotels)
+            .Where(ra => ra.Room.Id == roomId&& ra.StartDate <= startDate
+                         && endDate <= ra.EndDate)
+            .ToListAsync();
+    }
+    
     public async Task<IEnumerable<RoomAvailability?>> GetAvailability(HotelSearchAvailabilityRequest request) {
         return await _context.RoomAvailability
             .Include(ra => ra.Room)
             .Include(ra => ra.Hotel)
             .Include(a => a.BookingsHotels)
-            .Where(ra => ra.StartDate.Date <= request.ArrivalDate.Date 
-                         && request.ReturnDate.Date <= ra.EndDate.Date && ra.Room.Capacity >= request.NumberOfPeople / request.NumberOfRooms)
+            .Where(ra => ra.StartDate <= request.ArrivalDate 
+                         && request.ReturnDate <= ra.EndDate && ra.Room.Capacity >= request.NumberOfPeople)
             .ToListAsync();
     }
     

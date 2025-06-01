@@ -11,6 +11,8 @@ using ReserGo.Common.Security;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared.Interfaces;
 using ReserGo.Shared;
+using ReserGo.Common.Response;
+using ReserGo.Common.Requests.Products.Restaurant;
 
 namespace ReserGo.Business.Implementations;
 
@@ -20,17 +22,20 @@ public class RestaurantOfferService : IRestaurantOfferService {
     private readonly IRestaurantService _restaurantService;
     private readonly IRestaurantOfferDataAccess _restaurantOfferDataAccess;
     private readonly IMemoryCache _cache;
+    private readonly IImageService _imageService;
 
     public RestaurantOfferService(ILogger<RestaurantOfferService> logger,
         IRestaurantOfferDataAccess restaurantOfferDataAccess,
         IRestaurantService restaurantService,
         ISecurity security,
-        IMemoryCache cache) {
+        IMemoryCache cache,
+        IImageService imageService) {
         _logger = logger;
         _security = security;
         _restaurantOfferDataAccess = restaurantOfferDataAccess;
         _restaurantService = restaurantService;
         _cache = cache;
+        _imageService = imageService;
     }
 
     public async Task<RestaurantOfferDto> Create(RestaurantOfferCreationRequest request) {
@@ -63,25 +68,25 @@ public class RestaurantOfferService : IRestaurantOfferService {
                 throw new InvalidDataException(errorMessage);
             }
 
-            if (request.OfferStartDate.Date < DateTime.UtcNow.Date) {
+            if (request.OfferStartDate < DateOnly.FromDateTime(DateTime.UtcNow)) {
                 var errorMessage = "Offer start date must be greater than or equal to today";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
 
-            if (request.OfferEndDate.Date < request.OfferStartDate.Date) {
+            if (request.OfferEndDate < request.OfferStartDate) {
                 var errorMessage = "Offer end date must be greater than or equal to offer start date";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
-
-            if (request.OfferEndDate.Date < DateTime.UtcNow.Date) {
+    
+            if (request.OfferEndDate < DateOnly.FromDateTime(DateTime.UtcNow)) {
                 var errorMessage = "Offer end date must be greater than or equal to today";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
 
-            if (request.OfferStartDate.Date > request.OfferEndDate.Date) {
+            if (request.OfferStartDate > request.OfferEndDate) {
                 var errorMessage = "Offer start date must be less than or equal to offer end date";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
@@ -118,6 +123,33 @@ public class RestaurantOfferService : IRestaurantOfferService {
         }
         catch (Exception e) {
             _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
+    
+    public async Task<IEnumerable<RestaurantAvailabilityResponse>> SearchAvailability(RestaurantSearchAvailabilityRequest request) {
+        try {
+            var result = await _restaurantOfferDataAccess.SearchAvailability(request);
+            if (result == null || !result.Any()) {
+                _logger.LogWarning("No restaurant offers found for the given search criteria.");
+                return new List<RestaurantAvailabilityResponse>();
+            }
+            
+            var availableOffers = result
+                .Where(o => o.GuestLimit - o.GuestNumber >= request.NumberOfGuests)
+                .Select(o => new RestaurantAvailabilityResponse {
+                    RestaurantOfferId = o.Id,
+                    TypeOfCuisine = o.Restaurant.CuisineType,
+                    RestaurantName = o.Restaurant.Name, 
+                    PricePerGuest = o.PricePerPerson,
+                    AvailableCapacity = o.GuestLimit - o.GuestNumber,
+                    ImageSrc = _imageService.GetPicture(o.Restaurant.Picture ?? " ").Result
+                });
+
+            return availableOffers;
+        }
+        catch (Exception ex) {
+            _logger.LogError(ex, "An error occurred while searching restaurant availability.");
             throw;
         }
     }
@@ -200,6 +232,30 @@ public class RestaurantOfferService : IRestaurantOfferService {
 
             _logger.LogInformation("Restaurant Offer { stayId } updated successfully", restaurantOffer.Id);
             return restaurantOffer.ToDto();
+        }
+        catch (Exception e) {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
+    
+    public async Task<RestaurantOfferDto> Update(RestaurantOfferDto restaurantOfferDto) {
+        try {
+            var restaurant = await _restaurantOfferDataAccess.GetById(restaurantOfferDto.RestaurantId);
+            if(restaurant is null) throw new InvalidDataException("Restaurant not found");
+            
+            restaurant.Description = restaurantOfferDto.Description;
+            restaurant.PricePerPerson = restaurantOfferDto.PricePerPerson;
+            restaurant.GuestLimit = restaurantOfferDto.GuestLimit;
+            restaurant.GuestNumber = restaurantOfferDto.GuestNumber;
+            restaurant.OfferStartDate = restaurantOfferDto.OfferStartDate;
+            restaurant.OfferEndDate = restaurantOfferDto.OfferEndDate;
+            restaurant.IsActive = restaurantOfferDto.IsActive;
+            
+            restaurant = await _restaurantOfferDataAccess.Update(restaurant);
+
+            _logger.LogInformation("Restaurant Offer { stayId } updated successfully", restaurant.Id);
+            return restaurant.ToDto();
         }
         catch (Exception e) {
             _logger.LogError(e, e.Message);

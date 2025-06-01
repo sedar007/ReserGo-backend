@@ -7,8 +7,8 @@ public class HotelOfferDto {
     public double PricePerNight { get; set; }
     public int NumberOfGuests { get; set; }
     public int NumberOfRooms { get; set; }
-    public DateTime OfferStartDate { get; set; }
-    public DateTime OfferEndDate { get; set; }
+    public DateOnly OfferStartDate { get; set; }
+    public DateOnly OfferEndDate { get; set; }
     public bool IsActive { get; set; }
 
     public Guid HotelId { get; set; }

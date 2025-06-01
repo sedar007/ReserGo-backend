@@ -37,27 +37,27 @@ public class BookingHotelService : IBookingHotelService {
                 throw new InvalidDataException(Consts.UserNotFound);
             }
 
-            var availability = await _roomAvailabilityService.GetAvailabilityByRoomId(request.RoomId);
+            var availability = await _roomAvailabilityService.GetAvailabilityByRoomId(request.RoomId, request.StartDate, request.EndDate);
 
-            if (availability == null || availability.StartDate.Date > request.StartDate.Date ||
-                availability.EndDate.Date < request.EndDate.Date)
+            if (availability == null || availability.StartDate > request.StartDate || 
+                availability.EndDate < request.EndDate || 
+                (await _bookingHotelDataAccess.GetBookingsByRoomId(request.RoomId))
+                .Any(b => request.StartDate < b.EndDate && request.EndDate > b.StartDate)) {
                 throw new InvalidDataException("The room is not available for the selected dates.");
+            }
 
-            var existingBookings = await _bookingHotelDataAccess.GetBookingsByRoomId(request.RoomId);
-            if (existingBookings.Any(b =>
-                    request.StartDate.Date < b.EndDate.Date && request.EndDate.Date > b.StartDate.Date))
-                throw new InvalidDataException("The room is already booked for the selected dates.");
-
+            var totalDays = (request.EndDate.ToDateTime(TimeOnly.MinValue) - request.StartDate.ToDateTime(TimeOnly.MinValue)).TotalDays;
             var price = request.NumberOfGuests * (double)availability.Room.PricePerNight * 
-                        (request.EndDate.Date - request.StartDate.Date).TotalDays;
+                        totalDays;
             var reservation = new BookingHotel {
                 RoomId = request.RoomId,
                 HotelId = availability.Hotel.Id,
-                UserId = request.UserId,
+                UserId = user.UserId,
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
                 NumberOfGuests = request.NumberOfGuests,
-                Price = price,
+                PriceTotal = price,
+                PricePerPerson = (double)availability.Room.PricePerNight,
                 IsConfirmed = request.IsConfirmed,
                 RoomAvailabilityId = availability.Id,
                 BookingDate = DateTime.UtcNow

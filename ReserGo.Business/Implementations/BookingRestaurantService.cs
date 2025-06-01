@@ -39,14 +39,26 @@ public class BookingRestaurantService : IBookingRestaurantService {
                 _logger.LogError("Restaurant offer not found for id { id }", request.RestaurantOfferId);
                 throw new InvalidDataException("Restaurant offer not found");
             }
+            var remainingCapacity = restaurantOffer.GuestLimit - restaurantOffer.GuestNumber;
+            if (request.NumberOfGuests > remainingCapacity) {
+                _logger.LogError("Booking exceeds the remaining capacity for offer { id }", restaurantOffer.Id);
+                throw new InvalidDataException($"Cannot book {request.NumberOfGuests} guests. Only {remainingCapacity} spots are available.");
+            }
+            
 
+            var priceTotal = request.NumberOfGuests * restaurantOffer.PricePerPerson;
             var bookingRestaurant = new BookingRestaurant {
                 RestaurantOfferId = restaurantOffer.Id,
+                RestaurantId = restaurantOffer.Restaurant.Id,
                 UserId = user.UserId,
+                Date = request.Date,
+                PricePerPerson =  restaurantOffer.PricePerPerson,
+                PriceTotal = priceTotal,
                 NumberOfGuests = request.NumberOfGuests,
                 IsConfirmed = request.IsConfirmed,
                 BookingDate = DateTime.UtcNow
             };
+            
             _logger.LogInformation("Creating booking restaurant for user { id }", user.UserId);
             bookingRestaurant = await _bookingRestaurantDataAccess.Create(bookingRestaurant);
 
@@ -92,8 +104,7 @@ public class BookingRestaurantService : IBookingRestaurantService {
             Id = b.Id,
             RestaurantId = b.RestaurantId,
             UserId = b.UserId,
-            StartDate = b.StartDate,
-            EndDate = b.EndDate,
+            Date = b.Date,
             NumberOfGuests = b.NumberOfGuests,
             IsConfirmed = b.IsConfirmed,
             BookingDate = b.BookingDate

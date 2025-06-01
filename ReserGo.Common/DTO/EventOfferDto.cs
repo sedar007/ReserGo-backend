@@ -5,8 +5,8 @@ public class EventOfferDto {
     public string? Description { get; set; } = null!;
     public double PricePerPerson { get; set; }
     public int GuestLimit { get; set; }
-    public DateTime OfferStartDate { get; set; }
-    public DateTime OfferEndDate { get; set; }
+    public DateOnly OfferStartDate { get; set; }
+    public DateOnly OfferEndDate { get; set; }
     public bool IsActive { get; set; }
     public Guid EventId { get; set; }
     public EventDto Event { get; set; } = null!;

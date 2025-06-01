@@ -33,21 +33,7 @@ public class MetricsService : IMetricsService {
         _bookingHotelDataAccess = bookingHotelDataAccess;
         _bookingEventDataAccess = bookingEventDataAccess;
     }
-
-    public async Task<MetricsResponse> GetMetricsMonths(Product product, Guid userId) {
-        try {
-            if (userId == null) {
-                _logger.LogError("User not found");
-                throw new InvalidDataException(Consts.UserNotFound);
-            }
-
-            throw new NotImplementedException();
-        }
-        catch (Exception e) {
-            Console.WriteLine(e);
-            throw;
-        }
-    }
+    
     
     public async Task<Dictionary<string, double>> GetMonthlySales(Guid userId) {
         try {
@@ -61,9 +47,9 @@ public class MetricsService : IMetricsService {
             var eventBookings = await _bookingEventDataAccess.GetBookingYearsByUserId(userId);
 
             var allBookings = hotelBookings
-                .Select(b => new { b.BookingDate, b.Price })
-                .Concat(restaurantBookings.Select(b => new { b.BookingDate, b.Price }))
-                .Concat(eventBookings.Select(b => new { b.BookingDate, b.Price }));
+                .Select(b => new { b.BookingDate, b.PriceTotal })
+                .Concat(restaurantBookings.Select(b => new { b.BookingDate, b.PriceTotal }))
+                .Concat(eventBookings.Select(b => new { b.BookingDate, b.PriceTotal }));
 
             var currentYear = DateTime.UtcNow.Year;
 
@@ -76,7 +62,8 @@ public class MetricsService : IMetricsService {
                 .GroupBy(b => b.BookingDate.ToString("MMMM", CultureInfo.InvariantCulture))
                 .ToDictionary(
                     g => g.Key,
-                    g => g.Sum(b => b.Price).GetValueOrDefault()
+                    g => Math.Round(g.Sum(b => b.PriceTotal), 2)
+                    
                 );
             
             foreach (var month in allMonths.Keys.ToList()) {
@@ -161,21 +148,16 @@ public class MetricsService : IMetricsService {
 
         switch (types) {
             case Product.Hotel:
-                nbBookingThisMonth = await _bookingHotelDataAccess.GetNbBookingsLast30Days(adminId);
-                nbBookingLastMonth =
-                    await _bookingHotelDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days30Before, today);
+                nbBookingThisMonth = await _bookingHotelDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days30Before, today);
+                nbBookingLastMonth = await _bookingHotelDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before, days30Before);
                 break;
             case Product.Restaurant:
-                nbBookingThisMonth = await _bookingRestaurantDataAccess.GetNbBookingsLast30Days(adminId);
-                nbBookingLastMonth =
-                    await _bookingRestaurantDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before,
-                        days30Before);
+                nbBookingThisMonth = await _bookingRestaurantDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days30Before, today);
+                nbBookingLastMonth = await _bookingRestaurantDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before, days30Before);
                 break;
             case Product.Event:
-                nbBookingThisMonth = await _bookingEventDataAccess.GetNbBookingsLast30Days(adminId);
-                nbBookingLastMonth =
-                    await _bookingEventDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before,
-                        days30Before);
+                nbBookingThisMonth = await _bookingEventDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days30Before, today);
+                nbBookingLastMonth = await _bookingEventDataAccess.GetNbBookingBetween2DatesByAdminId(adminId, days60Before, days30Before);
                 break;
             default:
                 throw new InvalidDataException("Invalid product type specified.");
@@ -187,10 +169,12 @@ public class MetricsService : IMetricsService {
         if (nbBookingLastMonth > 0) {
             statsPercent = (double)(nbBookingThisMonth - nbBookingLastMonth) / nbBookingLastMonth * 100;
             up = nbBookingThisMonth > nbBookingLastMonth;
-        }
-        else if (nbBookingThisMonth > 0) {
+        } else if (nbBookingLastMonth == 0 && nbBookingThisMonth > 0) {
             statsPercent = 100;
             up = true;
+        } else if (nbBookingLastMonth == 0 && nbBookingThisMonth == 0) {
+            statsPercent = 0;
+            up = null;
         }
 
         return new MetricsResponse {
