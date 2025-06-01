@@ -9,9 +9,7 @@ public interface IBookingEventDataAccess {
     Task<IEnumerable<BookingEvent>> GetBookingYearsByUserId(Guid userId);
 
 
-    Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId, DateTime startDate, DateTime endDate);
-    Task<int> GetNbBookingsLast30Days(Guid adminId);
-
-
+    Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId, DateOnly startDate, DateOnly endDate);
+    
     Task<BookingEvent?> GetById(Guid id);
 }

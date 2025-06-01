@@ -25,15 +25,15 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
     }
 
     public async Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId,
-        DateTime startDate, DateTime endDate) {
+        DateOnly startDate, DateOnly endDate) {
         return await _context.BookingRestaurant
             .Include(b => b.Restaurant)
             .Where(b => b.Restaurant.UserId == adminId)
-            .Where(b => b.BookingDate >= startDate.Date && b.BookingDate <= endDate.Date)
+            .Where(b => b.BookingDate >= startDate && b.BookingDate <= endDate)
             .CountAsync();
     }
     
-    public async Task<int> GetNbBookingsLast30Days(Guid adminId) {
+   /* public async Task<int> GetNbBookingsLast30Days(Guid adminId) {
         var today = DateTime.UtcNow;
         var days30Before = today.AddDays(-30);
 
@@ -42,7 +42,7 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
             .Where(b => b.RestaurantOffer.UserId == adminId)
             .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
             .CountAsync();
-    }
+    } */
 
     public async Task<IEnumerable<BookingRestaurant>> GetBookingsByUserId(Guid userId) {
         return await _context.BookingRestaurant

@@ -52,6 +52,7 @@ public class BookingEventService : IBookingEventService {
                }
                
                var numberDays = (request.EndDate.ToDateTime(TimeOnly.MinValue) - request.StartDate.ToDateTime(TimeOnly.MinValue)).TotalDays;
+               numberDays = numberDays < 1 ? 1 : numberDays;
                var priceTotal = numberDays * eventOffer.PricePerDay;
                var bookingEvent = new BookingEvent {
                    EventOfferId = eventOffer.Id,
@@ -63,7 +64,7 @@ public class BookingEventService : IBookingEventService {
                    PriceTotal = priceTotal,
                    NumberOfGuests = request.NumberOfGuests,
                    IsConfirmed = request.IsConfirmed,
-                   BookingDate = DateTime.UtcNow
+                   BookingDate = DateOnly.FromDateTime(DateTime.UtcNow)
                };
                
                _logger.LogInformation("Creating booking event for user { id }", user.UserId);
@@ -104,20 +105,6 @@ public class BookingEventService : IBookingEventService {
                throw;
            }
        }
-
-   /* public async Task<IEnumerable<BookingEventDto>> GetBookingsByUserId(Guid userId) {
-        var bookings = await _bookingEventDataAccess.GetBookingsByUserId(userId);
-        return bookings.Select(b => new BookingEventDto {
-            Id = b.Id,
-            EventId = b.EventId,
-            UserId = b.UserId,
-            StartDate = b.StartDate,
-            EndDate = b.EndDate,
-            NumberOfGuests = b.NumberOfGuests,
-            IsConfirmed = b.IsConfirmed,
-            BookingDate = b.BookingDate
-        });
-    }*/
 
     public async Task<IEnumerable<BookingEventDto>> GetBookingsByAdminId(Guid adminId) {
         var bookings = await _bookingEventDataAccess.GetBookingsByAdminId(adminId);

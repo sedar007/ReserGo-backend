@@ -60,7 +60,7 @@ public class BookingHotelService : IBookingHotelService {
                 PricePerPerson = (double)availability.Room.PricePerNight,
                 IsConfirmed = request.IsConfirmed,
                 RoomAvailabilityId = availability.Id,
-                BookingDate = DateTime.UtcNow
+                BookingDate = DateOnly.FromDateTime(DateTime.UtcNow)
             };
 
             var createdReservation = await _bookingHotelDataAccess.Create(reservation);

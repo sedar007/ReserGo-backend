@@ -10,8 +10,8 @@ using ReserGo.Common.Requests.Products.Hotel.Rooms;
 using ReserGo.Common.Security;
 using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.Common.Response;
-
 namespace ReserGo.Business.Implementations;
+
 
 public class RoomAvailabilityService : IRoomAvailabilityService {
     private readonly ILogger<UserService> _logger;
@@ -20,7 +20,7 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
     private readonly IRoomAvailabilityDataAccess _availabilityDataAccess;
     private readonly IHotelService _hotelService;
     private readonly IImageService _imageService;
-    private readonly IMemoryCache _cache;
+     private readonly IMemoryCache _cache;
 
     public RoomAvailabilityService(ILogger<UserService> logger, IRoomDataAccess roomDataAccess,
         IRoomAvailabilityDataAccess availabilityDataAccess, IHotelService hotelService, IMemoryCache cache,
@@ -30,64 +30,69 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
         _availabilityDataAccess = availabilityDataAccess;
         _hotelService = hotelService;
         _imageService = imageService;
-        _cache = cache;
+         _cache = cache;
     }
 
     private async void IsAuthorized(ConnectedUser connectedUser, Guid hotelId) {
         Utils.IsAuthorized(connectedUser, _logger);
-        if (await _hotelService.IsAuthorized(hotelId, connectedUser.UserId)) return;
+        if (await _hotelService.IsAuthorized(hotelId, connectedUser.UserId)) {
+            return;
+        }
 
         _logger.LogWarning("User not authorized to set availability for this hotel.");
         throw new UnauthorizedAccessException("User not authorized to set availability for this hotel.");
     }
 
+    
 
     public async Task<RoomAvailabilityDto> SetAvailability(ConnectedUser connectedUser, Guid roomId,
         RoomAvailabilityRequest request) {
-        IsAuthorized(connectedUser, request.HotelId);
+        
+            IsAuthorized(connectedUser, request.HotelId);
 
-        ValidateRequest(request);
+            ValidateRequest(request);
 
-        var room = await _roomDataAccess.GetById(roomId);
-        if (room == null) {
-            _logger.LogWarning("Room not found for RoomId: {RoomId}", roomId);
-            throw new InvalidDataException("Room not found.");
-        }
+            var room = await _roomDataAccess.GetById(roomId);
+            if (room == null) {
+                _logger.LogWarning("Room not found for RoomId: {RoomId}", roomId);
+                throw new InvalidDataException("Room not found.");
+            }
 
-        var existingAvailability = await _availabilityDataAccess.GetByRoomId(roomId);
-        RoomAvailability availabilityResponse;
+            var existingAvailability = await _availabilityDataAccess.GetByRoomId(roomId);
+            RoomAvailability availabilityResponse;
 
-        if (existingAvailability == null || existingAvailability.EndDate < DateOnly.FromDateTime(DateTime.UtcNow))
-            availabilityResponse = await CreateNewAvailability(roomId, request);
-        else
-            availabilityResponse = await ExtendExistingAvailability(existingAvailability, request);
+            if (existingAvailability == null || existingAvailability.EndDate < DateOnly.FromDateTime(DateTime.UtcNow))
+                availabilityResponse = await CreateNewAvailability(roomId, request);
+            else
+                availabilityResponse = await ExtendExistingAvailability(existingAvailability, request);
 
-        DeleteCache(connectedUser.UserId);
-        _logger.LogInformation("Availability successfully processed for RoomId: {RoomId}", roomId);
-        return availabilityResponse.ToDto();
+            DeleteCache(connectedUser.UserId);
+            _logger.LogInformation("Availability successfully processed for RoomId: {RoomId}", roomId);
+            return availabilityResponse.ToDto();
+        
     }
 
     public async Task<RoomAvailabilityDto> GetAvailabilityByRoomId(Guid roomId, DateOnly startDate, DateOnly endDate) {
-        var resultList = (await _availabilityDataAccess.GetAvailabilitiesByRoomIdDate(roomId, startDate, endDate))
-            .ToList();
+      
+            var resultList = (await _availabilityDataAccess.GetAvailabilitiesByRoomIdDate(roomId, startDate, endDate)).ToList();
 
-        if (!resultList.Any()) {
-            _logger.LogWarning("No availability found for RoomId: {RoomId} between {StartDate} and {EndDate}",
-                roomId, startDate, endDate);
-            throw new InvalidDataException("No availability found for the specified room and dates.");
-        }
+            if(!resultList.Any()) {
+                _logger.LogWarning("No availability found for RoomId: {RoomId} between {StartDate} and {EndDate}",
+                    roomId, startDate, endDate);
+                throw new InvalidDataException("No availability found for the specified room and dates.");
+            }
 
-        var availableRooms = resultList
-            .Where(a => a.BookingsHotels.All(b => b.EndDate <= startDate || b.StartDate >= endDate)).ToList();
+            var availableRooms = resultList
+                .Where(a => a.BookingsHotels.All(b => b.EndDate <= startDate || b.StartDate >= endDate)).ToList();
+            
+            if(!availableRooms.Any()) {
+                _logger.LogWarning("No available rooms found for RoomId: {RoomId} between {StartDate} and {EndDate}",
+                    roomId, startDate, endDate);
+                throw new InvalidDataException("No available rooms found for the specified dates.");
+            }
 
-        if (!availableRooms.Any()) {
-            _logger.LogWarning("No available rooms found for RoomId: {RoomId} between {StartDate} and {EndDate}",
-                roomId, startDate, endDate);
-            throw new InvalidDataException("No available rooms found for the specified dates.");
-        }
-
-        return availableRooms.FirstOrDefault()?.ToDto() ??
-               throw new InvalidDataException("No available rooms found for the specified dates.");
+            return availableRooms.FirstOrDefault()?.ToDto() ??
+                   throw new InvalidDataException("No available rooms found for the specified dates.");
     }
 
     private void ValidateRequest(RoomAvailabilityRequest request) {
@@ -97,7 +102,9 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
             throw new InvalidDataException("Start date must be before end date.");
         }
 
-        if (request.StartDate >= DateOnly.FromDateTime(DateTime.UtcNow)) return;
+        if (request.StartDate >= DateOnly.FromDateTime(DateTime.UtcNow)) {
+            return;
+        }
 
         _logger.LogWarning("Start date cannot be before today. StartDate: {StartDate}", request.StartDate);
         throw new InvalidDataException("Start date cannot be before today.");
@@ -145,74 +152,76 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
 
     public async Task<IEnumerable<RoomAvailabilityDto>> GetAvailabilitiesByHotelId(ConnectedUser connectedUser,
         Guid hotelId, int skip, int take) {
-        IsAuthorized(connectedUser, hotelId);
-
-        _logger.LogInformation("Fetching room availabilities for HotelId: {HotelId}", hotelId);
-        var availabilities = await _availabilityDataAccess.GetAvailabilitiesByHotelId(hotelId, skip, take);
-        var availabilityDtos = availabilities.Select(a => a.ToDto()).ToList();
-
-        return availabilityDtos;
+            IsAuthorized(connectedUser, hotelId);
+            
+            _logger.LogInformation("Fetching room availabilities for HotelId: {HotelId}", hotelId);
+            var availabilities = await _availabilityDataAccess.GetAvailabilitiesByHotelId(hotelId, skip, take);
+            var availabilityDtos = availabilities.Select(a => a.ToDto()).ToList();
+            
+            return availabilityDtos;
     }
 
     public async Task<IEnumerable<RoomAvailabilityDto>> GetAvailabilitiesForAllHotels(ConnectedUser connectedUser,
         int skip, int take) {
-        Utils.IsAuthorized(connectedUser, _logger);
+            Utils.IsAuthorized(connectedUser, _logger);
 
-        var cacheKey = string.Format(Consts.CacheKeyAvailabilitiesRoom, connectedUser.UserId, skip, take);
-        if (_cache.TryGetValue(cacheKey, out IEnumerable<RoomAvailabilityDto>? cachedAvailabilities))
-            if (cachedAvailabilities != null) {
-                _logger.LogInformation("Returning cached availabilities for UserId: {UserId}", connectedUser.UserId);
-                return cachedAvailabilities;
+            var cacheKey = string.Format(Consts.CacheKeyAvailabilitiesRoom, connectedUser.UserId, skip, take);
+            if (_cache.TryGetValue(cacheKey, out IEnumerable<RoomAvailabilityDto>? cachedAvailabilities)) {
+                if (cachedAvailabilities != null) {
+                    _logger.LogInformation("Returning cached availabilities for UserId: {UserId}", connectedUser.UserId);
+                    return cachedAvailabilities;
+                }
             }
 
-        _logger.LogInformation("Fetching hotels for UserId: {UserId}", connectedUser.UserId);
-        var hotels = await _hotelService.GetHotelsByUserId(connectedUser.UserId);
-        var hotelIds = hotels.Select(h => h.Id);
+            _logger.LogInformation("Fetching hotels for UserId: {UserId}", connectedUser.UserId);
+            var hotels = await _hotelService.GetHotelsByUserId(connectedUser.UserId);
+            var hotelIds = hotels.Select(h => h.Id);
 
-        _logger.LogInformation("Fetching availabilities for UserId: {UserId}", connectedUser.UserId);
-        var availabilities = await _availabilityDataAccess.GetAvailabilitiesByHotelIds(hotelIds, skip, take);
-        var availabilityDtos = availabilities.Select(a => a.ToDto()).ToList();
+            _logger.LogInformation("Fetching availabilities for UserId: {UserId}", connectedUser.UserId);
+            var availabilities = await _availabilityDataAccess.GetAvailabilitiesByHotelIds(hotelIds, skip, take);
+            var availabilityDtos = availabilities.Select(a => a.ToDto()).ToList();
 
-        _cache.Set(cacheKey, availabilityDtos, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-        _logger.LogInformation("Availabilities cached for UserId: {UserId}", connectedUser.UserId);
+            _cache.Set(cacheKey, availabilityDtos, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+            _logger.LogInformation("Availabilities cached for UserId: {UserId}", connectedUser.UserId);
 
-        return availabilityDtos;
+            return availabilityDtos;
+        
     }
+    
 
+    public async Task<IEnumerable<RoomAvailibilityHotelResponse>> SearchAvailability(HotelSearchAvailabilityRequest request) {
+            var result = (await _availabilityDataAccess.GetAvailability(request)).ToList();
+            if (!result.Any()) {
+                _logger.LogWarning("No availabilities found for the given search criteria.");
+                return new List<RoomAvailibilityHotelResponse>();
+            }
+            
+            var response = await Task.WhenAll(result
+                .GroupBy(a => a.HotelId)
+                .Select(async group => new RoomAvailibilityHotelResponse {
+                    HotelId = group.Key,
+                    HotelName = group.First().Hotel.Name,
+                    ImageSrc = await _imageService.GetPicture(group.First().Hotel.Picture?? string.Empty),
+                    Rooms = await Task.WhenAll(group
+                        .Where(a => a.BookingsHotels.All(b => b.EndDate <= request.ArrivalDate || b.StartDate >= request.ReturnDate))
+                        .Select(async a => await Task.FromResult(a.Room.ToDto())))
 
-    public async Task<IEnumerable<RoomAvailibilityHotelResponse>> SearchAvailability(
-        HotelSearchAvailabilityRequest request) {
-        var result = (await _availabilityDataAccess.GetAvailability(request)).ToList();
-        if (!result.Any()) {
-            _logger.LogWarning("No availabilities found for the given search criteria.");
-            return new List<RoomAvailibilityHotelResponse>();
-        }
+                }));
 
-        var response = await Task.WhenAll(result
-            .GroupBy(a => a.HotelId)
-            .Select(async group => new RoomAvailibilityHotelResponse {
-                HotelId = group.Key,
-                HotelName = group.First().Hotel.Name,
-                ImageSrc = await _imageService.GetPicture(group.First().Hotel.Picture ?? string.Empty),
-                Rooms = await Task.WhenAll(group
-                    .Where(a => a.BookingsHotels.All(b =>
-                        b.EndDate <= request.ArrivalDate || b.StartDate >= request.ReturnDate))
-                    .Select(async a => await Task.FromResult(a.Room.ToDto())))
-            }));
-
-        return response;
+            return response;
+        
     }
 
     private void DeleteCache(Guid userId) {
         const int skip = 0;
         const int take = 100;
-
+        
         var cacheKeys = new[] {
             Consts.CacheKeyAvailabilitiesHotel,
             string.Format(Consts.CacheKeyAvailabilitiesRoom, userId, skip, take),
             Consts.CacheKeyAvailabilitiesRoom
         };
-
+        
         foreach (var cacheKey in cacheKeys) {
             _cache.Remove(cacheKey);
             _logger.LogInformation("Cache removed for key: {CacheKey}", cacheKey);

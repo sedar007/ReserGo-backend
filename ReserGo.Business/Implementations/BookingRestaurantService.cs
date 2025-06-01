@@ -56,7 +56,7 @@ public class BookingRestaurantService : IBookingRestaurantService {
                 PriceTotal = priceTotal,
                 NumberOfGuests = request.NumberOfGuests,
                 IsConfirmed = request.IsConfirmed,
-                BookingDate = DateTime.UtcNow
+                BookingDate = DateOnly.FromDateTime(DateTime.UtcNow)
             };
             
             _logger.LogInformation("Creating booking restaurant for user { id }", user.UserId);

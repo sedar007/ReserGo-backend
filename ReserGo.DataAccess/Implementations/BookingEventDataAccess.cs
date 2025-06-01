@@ -40,23 +40,13 @@ public class BookingEventDataAccess : IBookingEventDataAccess {
     }
 
     public async Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId,
-        DateTime startDate, DateTime endDate) {
-        return await _context.BookingEvent
+        DateOnly startDate, DateOnly endDate) {
+        var res = await _context.BookingEvent
             .Include(b => b.Event)
             .Where(b => b.Event.UserId == adminId)
-            .Where(b => startDate.Date >= b.BookingDate && endDate.Date <= b.BookingDate)
+            .Where(b => b.BookingDate >= startDate && b.BookingDate <= endDate)
             .CountAsync();
-    }
-
-    public async Task<int> GetNbBookingsLast30Days(Guid adminId) {
-        var today = DateTime.UtcNow;
-        var days30Before = today.AddDays(-30);
-
-        return await _context.BookingEvent
-            .Include(b => b.Event)
-            .Where(b => b.Event.UserId == adminId)
-            .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
-            .CountAsync();
+        return res;
     }
     
     public async Task<IEnumerable<BookingEvent>> GetBookingYearsByUserId(Guid userId) {

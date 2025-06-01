@@ -138,9 +138,9 @@ public class MetricsService : IMetricsService {
 }
 
     public async Task<MetricsResponse> GetNbBookingsLast30Days(Guid adminId, Product types) {
-        var today = DateTime.UtcNow;
-        var days30Before = today.AddDays(-30);
-        var days60Before = today.AddDays(-60);
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var days30Before = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-30));
+        var days60Before = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(-60));
 
         var nbBookingThisMonth = 0;
         var nbBookingLastMonth = 0;
