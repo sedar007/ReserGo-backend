@@ -7,6 +7,6 @@ public class RestaurantAvailabilityResponse {
     public string? TypeOfCuisine { get; set; } = null!;
     public double? PricePerGuest { get; set; }
     public int AvailableCapacity { get; set; }
-    public string ImageSrc { get; set; } = null!;
+    public string ImageSrc { get; set; } = string.Empty;
     
 }

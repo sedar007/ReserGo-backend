@@ -59,7 +59,7 @@ public class BookingEventService : IBookingEventService {
                    UserId = user.UserId,
                    StartDate = request.StartDate,
                      EndDate = request.EndDate,
-                   PricePerPerson =  eventOffer.PricePerDay,
+                     PricePerDay =  eventOffer.PricePerDay,
                    PriceTotal = priceTotal,
                    NumberOfGuests = request.NumberOfGuests,
                    IsConfirmed = request.IsConfirmed,

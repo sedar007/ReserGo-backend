@@ -5,5 +5,5 @@ public class EventAvailabilityResponse {
     public string EventName { get; set; } = null!;
     public double PricePerDay { get; set; }
     public int AvailableCapacity { get; set; }
-    public string ImageSrc { get; set; } = null!;
+    public string ImageSrc { get; set; } = string.Empty;
 }

@@ -17,17 +17,17 @@ public class FranceGouvApiService : IFranceGouvApiService {
     }
 
 
-    public async Task<IEnumerable<string>?> SearchAddresses(string query) {
-        if (string.IsNullOrWhiteSpace(query) || query.Length < 3) {
-            _logger.LogWarning("Invalid query: Query must be at least 3 characters long.");
-            return Enumerable.Empty<string>();
-        }
-
+    public async Task<IEnumerable<string?>> SearchAddresses(string query) {
         if (string.IsNullOrWhiteSpace(_api)) {
             _logger.LogError("FranceGouv API URL is not configured.");
             throw new InvalidOperationException("FranceGouv API URL is not configured.");
         }
-
+        
+        if (string.IsNullOrWhiteSpace(query) || query.Length < 3) {
+            _logger.LogWarning("Invalid query: Query must be at least 3 characters long.");
+            return new List<string>();
+        }
+        
         var encodedQuery = Uri.EscapeDataString(query);
         var requestUrl = _api.Replace("{encodedQuery}", encodedQuery);
 
@@ -48,7 +48,7 @@ public class FranceGouvApiService : IFranceGouvApiService {
 
             if (!jsonResponse.RootElement.TryGetProperty("features", out var features)) {
                 _logger.LogWarning("Response does not contain 'features' property.");
-                return null;
+                return new List<string>();
             }
 
             var properties = features.EnumerateArray()
@@ -64,7 +64,7 @@ public class FranceGouvApiService : IFranceGouvApiService {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while searching for addresses.");
-            return Enumerable.Empty<string>();
+            return new List<string>();
         }
     }
 }
