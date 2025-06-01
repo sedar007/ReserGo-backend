@@ -1,19 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+
 using ReserGo.Business.Interfaces;
-using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Controllers.Administration.Products;
-using Microsoft.AspNetCore.SignalR;
-using ReserGo.WebAPI.Hubs;
-using Microsoft.AspNetCore.Mvc;
-using ReserGo.Business.Interfaces;
-using ReserGo.Common.DTO;
-using ReserGo.Common.Requests.Products.Hotel;
-using ReserGo.WebAPI.Attributes;
-using ReserGo.Shared.Interfaces;
-using ReserGo.WebAPI.Controllers.Administration.Products;
-using ReserGo.Common.Models;
 using ReserGo.Common.Response;
 using ReserGo.Common.Enum;
 
@@ -26,40 +16,24 @@ namespace ReserGo.WebAPI.Controllers.Administration;
 public class MetricsController : ControllerBase {
     private readonly ILogger<HotelController> _logger;
     private readonly ISecurity _security;
-    private readonly IBookingHotelService _bookingHotelService;
-    private readonly IHubContext<NotificationHub> _notificationHub;
     private readonly IMetricsService _metricsService;
 
     public MetricsController(ILogger<HotelController> logger,
-        ISecurity security, IBookingHotelService bookingHotelService, IHubContext<NotificationHub> notificationHub,
+        ISecurity security,
         IMetricsService metricsService) {
         _logger = logger;
         _security = security;
-        _bookingHotelService = bookingHotelService;
-        _notificationHub = notificationHub;
         _metricsService = metricsService;
     }
-
-
-    [HttpGet("months/{types}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<MetricsResponse>> GetMetricsMonths(Product product) {
-        try {
-            var user = _security.GetCurrentUser();
-            if (user == null) return Unauthorized();
-
-            var responses = await _metricsService.GetMetricsMonths(product, user.UserId);
-
-
-            return Ok(responses);
-        }
-        catch (Exception e) {
-            _logger.LogError(e, "An unexpected error occurred while retrieving bookings");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
-        }
-    }
+    /// <summary>
+    /// Retrieves monthly sales data for the authenticated user.
+    /// </summary>
+    /// <returns>
+    /// A dictionary where the keys are month names and the values are the sales totals rounded to two decimal places.
+    /// </returns>
+    /// <response code="200">Monthly sales data retrieved successfully.</response>
+    /// <response code="401">User not authenticated.</response>
+    /// <response code="500">An unexpected error occurred.</response>
     [HttpGet("months")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -68,10 +42,7 @@ public class MetricsController : ControllerBase {
         try {
             var user = _security.GetCurrentUser();
             if (user == null) return Unauthorized();
-
             var responses = await _metricsService.GetMonthlySales(user.UserId);
-
-
             return Ok(responses);
         }
         catch (Exception e) {
@@ -139,7 +110,5 @@ public class MetricsController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
         }
     }
-    
-    
     
 }

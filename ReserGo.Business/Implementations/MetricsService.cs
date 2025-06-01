@@ -33,21 +33,7 @@ public class MetricsService : IMetricsService {
         _bookingHotelDataAccess = bookingHotelDataAccess;
         _bookingEventDataAccess = bookingEventDataAccess;
     }
-
-    public async Task<MetricsResponse> GetMetricsMonths(Product product, Guid userId) {
-        try {
-            if (userId == null) {
-                _logger.LogError("User not found");
-                throw new InvalidDataException(Consts.UserNotFound);
-            }
-
-            throw new NotImplementedException();
-        }
-        catch (Exception e) {
-            Console.WriteLine(e);
-            throw;
-        }
-    }
+    
     
     public async Task<Dictionary<string, double>> GetMonthlySales(Guid userId) {
         try {
@@ -76,7 +62,8 @@ public class MetricsService : IMetricsService {
                 .GroupBy(b => b.BookingDate.ToString("MMMM", CultureInfo.InvariantCulture))
                 .ToDictionary(
                     g => g.Key,
-                    g => g.Sum(b => b.PriceTotal)
+                    g => Math.Round(g.Sum(b => b.PriceTotal), 2)
+                    
                 );
             
             foreach (var month in allMonths.Keys.ToList()) {
