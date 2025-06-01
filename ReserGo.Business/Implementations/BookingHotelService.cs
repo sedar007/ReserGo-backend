@@ -30,67 +30,69 @@ public class BookingHotelService : IBookingHotelService {
         _roomAvailabilityService = roomAvailabilityService;
     }
 
-    public async Task<BookingResponses> CreateBooking(BookingHotelRequest request, ConnectedUser user) {
-        try {
-            if (user == null) {
-                _logger.LogError("User not found");
-                throw new InvalidDataException(Consts.UserNotFound);
-            }
+    public async Task<BookingHotelResponses> CreateBooking(BookingHotelRequest request, ConnectedUser user) {
+    try {
+        if (user == null) {
+            _logger.LogError("User not found");
+            throw new InvalidDataException(Consts.UserNotFound);
+        }
 
-            var availability = await _roomAvailabilityService.GetAvailabilityByRoomId(request.RoomId, request.StartDate, request.EndDate);
+        var reservations = new List<BookingHotel>();
+        foreach (var room in request.Rooms) {
+            var availability = await _roomAvailabilityService.GetAvailabilityByRoomId(room.RoomId, request.StartDate, request.EndDate);
 
             if (availability == null || availability.StartDate > request.StartDate || 
                 availability.EndDate < request.EndDate || 
-                (await _bookingHotelDataAccess.GetBookingsByRoomId(request.RoomId))
+                (await _bookingHotelDataAccess.GetBookingsByRoomId(room.RoomId))
                 .Any(b => request.StartDate < b.EndDate && request.EndDate > b.StartDate)) {
-                throw new InvalidDataException("The room is not available for the selected dates.");
+                throw new InvalidDataException($"The room with ID {room.RoomId} is not available for the selected dates.");
             }
 
             var totalDays = (request.EndDate.ToDateTime(TimeOnly.MinValue) - request.StartDate.ToDateTime(TimeOnly.MinValue)).TotalDays;
-            var price = request.NumberOfGuests * (double)availability.Room.PricePerNight * 
-                        totalDays;
+            var price = room.NumberOfGuests * (double)availability.Room.PricePerNight * totalDays;
+
             var reservation = new BookingHotel {
-                RoomId = request.RoomId,
+                RoomId = room.RoomId,
                 HotelId = availability.Hotel.Id,
                 UserId = user.UserId,
                 StartDate = request.StartDate,
                 EndDate = request.EndDate,
-                NumberOfGuests = request.NumberOfGuests,
+                NumberOfGuests = room.NumberOfGuests,
                 PriceTotal = price,
                 PricePerPerson = (double)availability.Room.PricePerNight,
-                IsConfirmed = request.IsConfirmed,
+                IsConfirmed = true,
                 RoomAvailabilityId = availability.Id,
                 BookingDate = DateOnly.FromDateTime(DateTime.UtcNow)
             };
 
             var createdReservation = await _bookingHotelDataAccess.Create(reservation);
             if (createdReservation == null) {
-                _logger.LogError("Booking hotel not created");
-                throw new InvalidDataException("Booking hotel not created");
+                _logger.LogError($"Booking hotel not created for RoomId: {room.RoomId}");
+                throw new InvalidDataException($"Booking hotel not created for RoomId: {room.RoomId}");
             }
 
-            var bookingHotel = createdReservation?.ToDto();
-
-            var notification = new NotificationCreationRequest {
-                Title = "New Reservation",
-                Message = $"New reservation made by {user.Username} for offer at {availability.Hotel.Name} " +
-                          $"number of guests: {request.NumberOfGuests}",
-                Type = "Hotel",
-                Name = availability.Hotel.Name,
-                UserId = availability.Hotel.UserId
-            };
-            var notificationDto = await _notificationService.CreateNotification(notification);
-
-            return new BookingResponses {
-                Notification = notificationDto,
-                Booking = bookingHotel
-            };
+            reservations.Add(createdReservation);
         }
-        catch (Exception e) {
-            Console.WriteLine(e);
-            throw;
-        }
+
+        var notification = new NotificationCreationRequest {
+            Title = "New Reservation",
+            Message = $"New reservation made by {user.Username} for {reservations.Count} rooms.",
+            Type = "Hotel",
+            Name = reservations.First().Hotel.Name,
+            UserId = reservations.First().Hotel.UserId
+        };
+        var notificationDto = await _notificationService.CreateNotification(notification);
+
+        return new BookingHotelResponses {
+            Notification = notificationDto,
+            Bookings = reservations.Select(r => r.ToDto())
+        };
     }
+    catch (Exception e) {
+        _logger.LogError(e, "Error creating bookings");
+        throw;
+    }
+}
 
     public async Task<IEnumerable<BookingHotelDto>> GetBookingsByUserId(Guid userId) {
         var bookings = await _bookingHotelDataAccess.GetBookingsByUserId(userId);

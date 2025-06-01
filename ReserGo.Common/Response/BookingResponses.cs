@@ -3,6 +3,11 @@ using ReserGo.Common.DTO;
 namespace ReserGo.Common.Response;
 
 public class BookingResponses {
-    public BookingDto Booking { get; set; }
-    public required NotificationDto Notification { get; set; }
+    public required BookingDto Booking { get; init; }
+    public required NotificationDto Notification { get; init; }
+}
+
+public class BookingHotelResponses {
+    public required IEnumerable<BookingDto> Bookings { get; init; }
+    public required NotificationDto Notification { get; init; }
 }
