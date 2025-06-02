@@ -79,52 +79,6 @@ public class BookingEventController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-/*
-    /// <summary>
-    ///     Retrieve all bookings for the current user.
-    /// </summary>
-    /// <returns>
-    ///     - **200 OK**: If the bookings are successfully retrieved.
-    ///     - **401 Unauthorized**: If the user is not authenticated.
-    ///     - **500 Internal Server Error**: If an unexpected error occurs.
-    /// </returns>
-    /// <response code="200">Bookings retrieved successfully.</response>
-    /// <response code="401">User is not authenticated.</response>
-    /// <response code="500">An unexpected error occurred.</response>
-    [ClientOnly]
-    [HttpGet("my-bookings")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<IEnumerable<Resource<BookingEventDto>>>>> GetMyBookings() {
-        try {
-            var user = _security.GetCurrentUser();
-            if (user == null) return Unauthorized();
-
-           var bookings = await _bookingEventService.GetBookingsByUserId(user.UserId);
-              var bookingsWithLinks = bookings.Select(booking => new Resource<BookingEventDto> {
-                  Data = booking,
-                  Links = GenerateLinks(booking.Id)
-              });
-
-              var resourceCollection = new Resource<IEnumerable<Resource<BookingEventDto>>> {
-                  Data = bookingsWithLinks,
-                  Links = new List<Link> {
-                      new() {
-                          Href = Url.Action(nameof(GetMyBookings)),
-                          Rel = "self",
-                          Method = "GET"
-                      }
-                  }
-              };
-
-            return Ok(resourceCollection);
-        }
-        catch (Exception e) {
-            _logger.LogError(e, "An unexpected error occurred while retrieving bookings");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
-        }
-    } */
 
     /// <summary>
     ///     Searches for event availability based on the provided criteria.

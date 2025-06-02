@@ -36,7 +36,7 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
             .CountAsync();
     }
 
-    public async Task<IEnumerable<BookingRestaurant>> GetBookingsByUserId(Guid userId, int pageSize) {
+    public async Task<IEnumerable<BookingRestaurant>> GetBookingsByUserId(Guid userId, int pageSize = 10) {
         return await _context.BookingRestaurant
             .Include(b => b.Restaurant)
             .OrderByDescending(b => b.Date)
@@ -48,7 +48,10 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
     public async Task<IEnumerable<BookingRestaurant>> GetBookingsByAdminId(Guid adminId) {
         return await _context.BookingRestaurant
             .Include(b => b.Restaurant)
+            .Include(b => b.User)
+            .Include(b => b.RestaurantOffer)
             .Where(b => b.Restaurant.UserId == adminId)
+            .OrderByDescending(b => b.Date)
             .ToListAsync();
     }
 

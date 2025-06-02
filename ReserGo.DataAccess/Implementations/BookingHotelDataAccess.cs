@@ -18,8 +18,7 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
         return await GetById(newData.Entity.Id) ??
                throw new NullDataException("Error creating new booking hotel.");
     }
-
-
+    
     public async Task<BookingHotel?> GetById(Guid id) {
         return await _context.BookingHotel
             .Include(x => x.Room)
@@ -35,7 +34,7 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<BookingHotel>> GetBookingsByUserId(Guid userId, int pageSize) {
+    public async Task<IEnumerable<BookingHotel>> GetBookingsByUserId(Guid userId, int pageSize = 10) {
         return await _context.BookingHotel
             .Include(b => b.Hotel)
             .OrderByDescending(b => b.StartDate)
@@ -47,8 +46,10 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
     public async Task<IEnumerable<BookingHotel>> GetBookingsByAdminId(Guid adminId) {
         return await _context.BookingHotel
             .Include(b => b.Hotel)
+            .Include(b => b.User)
             .Include(r => r.Room)
             .Where(b => b.Hotel.UserId == adminId)
+            .OrderByDescending(b=> b.StartDate)
             .ToListAsync();
     }
 

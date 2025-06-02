@@ -1,33 +1,35 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using ReserGo.Business.Interfaces;
-using ReserGo.Common.DTO;
 using ReserGo.Common.Models;
 using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.Shared;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
-using ReserGo.WebAPI.Controllers.Administration.Products;
 using ReserGo.WebAPI.Hubs;
+using ReserGo.Common.Response;
 
 namespace ReserGo.WebAPI.Controllers.Customer.Booking;
 
 [ApiController]
 [Tags("Booking | Hotel")]
-[ClientOnly]
 [Route("api/customer/booking/hotels/")]
 public class BookingHotelController : ControllerBase {
     private readonly IBookingHotelService _bookingHotelService;
     private readonly ILogger<BookingHotelController> _logger;
     private readonly IHubContext<NotificationHub> _notificationHub;
     private readonly ISecurity _security;
+    private readonly IRoomAvailabilityService _roomAvailabilityService;
 
     public BookingHotelController(ILogger<BookingHotelController> logger,
-        ISecurity security, IBookingHotelService bookingHotelService, IHubContext<NotificationHub> notificationHub) {
+        ISecurity security, IBookingHotelService bookingHotelService, 
+        IHubContext<NotificationHub> notificationHub,
+        IRoomAvailabilityService roomAvailabilityService) {
         _logger = logger;
         _security = security;
         _bookingHotelService = bookingHotelService;
         _notificationHub = notificationHub;
+        _roomAvailabilityService = roomAvailabilityService;
     }
 
     /// <summary>
@@ -44,6 +46,7 @@ public class BookingHotelController : ControllerBase {
     /// <response code="401">User is not authenticated.</response>
     /// <response code="400">Invalid booking request or creation failed.</response>
     /// <response code="500">An unexpected error occurred.</response>
+    [ClientOnly]
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -78,65 +81,47 @@ public class BookingHotelController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-/*
+    
     /// <summary>
-    ///     Retrieve all bookings for the current user.
+    ///     Searches for room availability based on the provided criteria.
     /// </summary>
+    /// <param name="hotelSearchAvailabilityRequest">The search criteria including arrival date and return date.</param>
     /// <returns>
-    ///     - **200 OK**: If the bookings are successfully retrieved.
-    ///     - **401 Unauthorized**: If the user is not authenticated.
+    ///     - **200 OK**: If availability is found.
+    ///     - **400 Bad Request**: If the request is invalid.
     ///     - **500 Internal Server Error**: If an unexpected error occurs.
     /// </returns>
-    /// <response code="200">Bookings retrieved successfully.</response>
-    /// <response code="401">User is not authenticated.</response>
+    /// <response code="200">Availability found and returned.</response>
+    /// <response code="400">Invalid search criteria.</response>
     /// <response code="500">An unexpected error occurred.</response>
-    [HttpGet("my-bookings")]
+    [HttpGet("search-availability")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<IEnumerable<Resource<BookingHotelDto>>>>> GetMyBookings() {
+    public async Task<IActionResult> SearchAvailability(
+        [FromQuery] HotelSearchAvailabilityRequest hotelSearchAvailabilityRequest) {
         try {
-            var user = _security.GetCurrentUser();
-            if (user == null) return Unauthorized();
+            var availability = await _roomAvailabilityService.SearchAvailability(hotelSearchAvailabilityRequest);
 
-            var bookings = await _bookingHotelService.GetBookingsByUserId(user.UserId);
-
-            var bookingsWithLinks = bookings.Select(booking => new Resource<BookingHotelDto> {
-                Data = booking,
-                Links = GenerateLinks(booking.Id)
-            });
-
-            var resourceCollection = new Resource<IEnumerable<Resource<BookingHotelDto>>> {
-                Data = bookingsWithLinks,
+            return Ok(availability.Select(a => new Resource<RoomAvailibilityHotelResponse> {
+                Data = a,
                 Links = new List<Link> {
                     new() {
-                        Href = Url.Action(nameof(GetMyBookings)),
+                        Href = Url.Action(nameof(SearchAvailability), new {
+                            hotelSearchAvailabilityRequest.ArrivalDate,
+                            hotelSearchAvailabilityRequest.ReturnDate
+                        }) ?? string.Empty,
                         Rel = "self",
                         Method = "GET"
                     }
                 }
-            };
-
-            return Ok(resourceCollection);
+            }));
         }
         catch (Exception e) {
-            _logger.LogError(e, "An unexpected error occurred while retrieving bookings");
+            _logger.LogError(e, "An error occurred while searching for availability.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
-    }*/
-
-    private List<Link> GenerateLinks(Guid bookingId) {
-        return new List<Link> {
-            new() {
-                Href = Url.Action(nameof(CreateReservation), new { id = bookingId }),
-                Rel = "create",
-                Method = "POST"
-            },
-            new() {
-                Href = Url.Action("DeleteBooking", new { id = bookingId }),
-                Rel = "delete",
-                Method = "DELETE"
-            }
-        };
     }
+    
 }
+

@@ -26,9 +26,8 @@ public class BookingEventDataAccess : IBookingEventDataAccess {
             .Include(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
-
-
-    public async Task<IEnumerable<BookingEvent>> GetBookingsByUserId(Guid userId, int pageSize) {
+    
+    public async Task<IEnumerable<BookingEvent>> GetBookingsByUserId(Guid userId, int pageSize = 10) {
         return await _context.BookingEvent
             .Include(b => b.Event)
             .OrderByDescending(b => b.StartDate)
@@ -40,7 +39,9 @@ public class BookingEventDataAccess : IBookingEventDataAccess {
     public async Task<IEnumerable<BookingEvent>> GetBookingsByAdminId(Guid adminId) {
         return await _context.BookingEvent
             .Include(b => b.Event)
+            .Include(b => b.User)
             .Where(b => b.Event.UserId == adminId)
+            .OrderByDescending(b=> b.StartDate)
             .ToListAsync();
     }
 
