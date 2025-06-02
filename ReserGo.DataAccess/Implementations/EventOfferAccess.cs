@@ -21,7 +21,10 @@ public class EventOfferDataAccess : IEventOfferDataAccess {
     }
 
     public async Task<IEnumerable<EventOffer>> GetEventsOfferByUserId(Guid userId) {
-        return await _context.EventOffer.Where(x => x.UserId == userId).Include(h => h.Event).ToListAsync();
+        return await _context.EventOffer
+            .Where(x => x.UserId == userId)
+            .Include(h => h.Event)
+            .ToListAsync();
     }
 
     public async Task<EventOffer> Create(EventOffer eventOffer) {
@@ -46,6 +49,7 @@ public class EventOfferDataAccess : IEventOfferDataAccess {
         return await _context.EventOffer
             .Include(o => o.Event)
             .Include(o => o.Bookings)
+            .OrderByDescending(o => o.OfferStartDate)
             .Where(o => o.OfferStartDate <= request.StartDate &&
                         o.OfferEndDate >= request.EndDate &&
                         o.GuestLimit >= request.NumberOfGuests &&

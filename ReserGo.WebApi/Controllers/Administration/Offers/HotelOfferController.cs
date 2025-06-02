@@ -6,7 +6,6 @@ using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.Shared;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
-using ReserGo.WebAPI.Controllers.Administration.Products;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Offers;
 
@@ -121,64 +120,6 @@ public class HotelOfferController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving the hotel offer.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
-        }
-    }
-
-    /// <summary>
-    ///     Retrieve hotel offers for the connected user.
-    /// </summary>
-    /// <returns>A list of hotel offers associated with the connected user.</returns>
-    /// <response code="200">Hotel offers retrieved successfully.</response>
-    /// <response code="401">User not authenticated.</response>
-    /// <response code="500">An unexpected error occurred.</response>
-    [HttpGet("my-offers")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<IEnumerable<Resource<HotelOfferDto>>>>> GetOffersForConnectedUser() {
-        try {
-            var connectedUser = _security.GetCurrentUser();
-            if (connectedUser == null) return Unauthorized("User not authenticated");
-
-            var hotelOffers = await _hotelOfferService.GetHotelsByUserId(connectedUser.UserId);
-
-            var resources = hotelOffers.Select(offer => new Resource<HotelOfferDto> {
-                Data = offer,
-                Links = new List<Link> {
-                    new() {
-                        Href = Url.Action(nameof(GetById), new { id = offer.Id }),
-                        Rel = "self",
-                        Method = "GET"
-                    },
-                    new() {
-                        Href = Url.Action(nameof(Update), new { id = offer.Id }),
-                        Rel = "update",
-                        Method = "PUT"
-                    },
-                    new() {
-                        Href = Url.Action(nameof(Delete), new { id = offer.Id }),
-                        Rel = "delete",
-                        Method = "DELETE"
-                    }
-                }
-            });
-
-            var resourceCollection = new Resource<IEnumerable<Resource<HotelOfferDto>>> {
-                Data = resources,
-                Links = new List<Link> {
-                    new() {
-                        Href = Url.Action(nameof(GetOffersForConnectedUser)),
-                        Rel = "self",
-                        Method = "GET"
-                    }
-                }
-            };
-
-            return Ok(resourceCollection);
-        }
-        catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while retrieving hotel offers for the connected user.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
         }
     }

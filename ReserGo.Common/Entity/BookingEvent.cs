@@ -4,7 +4,6 @@ public class BookingEvent : Booking {
     public Guid EventOfferId { get; set; }
     public Guid EventId { get; set; }
     public double PricePerDay { get; set; }
-
     public DateOnly StartDate { get; set; }
     public DateOnly EndDate { get; set; }
     public EventOffer EventOffer { get; set; } = null!;

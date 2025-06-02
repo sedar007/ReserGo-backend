@@ -2,9 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Models;
-using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.Common.Requests.Products.Hotel.Rooms;
-using ReserGo.Common.Response;
 using ReserGo.Shared;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
@@ -49,12 +47,12 @@ public class RoomController : ControllerBase {
                 Data = data,
                 Links = new List<Link> {
                     new() {
-                        Href = Url.Action(nameof(GetById), new { id = data.Id }),
+                        Href = Url.Action(nameof(GetById), new { id = data.Id }) ?? string.Empty,
                         Rel = "self",
                         Method = "GET"
                     },
                     new() {
-                        Href = Url.Action(nameof(Update), new { id = data.Id }),
+                        Href = Url.Action(nameof(Update), new { id = data.Id }) ?? string.Empty,
                         Rel = "update",
                         Method = "PUT"
                     }
@@ -94,12 +92,12 @@ public class RoomController : ControllerBase {
                 Data = room,
                 Links = new List<Link> {
                     new() {
-                        Href = Url.Action(nameof(GetById), new { id }),
+                        Href = Url.Action(nameof(GetById), new { id }) ?? string.Empty,
                         Rel = "self",
                         Method = "GET"
                     },
                     new() {
-                        Href = Url.Action(nameof(Update), new { id }),
+                        Href = Url.Action(nameof(Update), new { id }) ?? string.Empty,
                         Rel = "update",
                         Method = "PUT"
                     }
@@ -141,7 +139,7 @@ public class RoomController : ControllerBase {
                 Data = rooms,
                 Links = new List<Link> {
                     new() {
-                        Href = Url.Action(nameof(GetRoomsByHotelId), new { hotelId }),
+                        Href = Url.Action(nameof(GetRoomsByHotelId), new { hotelId }) ?? string.Empty,
                         Rel = "self",
                         Method = "GET"
                     }
@@ -179,7 +177,7 @@ public class RoomController : ControllerBase {
                 Data = updatedRoom,
                 Links = new List<Link> {
                     new() {
-                        Href = Url.Action(nameof(GetById), new { id }),
+                        Href = Url.Action(nameof(GetById), new { id }) ?? string.Empty,
                         Rel = "self",
                         Method = "GET"
                     }
@@ -251,7 +249,7 @@ public class RoomController : ControllerBase {
                 Data = availability,
                 Links = new List<Link> {
                     new() {
-                        Href = Url.Action(nameof(SetAvailability), new { availability.Room.Id }),
+                        Href = Url.Action(nameof(SetAvailability), new { availability.Room.Id }) ?? string.Empty,
                         Rel = "self",
                         Method = "POST"
                     }
@@ -295,7 +293,7 @@ public class RoomController : ControllerBase {
                 Data = availabilities,
                 Links = new List<Link> {
                     new() {
-                        Href = Url.Action(nameof(GetAvailabilitiesOrderedByDate), new { hotelId, skip, take }),
+                        Href = Url.Action(nameof(GetAvailabilitiesOrderedByDate), new { hotelId, skip, take }) ?? string.Empty,
                         Rel = "self",
                         Method = "GET"
                     }
@@ -337,7 +335,7 @@ public class RoomController : ControllerBase {
                 Data = availabilities,
                 Links = new List<Link> {
                     new() {
-                        Href = Url.Action(nameof(GetAvailabilitiesForAllHotels), new { skip, take }),
+                        Href = Url.Action(nameof(GetAvailabilitiesForAllHotels), new { skip, take }) ?? string.Empty,
                         Rel = "self",
                         Method = "GET"
                     }
@@ -351,46 +349,6 @@ public class RoomController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
-
-
-    /// <summary>
-    ///     Searches for room availability based on the provided criteria.
-    /// </summary>
-    /// <param name="hotelSearchAvailabilityRequest">The search criteria including arrival date and return date.</param>
-    /// <returns>
-    ///     - **200 OK**: If availability is found.
-    ///     - **400 Bad Request**: If the request is invalid.
-    ///     - **500 Internal Server Error**: If an unexpected error occurs.
-    /// </returns>
-    /// <response code="200">Availability found and returned.</response>
-    /// <response code="400">Invalid search criteria.</response>
-    /// <response code="500">An unexpected error occurred.</response>
-    [HttpGet("search-availability")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SearchAvailability(
-        [FromQuery] HotelSearchAvailabilityRequest hotelSearchAvailabilityRequest) {
-        try {
-            var availability = await _roomAvailabilityService.SearchAvailability(hotelSearchAvailabilityRequest);
-
-            return Ok(availability.Select(a => new Resource<RoomAvailibilityHotelResponse> {
-                Data = a,
-                Links = new List<Link> {
-                    new() {
-                        Href = Url.Action(nameof(SearchAvailability), new {
-                            hotelSearchAvailabilityRequest.ArrivalDate,
-                            hotelSearchAvailabilityRequest.ReturnDate
-                        }),
-                        Rel = "self",
-                        Method = "GET"
-                    }
-                }
-            }));
-        }
-        catch (Exception e) {
-            _logger.LogError(e, "An error occurred while searching for availability.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
-        }
-    }
+    
 }
+

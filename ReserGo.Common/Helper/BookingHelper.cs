@@ -16,7 +16,8 @@ public static class BookingHelper {
             RestaurantOfferId = bookingRestaurant.RestaurantOfferId,
             RestaurantOffer = bookingRestaurant.RestaurantOffer.ToDto(),
             Restaurant = bookingRestaurant.Restaurant.ToDto(),
-            Date = bookingRestaurant.Date
+            Date = bookingRestaurant.Date,
+            User = bookingRestaurant.User?.ToDto()
         };
     }
 
@@ -34,7 +35,8 @@ public static class BookingHelper {
             StartDate = bookingHotel.StartDate,
             EndDate = bookingHotel.EndDate,
             Hotel = bookingHotel?.Hotel.ToDto(),
-            Room = bookingHotel?.Room.ToDto()
+            Room = bookingHotel?.Room.ToDto(),
+            User = bookingHotel.User?.ToDto()
         };
     }
 
@@ -52,7 +54,8 @@ public static class BookingHelper {
             Event = bookingEvent?.Event.ToDto(),
             EventId = bookingEvent.EventId,
             StartDate = bookingEvent.StartDate,
-            EndDate = bookingEvent.EndDate
+            EndDate = bookingEvent.EndDate,
+            User = bookingEvent.User?.ToDto()
         };
     }
 }
