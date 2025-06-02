@@ -1,6 +1,6 @@
-﻿using ReserGo.Common.Enum;
+﻿using Microsoft.AspNetCore.Http;
+using ReserGo.Common.Enum;
 using ReserGo.Common.Security;
-using Microsoft.AspNetCore.Http;
 
 namespace ReserGo.Shared.Interfaces;
 

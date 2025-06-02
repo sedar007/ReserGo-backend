@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared.Exceptions;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -13,12 +13,12 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
     }
 
     public async Task<BookingHotel> Create(BookingHotel bookingHotel) {
-        EntityEntry<BookingHotel> newData = _context.BookingHotel.Add(bookingHotel);
+        var newData = _context.BookingHotel.Add(bookingHotel);
         await _context.SaveChangesAsync();
-        return await GetById(newData.Entity.Id) ?? throw new NullReferenceException("Error creating new booking hotel.");
-
+        return await GetById(newData.Entity.Id) ??
+               throw new NullDataException("Error creating new booking hotel.");
     }
-    
+
 
     public async Task<BookingHotel?> GetById(Guid id) {
         return await _context.BookingHotel
@@ -35,9 +35,12 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<BookingHotel>> GetBookingsByUserId(Guid userId) {
+    public async Task<IEnumerable<BookingHotel>> GetBookingsByUserId(Guid userId, int pageSize) {
         return await _context.BookingHotel
+            .Include(b => b.Hotel)
+            .OrderByDescending(b => b.StartDate)
             .Where(b => b.UserId == userId)
+            .Take(pageSize)
             .ToListAsync();
     }
 
@@ -50,25 +53,14 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
     }
 
     public async Task<int> GetNbBookingBetween2DatesByAdminId(Guid adminId,
-        DateTime startDate, DateTime endDate) {
+        DateOnly startDate, DateOnly endDate) {
         return await _context.BookingHotel
             .Include(b => b.Hotel)
             .Where(b => b.Hotel.UserId == adminId)
-            .Where(b => b.BookingDate >= startDate.Date && b.BookingDate <= endDate.Date)
+            .Where(b => b.BookingDate >= startDate && b.BookingDate <= endDate)
             .CountAsync();
     }
 
-    public async Task<int> GetNbBookingsLast30Days(Guid adminId) {
-        var today = DateTime.UtcNow;
-        var days30Before = today.AddDays(-30);
-
-        return await _context.BookingHotel
-            .Include(b => b.Hotel)
-            .Where(b => b.Hotel.UserId == adminId)
-            .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
-            .CountAsync();
-    }
-    
     public async Task<IEnumerable<BookingHotel>> GetBookingYearsByUserId(Guid userId) {
         var currentYear = DateTime.UtcNow.Year;
         return await _context.BookingHotel

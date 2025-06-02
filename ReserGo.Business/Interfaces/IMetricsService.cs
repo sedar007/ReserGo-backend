@@ -1,5 +1,5 @@
-using ReserGo.Common.Response;
 using ReserGo.Common.Enum;
+using ReserGo.Common.Response;
 
 namespace ReserGo.Business.Interfaces;
 

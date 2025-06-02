@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-
 namespace ReserGo.Common.Requests.Security;
 
 public class LoginRequest {

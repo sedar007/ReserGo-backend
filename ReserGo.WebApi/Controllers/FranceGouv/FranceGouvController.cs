@@ -1,18 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
-using ReserGo.Common.DTO;
-using ReserGo.Common.Models;
-using ReserGo.Common.Requests.User;
-using ReserGo.Shared.Interfaces;
-using ReserGo.WebAPI.Attributes;
 
 namespace ReserGo.WebAPI.Controllers.FranceGouv;
 
 [ApiController]
 [Route("api/[controller]")]
 public class FranceGouvController : ControllerBase {
-    private readonly ILogger<FranceGouvController> _logger;
     private readonly IFranceGouvService _franceGouvService;
+    private readonly ILogger<FranceGouvController> _logger;
 
     public FranceGouvController(ILogger<FranceGouvController> logger, IFranceGouvService franceGouvService) {
         _logger = logger;
@@ -20,7 +15,7 @@ public class FranceGouvController : ControllerBase {
     }
 
     /// <summary>
-    /// Retrieve a list of addresses based on a search query.
+    ///     Retrieve a list of addresses based on a search query.
     /// </summary>
     /// <param name="query">The search query to find addresses.</param>
     /// <returns>A list of matching addresses.</returns>

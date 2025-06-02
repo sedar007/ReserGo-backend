@@ -1,19 +1,12 @@
 using Microsoft.Extensions.Logging;
 using ReserGo.Business.Interfaces;
-using ReserGo.Common.Entity;
-using ReserGo.DataAccess.Interfaces;
-using ReserGo.Shared.Interfaces;
-using ReserGo.Common.Security;
 using ReserGo.Tiers.Interfaces;
-using ReserGo.Tiers.Responses;
-using ReserGo.Common.Enum;
 
 namespace ReserGo.Business.Implementations;
 
 public class FranceGouvService : IFranceGouvService {
-    private readonly ILogger<FranceGouvService> _logger;
-
     private readonly IFranceGouvApiService _franceGouvApiService;
+    private readonly ILogger<FranceGouvService> _logger;
 
     public FranceGouvService(ILogger<FranceGouvService> logger, IFranceGouvApiService franceGouvApiService) {
         _logger = logger;

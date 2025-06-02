@@ -1,12 +1,21 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using ReserGo.Common.DTO;
 using ReserGo.Common.Entity;
 using ReserGo.Common.Security;
 
 namespace ReserGo.DataAccess;
 
 public class ReserGoContext : DbContext {
+    private readonly string _sqlConnectionString;
+
+    public ReserGoContext(IOptions<AppSettings> options) {
+        _sqlConnectionString = options.Value.SqlConnectionString;
+    }
+
+    // Add this constructor for testing purposes
+    public ReserGoContext(DbContextOptions<ReserGoContext> options) : base(options) {
+    }
+
     public DbSet<User> Users { get; set; }
     public DbSet<Login> Login { get; set; }
     public DbSet<Hotel> Hotel { get; set; }
@@ -23,16 +32,6 @@ public class ReserGoContext : DbContext {
     public DbSet<BookingEvent> BookingEvent { get; set; }
     public DbSet<BookingRestaurant> BookingRestaurant { get; set; }
     public DbSet<Address> Addresses { get; set; }
-
-    private readonly string _sqlConnectionString;
-
-    public ReserGoContext(IOptions<AppSettings> options) {
-        _sqlConnectionString = options.Value.SqlConnectionString;
-    }
-
-    // Add this constructor for testing purposes
-    public ReserGoContext(DbContextOptions<ReserGoContext> options) : base(options) {
-    }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
         optionsBuilder.UseNpgsql(_sqlConnectionString);
@@ -115,18 +114,6 @@ public class ReserGoContext : DbContext {
             .WithOne(oo => oo.User)
             .HasForeignKey(oo => oo.UserId)
             .OnDelete(DeleteBehavior.Cascade);
-
-        /* //Config Login
-         modelBuilder.Entity<Login>()
-             .HasKey(l => l.Id);
-         modelBuilder.Entity<Login>()
-             .HasIndex(l => l.Username)
-             .IsUnique();
-         modelBuilder.Entity<Login>()
-             .HasOne(l => l.User)
-             .WithOne(u => u.Login)
-             .HasForeignKey<Login>(l => l.UserId)
-             .OnDelete(DeleteBehavior.Cascade); */
 
         // Config Hotel
         modelBuilder.Entity<Hotel>()
@@ -242,11 +229,6 @@ public class ReserGoContext : DbContext {
             .WithMany(u => u.BookingsHotel)
             .HasForeignKey(b => b.UserId);
 
-        /* modelBuilder.Entity<BookingHotel>()
-             .HasOne(b => b.HotelOffer)
-             .WithMany(h => h.Bookings)
-             .HasForeignKey(b => b.HotelOfferId);*/
-
         // Config Notification
         modelBuilder.Entity<Notification>()
             .HasKey(n => n.Id);
@@ -277,7 +259,7 @@ public class ReserGoContext : DbContext {
             .HasIndex(ra => new
                 { ra.RoomId, ra.StartDate, ra.EndDate }) // Index pour éviter les conflits de disponibilité
             .IsUnique();
-        
+
         modelBuilder.Entity<RoomAvailability>()
             .HasMany(ra => ra.BookingsHotels)
             .WithOne(bh => bh.RoomAvailability)

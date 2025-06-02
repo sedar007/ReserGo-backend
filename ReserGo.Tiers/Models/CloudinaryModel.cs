@@ -1,6 +1,6 @@
+using CloudinaryDotNet;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using CloudinaryDotNet;
 
 namespace ReserGo.Tiers.Models;
 
@@ -16,7 +16,7 @@ public class CloudinaryModel {
         var cloudinaryApiSecret = configuration.GetSection("CloudinaryApiSecret").Get<string>();
         if (cloudinaryCloudName == null || cloudinaryApiKey == null || cloudinaryApiSecret == null) {
             _logger.LogError("Cloudinary settings are not configured properly.");
-            throw new ArgumentNullException(nameof(cloudinaryCloudName), "Cloudinary settings are missing.");
+            throw new ArgumentNullException(nameof(configuration), "Cloudinary settings are missing.");
         }
 
 

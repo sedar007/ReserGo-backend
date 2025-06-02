@@ -1,15 +1,13 @@
 ﻿using ReserGo.Common.DTO;
-using ReserGo.Common.Entity;
 using ReserGo.Common.Enum;
 
 namespace ReserGo.Common.Security;
 
 public class AuthenticateResponse {
     public readonly Guid Id;
-    public readonly string Username;
-    public readonly string Token;
     public readonly UserRole Role;
-    public string RoleName => Role.ToString();
+    public readonly string Token;
+    public readonly string Username;
 
     public AuthenticateResponse(UserDto user, string token, UserRole role) {
         Id = user.Id;
@@ -17,4 +15,6 @@ public class AuthenticateResponse {
         Token = token;
         Role = role;
     }
+
+    public string RoleName => Role.ToString();
 }

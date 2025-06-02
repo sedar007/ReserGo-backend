@@ -1,5 +1,3 @@
-using ReserGo.Common.Requests.Products;
-using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.Common.Requests.Products.Event;
 
 namespace ReserGo.Business.Validator;

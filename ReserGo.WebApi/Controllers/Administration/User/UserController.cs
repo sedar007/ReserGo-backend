@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
+using ReserGo.Common.Enum;
 using ReserGo.Common.Models;
 using ReserGo.Common.Requests.User;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.WebAPI.Controllers.Helper;
-using ReserGo.Common.Enum;
 
 namespace ReserGo.WebAPI.Controllers.Administration.User;
 
@@ -15,8 +15,8 @@ namespace ReserGo.WebAPI.Controllers.Administration.User;
 public class UserController : ControllerBase {
     private readonly ILogger<UserController> _logger;
     private readonly ISecurity _security;
-    private readonly IUserService _userService;
     private readonly UserRole _userRole;
+    private readonly IUserService _userService;
 
     public UserController(ILogger<UserController> logger, ISecurity security, IUserService userService) {
         _logger = logger;
@@ -158,7 +158,7 @@ public class UserController : ControllerBase {
             }
 
             var profilePicture = await _userService.GetProfilePicture(connectedUser.UserId);
-            _logger.LogInformation("Profile picture of user {id} retrieved successfully", connectedUser.UserId);
+            _logger.LogInformation("Profile picture of user {Id} retrieved successfully", connectedUser.UserId);
             return Ok(profilePicture);
         }
         catch (Exception ex) {
@@ -203,7 +203,7 @@ public class UserController : ControllerBase {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Profile picture update failed.");
             }
 
-            _logger.LogInformation("Profile picture of user {id} updated successfully", connectedUser.UserId);
+            _logger.LogInformation("Profile picture of user {Id} updated successfully", connectedUser.UserId);
             return Ok(newProfilePictureUrl);
         }
         catch (Exception ex) {

@@ -1,24 +1,22 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Microsoft.Extensions.Caching.Memory;
-using ReserGo.Business.Interfaces;
-using ReserGo.Common.DTO;
-using ReserGo.Common.Requests.User;
-using ReserGo.WebAPI.Controllers.Administration.User;
-using ReserGo.DataAccess;
-using ReserGo.Common.Entity;
 using ReserGo.Business.Implementations;
+using ReserGo.Business.Interfaces;
+using ReserGo.Common.Entity;
+using ReserGo.Common.Requests.User;
+using ReserGo.DataAccess;
 using ReserGo.DataAccess.Implementations;
-using ReserGo.Common.Models;
+using ReserGo.WebAPI.Controllers.Administration.User;
 
 public class UserControllerTests {
     private readonly UserController _controller;
-    private readonly IUserService _userService;
     private readonly Mock<ILogger<UserController>> _loggerMock;
+    private readonly IUserService _userService;
 
     public UserControllerTests() {
         var serviceProvider = new ServiceCollection()
@@ -144,7 +142,7 @@ public class UserControllerTests {
             Username = "janedoe"
         };
 
-        var result = await _controller.UpdateUser(Guid.NewGuid(), request) as ActionResult<Resource<UserDto>>;
+        var result = await _controller.UpdateUser(Guid.NewGuid(), request);
         var notFoundResult = result.Result as NotFoundObjectResult;
         notFoundResult.Should().NotBeNull();
         notFoundResult.StatusCode.Should().Be(404);

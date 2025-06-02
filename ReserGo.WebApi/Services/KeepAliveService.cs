@@ -1,17 +1,22 @@
 namespace ReserGo.WebAPI.Services;
 
 public class KeepAliveService : IHostedService, IDisposable {
-    private Timer _timer;
     private readonly HttpClient _httpClient;
-    private readonly string _url;
     private readonly ILogger<KeepAliveService> _logger;
+    private readonly string _url;
+    private Timer _timer;
 
 
     public KeepAliveService(IConfiguration configuration, ILogger<KeepAliveService> logger) {
         _httpClient = new HttpClient();
         _logger = logger;
         _url = configuration.GetSection("urlInstance")?.Get<string>() ?? string.Empty;
-        _logger.LogInformation($"Keep-alive URL: {_url}");
+        _logger.LogInformation("Keep-alive URL: {Url}", _url);
+    }
+
+    public void Dispose() {
+        _timer?.Dispose();
+        _httpClient?.Dispose();
     }
 
     public Task StartAsync(CancellationToken cancellationToken) {
@@ -20,26 +25,21 @@ public class KeepAliveService : IHostedService, IDisposable {
         return Task.CompletedTask;
     }
 
-    private async void SendKeepAliveRequest(object state) {
-        try {
-            var response = await _httpClient.GetAsync(_url);
-            if (response.IsSuccessStatusCode)
-                _logger.LogInformation($"Keep-alive successful at {DateTime.Now}");
-            else
-                _logger.LogWarning($"Failed keep-alive at {DateTime.Now}: {response.StatusCode}");
-        }
-        catch (Exception ex) {
-            _logger.LogError($"Exception in keep-alive: {ex.Message}");
-        }
-    }
-
     public Task StopAsync(CancellationToken cancellationToken) {
         _timer?.Change(Timeout.Infinite, 0);
         return Task.CompletedTask;
     }
 
-    public void Dispose() {
-        _timer?.Dispose();
-        _httpClient?.Dispose();
+    private async void SendKeepAliveRequest(object state) {
+        try {
+            var response = await _httpClient.GetAsync(_url);
+            if (response.IsSuccessStatusCode)
+                _logger.LogInformation("Keep-alive successful at {Date}", DateTime.Now);
+            else
+                _logger.LogWarning("Failed keep-alive at {Date}: {Response}", DateTime.Now, response.StatusCode);
+        }
+        catch (Exception ex) {
+            _logger.LogError("Exception in keep-alive: {Message}", ex.Message);
+        }
     }
 }

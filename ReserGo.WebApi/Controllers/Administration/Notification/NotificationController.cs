@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
-using ReserGo.Common.Requests.Products.Hotel;
-using ReserGo.WebAPI.Attributes;
 using ReserGo.Shared.Interfaces;
+using ReserGo.WebAPI.Attributes;
 using ReserGo.WebAPI.Controllers.Administration.Products;
-using ReserGo.Common.Models;
-
 
 namespace ReserGo.WebAPI.Controllers.Administration.Notification;
 
@@ -15,11 +12,11 @@ namespace ReserGo.WebAPI.Controllers.Administration.Notification;
 [AdminOnly]
 [Route("api/administration/notifications/")]
 public class NotificationController : ControllerBase {
-    private readonly ILogger<HotelController> _logger;
+    private readonly ILogger<NotificationController> _logger;
     private readonly INotificationService _notificationService;
     private readonly ISecurity _security;
 
-    public NotificationController(ILogger<HotelController> logger, INotificationService notificationService,
+    public NotificationController(ILogger<NotificationController> logger, INotificationService notificationService,
         ISecurity security) {
         _logger = logger;
         _notificationService = notificationService;

@@ -60,13 +60,16 @@ namespace ReserGo.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("BookingDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("BookingDate")
+                        .HasColumnType("date");
 
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
 
                     b.Property<Guid>("EventId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("EventOfferId")
                         .HasColumnType("uuid");
 
                     b.Property<bool>("IsConfirmed")
@@ -75,7 +78,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<int>("NumberOfGuests")
                         .HasColumnType("integer");
 
-                    b.Property<double>("PricePerPerson")
+                    b.Property<double>("PricePerDay")
                         .HasColumnType("double precision");
 
                     b.Property<double>("PriceTotal")
@@ -91,6 +94,8 @@ namespace ReserGo.DataAccess.Migrations
 
                     b.HasIndex("EventId");
 
+                    b.HasIndex("EventOfferId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("BookingEvent");
@@ -102,8 +107,8 @@ namespace ReserGo.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("BookingDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("BookingDate")
+                        .HasColumnType("date");
 
                     b.Property<DateOnly>("EndDate")
                         .HasColumnType("date");
@@ -159,8 +164,8 @@ namespace ReserGo.DataAccess.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("BookingDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("BookingDate")
+                        .HasColumnType("date");
 
                     b.Property<DateOnly>("Date")
                         .HasColumnType("date");
@@ -251,6 +256,9 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<int>("GuestLimit")
                         .HasColumnType("integer");
 
+                    b.Property<int>("GuestNumber")
+                        .HasColumnType("integer");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
@@ -260,7 +268,7 @@ namespace ReserGo.DataAccess.Migrations
                     b.Property<DateOnly>("OfferStartDate")
                         .HasColumnType("date");
 
-                    b.Property<double>("PricePerPerson")
+                    b.Property<double>("PricePerDay")
                         .HasColumnType("double precision");
 
                     b.Property<Guid>("UserId")
@@ -643,6 +651,12 @@ namespace ReserGo.DataAccess.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("ReserGo.Common.Entity.EventOffer", "EventOffer")
+                        .WithMany("Bookings")
+                        .HasForeignKey("EventOfferId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("ReserGo.Common.Entity.User", "User")
                         .WithMany("BookingsEvent")
                         .HasForeignKey("UserId")
@@ -650,6 +664,8 @@ namespace ReserGo.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("Event");
+
+                    b.Navigation("EventOffer");
 
                     b.Navigation("User");
                 });
@@ -867,6 +883,11 @@ namespace ReserGo.DataAccess.Migrations
                     b.Navigation("BookingsEvent");
 
                     b.Navigation("EventOffers");
+                });
+
+            modelBuilder.Entity("ReserGo.Common.Entity.EventOffer", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 
             modelBuilder.Entity("ReserGo.Common.Entity.Hotel", b =>

@@ -15,5 +15,4 @@ public class RestaurantOffer {
     public User User { get; init; } = null!;
 
     public ICollection<BookingRestaurant> Bookings { get; set; } = new List<BookingRestaurant>();
-
 }

@@ -8,12 +8,13 @@ public static class EventOfferHelper {
         return new EventOfferDto {
             Id = occasion.Id,
             Description = occasion.Description,
-            PricePerPerson = occasion.PricePerPerson,
+            PricePerDay = occasion.PricePerDay,
             GuestLimit = occasion.GuestLimit,
             OfferStartDate = occasion.OfferStartDate,
             OfferEndDate = occasion.OfferEndDate,
             IsActive = occasion.IsActive,
             EventId = occasion.EventId,
+            UserId = occasion.UserId,
             Event = occasion.Event.ToDto()
         };
     }

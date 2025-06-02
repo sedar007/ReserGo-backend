@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+using ReserGo.Common.Requests.Products.Event;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared.Exceptions;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -13,18 +14,21 @@ public class EventOfferDataAccess : IEventOfferDataAccess {
     }
 
     public async Task<EventOffer?> GetById(Guid id) {
-        return await _context.EventOffer.Include(h => h.Event).FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.EventOffer
+            .Include(h => h.Event)
+            .Include(x => x.User)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<IEnumerable<EventOffer>> GetEventsOfferByUserId(Guid userId) {
         return await _context.EventOffer.Where(x => x.UserId == userId).Include(h => h.Event).ToListAsync();
     }
 
-    public async Task<EventOffer> Create(EventOffer user) {
-        EntityEntry<EventOffer> newData = _context.EventOffer.Add(user);
+    public async Task<EventOffer> Create(EventOffer eventOffer) {
+        var newData = _context.EventOffer.Add(eventOffer);
         await _context.SaveChangesAsync();
         return await GetById(newData.Entity.Id) ??
-               throw new NullReferenceException("Error creating new @event offer.");
+               throw new NullDataException("Error creating new @event offer.");
     }
 
     public async Task<EventOffer> Update(EventOffer eventOffer) {
@@ -33,8 +37,20 @@ public class EventOfferDataAccess : IEventOfferDataAccess {
         return eventOffer;
     }
 
-    public async Task Delete(EventOffer @event) {
-        _context.EventOffer.Remove(@event);
+    public async Task Delete(EventOffer eventOffer) {
+        _context.EventOffer.Remove(eventOffer);
         await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<EventOffer>> SearchAvailability(EventSearchAvailabilityRequest request) {
+        return await _context.EventOffer
+            .Include(o => o.Event)
+            .Include(o => o.Bookings)
+            .Where(o => o.OfferStartDate <= request.StartDate &&
+                        o.OfferEndDate >= request.EndDate &&
+                        o.GuestLimit >= request.NumberOfGuests &&
+                        !o.Bookings.Any(b => b.StartDate <= request.EndDate &&
+                                             b.EndDate >= request.StartDate))
+            .ToListAsync();
     }
 }

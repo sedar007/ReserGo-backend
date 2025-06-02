@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
-using ReserGo.Common.Requests.Products.Restaurant;
-using ReserGo.WebAPI.Attributes;
-using ReserGo.Shared.Interfaces;
 using ReserGo.Common.Models;
+using ReserGo.Common.Requests.Products.Restaurant;
+using ReserGo.Shared;
+using ReserGo.Shared.Interfaces;
+using ReserGo.WebAPI.Attributes;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
@@ -13,12 +14,12 @@ namespace ReserGo.WebAPI.Controllers.Administration.Products;
 [AdminOnly]
 [Route("api/administration/offers/restaurants/")]
 public class RestaurantOfferController : ControllerBase {
-    private readonly ILogger<RestaurantController> _logger;
+    private readonly IBookingRestaurantService _bookingRestaurantService;
+    private readonly ILogger<RestaurantOfferController> _logger;
     private readonly IRestaurantOfferService _restaurantOfferService;
     private readonly ISecurity _security;
-    private readonly IBookingRestaurantService _bookingRestaurantService;
 
-    public RestaurantOfferController(ILogger<RestaurantController> logger,
+    public RestaurantOfferController(ILogger<RestaurantOfferController> logger,
         IRestaurantOfferService restaurantOfferService, ISecurity security,
         IBookingRestaurantService bookingRestaurantService) {
         _logger = logger;
@@ -28,7 +29,7 @@ public class RestaurantOfferController : ControllerBase {
     }
 
     /// <summary>
-    /// Create a new restaurant offer.
+    ///     Create a new restaurant offer.
     /// </summary>
     /// <param name="request">The restaurant offer creation request containing necessary information.</param>
     /// <returns>The created restaurant offer object.</returns>
@@ -66,13 +67,13 @@ public class RestaurantOfferController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while creating the restaurant offer.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 
 
     /// <summary>
-    /// Retrieve a restaurant offer by its ID.
+    ///     Retrieve a restaurant offer by its ID.
     /// </summary>
     /// <param name="id">The ID of the restaurant offer.</param>
     /// <returns>The restaurant offer object.</returns>
@@ -116,7 +117,7 @@ public class RestaurantOfferController : ControllerBase {
     }
 
     /// <summary>
-    /// Retrieve restaurant offers for the connected user.
+    ///     Retrieve restaurant offers for the connected user.
     /// </summary>
     /// <returns>A list of restaurant offers associated with the connected user.</returns>
     /// <response code="200">Restaurant offers retrieved successfully.</response>
@@ -169,7 +170,7 @@ public class RestaurantOfferController : ControllerBase {
     }
 
     /// <summary>
-    /// Update an existing restaurant offer.
+    ///     Update an existing restaurant offer.
     /// </summary>
     /// <param name="id">The ID of the restaurant offer to update.</param>
     /// <param name="request">The restaurant offer update request.</param>
@@ -208,7 +209,7 @@ public class RestaurantOfferController : ControllerBase {
     }
 
     /// <summary>
-    /// Remove a restaurant offer by its ID.
+    ///     Remove a restaurant offer by its ID.
     /// </summary>
     /// <param name="id">The ID of the restaurant offer to remove.</param>
     /// <returns>No content if successful.</returns>

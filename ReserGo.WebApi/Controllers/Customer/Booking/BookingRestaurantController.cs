@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
-using ReserGo.Business.Interfaces;
-using ReserGo.Common.Requests.Products.Restaurant;
-using ReserGo.WebAPI.Attributes;
-using ReserGo.Shared.Interfaces;
-using ReserGo.WebAPI.Controllers.Administration.Products;
 using Microsoft.AspNetCore.SignalR;
-using ReserGo.WebAPI.Hubs;
-using ReserGo.Common.Response;
+using ReserGo.Business.Interfaces;
 using ReserGo.Common.Models;
+using ReserGo.Common.Requests.Products.Restaurant;
+using ReserGo.Common.Response;
+using ReserGo.Shared.Interfaces;
+using ReserGo.WebAPI.Attributes;
+using ReserGo.WebAPI.Controllers.Administration.Products;
+using ReserGo.WebAPI.Hubs;
 
 namespace ReserGo.WebAPI.Controllers.Customer.Booking;
 
@@ -15,13 +15,13 @@ namespace ReserGo.WebAPI.Controllers.Customer.Booking;
 [Tags("Booking | Restaurant")]
 [Route("api/customer/booking/restaurants/")]
 public class BookingRestaurantController : ControllerBase {
-    private readonly ILogger<RestaurantController> _logger;
-    private readonly ISecurity _security;
     private readonly IBookingRestaurantService _bookingRestaurantService;
+    private readonly ILogger<BookingRestaurantController> _logger;
     private readonly IHubContext<NotificationHub> _notificationHub;
     private readonly IRestaurantOfferService _restaurantOfferService;
+    private readonly ISecurity _security;
 
-    public BookingRestaurantController(ILogger<RestaurantController> logger,
+    public BookingRestaurantController(ILogger<BookingRestaurantController> logger,
         ISecurity security, IBookingRestaurantService bookingRestaurantService,
         IHubContext<NotificationHub> notificationHub, IRestaurantOfferService restaurantOfferService) {
         _logger = logger;
@@ -80,15 +80,15 @@ public class BookingRestaurantController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-    
+
     /// <summary>
-    /// Searches for restaurant availability based on the provided criteria.
+    ///     Searches for restaurant availability based on the provided criteria.
     /// </summary>
     /// <param name="restaurantSearchAvailabilityRequest">The search criteria including date and number of guests.</param>
     /// <returns>
-    /// - **200 OK**: If availability is found.
-    /// - **400 Bad Request**: If the request is invalid.
-    /// - **500 Internal Server Error**: If an unexpected error occurs.
+    ///     - **200 OK**: If availability is found.
+    ///     - **400 Bad Request**: If the request is invalid.
+    ///     - **500 Internal Server Error**: If an unexpected error occurs.
     /// </returns>
     /// <response code="200">Availability found and returned.</response>
     /// <response code="400">Invalid search criteria.</response>
@@ -97,9 +97,9 @@ public class BookingRestaurantController : ControllerBase {
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<IActionResult> SearchAvailability([FromQuery] RestaurantSearchAvailabilityRequest restaurantSearchAvailabilityRequest)
-    {
-        try { 
+    public async Task<IActionResult> SearchAvailability(
+        [FromQuery] RestaurantSearchAvailabilityRequest restaurantSearchAvailabilityRequest) {
+        try {
             var availability = await _restaurantOfferService.SearchAvailability(restaurantSearchAvailabilityRequest);
 
             return Ok(availability.Select(a => new Resource<RestaurantAvailabilityResponse> {
@@ -115,7 +115,8 @@ public class BookingRestaurantController : ControllerBase {
                     }
                 }
             }));
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             _logger.LogError(e, "An error occurred while searching for restaurant availability.");
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }

@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
+using ReserGo.Common.Enum;
 using ReserGo.Common.Models;
 using ReserGo.Common.Requests.User;
-using ReserGo.Common.Enum;
-using ReserGo.Shared.Interfaces;
 using ReserGo.Shared;
+using ReserGo.Shared.Interfaces;
 
 namespace ReserGo.WebAPI.Controllers.Helper;
 

@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
+using ReserGo.Common.Models;
 using ReserGo.Common.Requests.Products.Event;
+using ReserGo.Shared;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
-using ReserGo.Common.Models;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
@@ -13,8 +14,8 @@ namespace ReserGo.WebAPI.Controllers.Administration.Products;
 [Tags("Products | Event")]
 [Route("api/administration/products/events/")]
 public class EventController : ControllerBase {
-    private readonly ILogger<EventController> _logger;
     private readonly IEventService _eventService;
+    private readonly ILogger<EventController> _logger;
     private readonly ISecurity _security;
 
     public EventController(ILogger<EventController> logger, IEventService eventService,
@@ -25,7 +26,7 @@ public class EventController : ControllerBase {
     }
 
     /// <summary>
-    /// Create a new @event.
+    ///     Create a new @event.
     /// </summary>
     /// <param name="request">The @event creation request containing necessary information.</param>
     /// <returns>The created @event object.</returns>
@@ -63,12 +64,12 @@ public class EventController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while creating the @event.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 
     /// <summary>
-    /// Retrieve an @event by their ID.
+    ///     Retrieve an @event by their ID.
     /// </summary>
     /// <param name="id">The ID of the @event.</param>
     /// <returns>The Event object.</returns>
@@ -112,7 +113,7 @@ public class EventController : ControllerBase {
     }
 
     /// <summary>
-    /// Retrieve an @event by their StayId.
+    ///     Retrieve an @event by their StayId.
     /// </summary>
     /// <param name="id">The StayId of the @event.</param>
     /// <returns>The Event object.</returns>
@@ -156,7 +157,7 @@ public class EventController : ControllerBase {
     }
 
     /// <summary>
-    /// Retrieve events for the connected user.
+    ///     Retrieve events for the connected user.
     /// </summary>
     /// <returns>A list of events associated with the connected user.</returns>
     /// <response code="200">Events retrieved successfully.</response>
@@ -209,9 +210,9 @@ public class EventController : ControllerBase {
     }
 
     /// <summary>
-    /// Update an existing @event.
+    ///     Update an existing @event.
     /// </summary>
-    ///  <param name="id">The stayId to search the object.</param>
+    /// <param name="id">The stayId to search the object.</param>
     /// <param name="request">The Event update request.</param>
     /// <returns>The updated Event object.</returns>
     /// <response code="200">Event updated successfully.</response>
@@ -247,7 +248,7 @@ public class EventController : ControllerBase {
     }
 
     /// <summary>
-    /// Remove an Event by their ID.
+    ///     Remove an Event by their ID.
     /// </summary>
     /// <param name="id">The ID of the Event to remove.</param>
     /// <returns>No content if successful.</returns>

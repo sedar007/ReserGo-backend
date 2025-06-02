@@ -1,9 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
-using ReserGo.DataAccess.Interfaces;
 using ReserGo.Common.Requests.Products.Restaurant;
-using ReserGo.Common.Response;
+using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared.Exceptions;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -24,24 +23,25 @@ public class RestaurantOfferDataAccess : IRestaurantOfferDataAccess {
         return await _context.RestaurantOffer.Where(x => x.UserId == userId).Include(h => h.Restaurant).ToListAsync();
     }
 
-    public async Task<RestaurantOffer> Create(RestaurantOffer user) {
-        var newData = _context.RestaurantOffer.Add(user);
+    public async Task<RestaurantOffer> Create(RestaurantOffer restaurantOffer) {
+        var newData = _context.RestaurantOffer.Add(restaurantOffer);
         await _context.SaveChangesAsync();
         return await GetById(newData.Entity.Id) ??
-               throw new NullReferenceException("Error creating new restaurant offer.");
+               throw new NullDataException("Error creating new restaurant offer.");
     }
 
     public async Task<RestaurantOffer> Update(RestaurantOffer restaurantOffer) {
-        _context.RestaurantOffer.Update(restaurantOffer);
+        var data = _context.RestaurantOffer.Update(restaurantOffer);
         await _context.SaveChangesAsync();
-        return restaurantOffer;
+        return await GetById(data.Entity.Id) ??
+               throw new NullDataException("Error updating restaurant offer.");
     }
 
-    public async Task Delete(RestaurantOffer restaurant) {
-        _context.RestaurantOffer.Remove(restaurant);
+    public async Task Delete(RestaurantOffer restaurantOffer) {
+        _context.RestaurantOffer.Remove(restaurantOffer);
         await _context.SaveChangesAsync();
     }
-    
+
     public async Task<IEnumerable<RestaurantOffer>> SearchAvailability(RestaurantSearchAvailabilityRequest request) {
         return await _context.RestaurantOffer
             .Include(o => o.Restaurant)
@@ -49,11 +49,8 @@ public class RestaurantOfferDataAccess : IRestaurantOfferDataAccess {
                         o.OfferEndDate >= request.Date &&
                         o.GuestLimit - o.GuestNumber >= request.NumberOfGuests &&
                         (string.IsNullOrEmpty(request.CuisineType) ||
-                         (o.Restaurant.CuisineType != null && 
+                         (o.Restaurant.CuisineType != null &&
                           o.Restaurant.CuisineType.ToLower().Contains(request.CuisineType.ToLower()))))
             .ToListAsync();
     }
-    
-    
- 
 }

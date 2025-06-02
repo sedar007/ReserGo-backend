@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared.Exceptions;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -25,10 +25,10 @@ public class RestaurantDataAccess : IRestaurantDataAccess {
     }
 
     public async Task<Restaurant> Create(Restaurant restaurant) {
-        EntityEntry<Restaurant> newData = _context.Restaurant.Add(restaurant);
+        var newData = _context.Restaurant.Add(restaurant);
         await _context.SaveChangesAsync();
         return await GetByStayId(newData.Entity.StayId) ??
-               throw new NullReferenceException("Error creating new Restaurant.");
+               throw new NullDataException("Error creating new Restaurant.");
     }
 
     public async Task<Restaurant> Update(Restaurant restaurant) {

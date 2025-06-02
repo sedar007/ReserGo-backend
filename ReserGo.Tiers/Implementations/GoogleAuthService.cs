@@ -1,7 +1,7 @@
-﻿using ReserGo.Tiers.Interfaces;
-using ReserGo.Tiers.Responses;
-using Google.Apis.Auth;
+﻿using Google.Apis.Auth;
 using Microsoft.Extensions.Logging;
+using ReserGo.Tiers.Interfaces;
+using ReserGo.Tiers.Responses;
 
 namespace ReserGo.Tiers.Implementations;
 

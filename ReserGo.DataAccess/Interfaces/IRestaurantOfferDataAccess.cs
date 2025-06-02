@@ -1,6 +1,5 @@
 ﻿using ReserGo.Common.Entity;
 using ReserGo.Common.Requests.Products.Restaurant;
-using ReserGo.Common.Response;
 
 namespace ReserGo.DataAccess.Interfaces;
 

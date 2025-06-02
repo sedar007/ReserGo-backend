@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
+using ReserGo.Common.Models;
 using ReserGo.Common.Requests.Products.Restaurant;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
-using ReserGo.Common.Models;
 
 namespace ReserGo.WebAPI.Controllers.Administration.Products;
 
@@ -13,9 +13,9 @@ namespace ReserGo.WebAPI.Controllers.Administration.Products;
 [Tags("Products | Restaurant")]
 [Route("api/administration/products/restaurants/")]
 public class RestaurantController : ControllerBase {
-    private readonly ISecurity _security;
     private readonly ILogger<RestaurantController> _logger;
     private readonly IRestaurantService _restaurantService;
+    private readonly ISecurity _security;
 
     public RestaurantController(ISecurity security, ILogger<RestaurantController> logger,
         IRestaurantService restaurantService) {
@@ -25,7 +25,7 @@ public class RestaurantController : ControllerBase {
     }
 
     /// <summary>
-    /// Create a new restaurant.
+    ///     Create a new restaurant.
     /// </summary>
     /// <param name="request">The restaurant creation request containing necessary information.</param>
     /// <returns>The created restaurant object.</returns>
@@ -72,7 +72,7 @@ public class RestaurantController : ControllerBase {
     }
 
     /// <summary>
-    /// Retrieve a Restaurant by their ID.
+    ///     Retrieve a Restaurant by their ID.
     /// </summary>
     /// <param name="id">The ID of the restaurant.</param>
     /// <returns>The restaurant object.</returns>
@@ -116,7 +116,7 @@ public class RestaurantController : ControllerBase {
     }
 
     /// <summary>
-    /// Retrieve a restaurant by their StayId.
+    ///     Retrieve a restaurant by their StayId.
     /// </summary>
     /// <param name="id">The StayId of the restaurant.</param>
     /// <returns>The restaurant object.</returns>
@@ -160,7 +160,7 @@ public class RestaurantController : ControllerBase {
     }
 
     /// <summary>
-    /// Retrieve restaurants for the connected user.
+    ///     Retrieve restaurants for the connected user.
     /// </summary>
     /// <returns>A list of restaurants associated with the connected user.</returns>
     /// <response code="200">Restaurants retrieved successfully.</response>
@@ -213,7 +213,7 @@ public class RestaurantController : ControllerBase {
     }
 
     /// <summary>
-    /// Update an existing restaurant.
+    ///     Update an existing restaurant.
     /// </summary>
     /// <param name="id">The stayId to search the object.</param>
     /// <param name="request">The restaurant update request.</param>
@@ -251,7 +251,7 @@ public class RestaurantController : ControllerBase {
     }
 
     /// <summary>
-    /// Remove an Restaurant by their ID.
+    ///     Remove an Restaurant by their ID.
     /// </summary>
     /// <param name="id">The ID of the Restaurant to remove.</param>
     /// <returns>No content if successful.</returns>

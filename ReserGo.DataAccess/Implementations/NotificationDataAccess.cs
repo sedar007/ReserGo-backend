@@ -1,6 +1,5 @@
-﻿using ReserGo.Common.Entity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
+﻿using Microsoft.EntityFrameworkCore;
+using ReserGo.Common.Entity;
 using ReserGo.DataAccess.Interfaces;
 
 namespace ReserGo.DataAccess.Implementations;
@@ -13,7 +12,7 @@ public class NotificationDataAccess : INotificationDataAccess {
     }
 
     public async Task<Notification> Create(Notification notification) {
-        EntityEntry<Notification> entry = await _context.AddAsync(notification);
+        var entry = await _context.AddAsync(notification);
         await _context.SaveChangesAsync();
         return entry.Entity;
     }
