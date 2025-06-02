@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared.Exceptions;
+using ReserGo.Shared;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -34,7 +35,7 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<BookingHotel>> GetBookingsByUserId(Guid userId, int pageSize = 10) {
+    public async Task<IEnumerable<BookingHotel>> GetBookingsByUserId(Guid userId, int pageSize = Consts.DefaultPageSize) {
         return await _context.BookingHotel
             .Include(b => b.Hotel)
             .OrderByDescending(b => b.StartDate)
