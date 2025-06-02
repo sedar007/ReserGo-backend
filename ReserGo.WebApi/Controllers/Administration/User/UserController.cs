@@ -158,7 +158,7 @@ public class UserController : ControllerBase {
             }
 
             var profilePicture = await _userService.GetProfilePicture(connectedUser.UserId);
-            _logger.LogInformation("Profile picture of user {id} retrieved successfully", connectedUser.UserId);
+            _logger.LogInformation("Profile picture of user {Id} retrieved successfully", connectedUser.UserId);
             return Ok(profilePicture);
         }
         catch (Exception ex) {
@@ -203,7 +203,7 @@ public class UserController : ControllerBase {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Profile picture update failed.");
             }
 
-            _logger.LogInformation("Profile picture of user {id} updated successfully", connectedUser.UserId);
+            _logger.LogInformation("Profile picture of user {Id} updated successfully", connectedUser.UserId);
             return Ok(newProfilePictureUrl);
         }
         catch (Exception ex) {

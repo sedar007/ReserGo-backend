@@ -11,8 +11,6 @@ public class User {
     public string? Bio { get; set; }
 
     public string Username { get; set; } = null!;
-
-    //public Guid? AddressId { get; init; }
     public string? ProfilePicture { get; set; }
     public UserRole Role { get; init; }
     public DateTime CreatedAt { get; init; } = DateTime.UtcNow;

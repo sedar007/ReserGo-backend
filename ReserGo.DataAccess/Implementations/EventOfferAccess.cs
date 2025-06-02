@@ -2,6 +2,7 @@
 using ReserGo.Common.Entity;
 using ReserGo.Common.Requests.Products.Event;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared.Exceptions;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -23,11 +24,11 @@ public class EventOfferDataAccess : IEventOfferDataAccess {
         return await _context.EventOffer.Where(x => x.UserId == userId).Include(h => h.Event).ToListAsync();
     }
 
-    public async Task<EventOffer> Create(EventOffer user) {
-        var newData = _context.EventOffer.Add(user);
+    public async Task<EventOffer> Create(EventOffer eventOffer) {
+        var newData = _context.EventOffer.Add(eventOffer);
         await _context.SaveChangesAsync();
         return await GetById(newData.Entity.Id) ??
-               throw new NullReferenceException("Error creating new @event offer.");
+               throw new NullDataException("Error creating new @event offer.");
     }
 
     public async Task<EventOffer> Update(EventOffer eventOffer) {
@@ -36,8 +37,8 @@ public class EventOfferDataAccess : IEventOfferDataAccess {
         return eventOffer;
     }
 
-    public async Task Delete(EventOffer @event) {
-        _context.EventOffer.Remove(@event);
+    public async Task Delete(EventOffer eventOffer) {
+        _context.EventOffer.Remove(eventOffer);
         await _context.SaveChangesAsync();
     }
 

@@ -7,6 +7,6 @@ namespace ReserGo.Business.Interfaces;
 
 public interface IBookingRestaurantService {
     Task<BookingResponses> CreateBooking(BookingRestaurantRequest request, ConnectedUser user);
-    Task<IEnumerable<BookingRestaurantDto>> GetBookingsByUserId(Guid userId);
+    Task<IEnumerable<BookingAllResponses>> GetBookingsByUserId(Guid userId);
     Task<IEnumerable<BookingRestaurantDto>> GetBookingsByAdminId(Guid adminId);
 }

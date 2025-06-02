@@ -3,6 +3,7 @@ using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Models;
 using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.Shared;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.WebAPI.Controllers.Administration.Products;
@@ -16,10 +17,10 @@ namespace ReserGo.WebAPI.Controllers.Administration.Offers;
 public class HotelOfferController : ControllerBase {
     private readonly IBookingHotelService _bookingHotelService;
     private readonly IHotelOfferService _hotelOfferService;
-    private readonly ILogger<HotelController> _logger;
+    private readonly ILogger<HotelOfferController> _logger;
     private readonly ISecurity _security;
 
-    public HotelOfferController(ILogger<HotelController> logger, IHotelOfferService hotelOfferService,
+    public HotelOfferController(ILogger<HotelOfferController> logger, IHotelOfferService hotelOfferService,
         ISecurity security, IBookingHotelService bookingHotelService) {
         _logger = logger;
         _hotelOfferService = hotelOfferService;
@@ -69,7 +70,7 @@ public class HotelOfferController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while creating the hotel offer.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 

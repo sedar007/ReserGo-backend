@@ -16,12 +16,12 @@ namespace ReserGo.WebAPI.Controllers.Customer.Booking;
 [Route("api/customer/booking/restaurants/")]
 public class BookingRestaurantController : ControllerBase {
     private readonly IBookingRestaurantService _bookingRestaurantService;
-    private readonly ILogger<RestaurantController> _logger;
+    private readonly ILogger<BookingRestaurantController> _logger;
     private readonly IHubContext<NotificationHub> _notificationHub;
     private readonly IRestaurantOfferService _restaurantOfferService;
     private readonly ISecurity _security;
 
-    public BookingRestaurantController(ILogger<RestaurantController> logger,
+    public BookingRestaurantController(ILogger<BookingRestaurantController> logger,
         ISecurity security, IBookingRestaurantService bookingRestaurantService,
         IHubContext<NotificationHub> notificationHub, IRestaurantOfferService restaurantOfferService) {
         _logger = logger;

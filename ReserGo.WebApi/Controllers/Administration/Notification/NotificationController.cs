@@ -12,11 +12,11 @@ namespace ReserGo.WebAPI.Controllers.Administration.Notification;
 [AdminOnly]
 [Route("api/administration/notifications/")]
 public class NotificationController : ControllerBase {
-    private readonly ILogger<HotelController> _logger;
+    private readonly ILogger<NotificationController> _logger;
     private readonly INotificationService _notificationService;
     private readonly ISecurity _security;
 
-    public NotificationController(ILogger<HotelController> logger, INotificationService notificationService,
+    public NotificationController(ILogger<NotificationController> logger, INotificationService notificationService,
         ISecurity security) {
         _logger = logger;
         _notificationService = notificationService;

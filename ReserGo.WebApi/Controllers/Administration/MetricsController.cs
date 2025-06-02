@@ -13,11 +13,11 @@ namespace ReserGo.WebAPI.Controllers.Administration;
 [AdminOnly]
 [Route("api/administration/metrics/")]
 public class MetricsController : ControllerBase {
-    private readonly ILogger<HotelController> _logger;
+    private readonly ILogger<MetricsController> _logger;
     private readonly IMetricsService _metricsService;
     private readonly ISecurity _security;
 
-    public MetricsController(ILogger<HotelController> logger,
+    public MetricsController(ILogger<MetricsController> logger,
         ISecurity security,
         IMetricsService metricsService) {
         _logger = logger;

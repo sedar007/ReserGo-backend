@@ -3,6 +3,7 @@ using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Models;
 using ReserGo.Common.Requests.Products.Restaurant;
+using ReserGo.Shared;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
 
@@ -14,11 +15,11 @@ namespace ReserGo.WebAPI.Controllers.Administration.Products;
 [Route("api/administration/offers/restaurants/")]
 public class RestaurantOfferController : ControllerBase {
     private readonly IBookingRestaurantService _bookingRestaurantService;
-    private readonly ILogger<RestaurantController> _logger;
+    private readonly ILogger<RestaurantOfferController> _logger;
     private readonly IRestaurantOfferService _restaurantOfferService;
     private readonly ISecurity _security;
 
-    public RestaurantOfferController(ILogger<RestaurantController> logger,
+    public RestaurantOfferController(ILogger<RestaurantOfferController> logger,
         IRestaurantOfferService restaurantOfferService, ISecurity security,
         IBookingRestaurantService bookingRestaurantService) {
         _logger = logger;
@@ -66,7 +67,7 @@ public class RestaurantOfferController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while creating the restaurant offer.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 

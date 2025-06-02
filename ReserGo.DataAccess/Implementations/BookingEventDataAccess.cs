@@ -16,7 +16,7 @@ public class BookingEventDataAccess : IBookingEventDataAccess {
         var newData = await _context.BookingEvent.AddAsync(bookingEvent);
         await _context.SaveChangesAsync();
         return await GetById(newData.Entity.Id) ??
-               throw new CreateException("Error creating new booking event.");
+               throw new NullDataException("Error creating new booking event.");
     }
 
     public async Task<BookingEvent?> GetById(Guid id) {
@@ -28,9 +28,12 @@ public class BookingEventDataAccess : IBookingEventDataAccess {
     }
 
 
-    public async Task<IEnumerable<BookingEvent>> GetBookingsByUserId(Guid userId) {
+    public async Task<IEnumerable<BookingEvent>> GetBookingsByUserId(Guid userId, int pageSize) {
         return await _context.BookingEvent
+            .Include(b => b.Event)
+            .OrderByDescending(b => b.StartDate)
             .Where(b => b.UserId == userId)
+            .Take(pageSize)
             .ToListAsync();
     }
 

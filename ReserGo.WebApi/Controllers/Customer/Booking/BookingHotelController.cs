@@ -4,6 +4,7 @@ using ReserGo.Business.Interfaces;
 using ReserGo.Common.DTO;
 using ReserGo.Common.Models;
 using ReserGo.Common.Requests.Products.Hotel;
+using ReserGo.Shared;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
 using ReserGo.WebAPI.Controllers.Administration.Products;
@@ -17,11 +18,11 @@ namespace ReserGo.WebAPI.Controllers.Customer.Booking;
 [Route("api/customer/booking/hotels/")]
 public class BookingHotelController : ControllerBase {
     private readonly IBookingHotelService _bookingHotelService;
-    private readonly ILogger<HotelController> _logger;
+    private readonly ILogger<BookingHotelController> _logger;
     private readonly IHubContext<NotificationHub> _notificationHub;
     private readonly ISecurity _security;
 
-    public BookingHotelController(ILogger<HotelController> logger,
+    public BookingHotelController(ILogger<BookingHotelController> logger,
         ISecurity security, IBookingHotelService bookingHotelService, IHubContext<NotificationHub> notificationHub) {
         _logger = logger;
         _security = security;
@@ -58,7 +59,7 @@ public class BookingHotelController : ControllerBase {
 
 
             await _notificationHub.Clients.User(notification.UserId.ToString())
-                .SendAsync("ReceiveNotification", notification.Message);
+                .SendAsync(Consts.ReceiveNotification, notification.Message);
             var bookingHotelService = responses.Bookings;
 
 
@@ -77,7 +78,7 @@ public class BookingHotelController : ControllerBase {
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
     }
-
+/*
     /// <summary>
     ///     Retrieve all bookings for the current user.
     /// </summary>
@@ -122,15 +123,10 @@ public class BookingHotelController : ControllerBase {
             _logger.LogError(e, "An unexpected error occurred while retrieving bookings");
             return StatusCode(StatusCodes.Status500InternalServerError, "An internal error occurred.");
         }
-    }
+    }*/
 
     private List<Link> GenerateLinks(Guid bookingId) {
         return new List<Link> {
-            new() {
-                Href = Url.Action(nameof(GetMyBookings), new { id = bookingId }),
-                Rel = "self",
-                Method = "GET"
-            },
             new() {
                 Href = Url.Action(nameof(CreateReservation), new { id = bookingId }),
                 Rel = "create",

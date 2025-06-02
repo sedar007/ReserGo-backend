@@ -11,7 +11,7 @@ public class KeepAliveService : IHostedService, IDisposable {
         _httpClient = new HttpClient();
         _logger = logger;
         _url = configuration.GetSection("urlInstance")?.Get<string>() ?? string.Empty;
-        _logger.LogInformation($"Keep-alive URL: {_url}");
+        _logger.LogInformation("Keep-alive URL: {Url}", _url);
     }
 
     public void Dispose() {
@@ -34,12 +34,12 @@ public class KeepAliveService : IHostedService, IDisposable {
         try {
             var response = await _httpClient.GetAsync(_url);
             if (response.IsSuccessStatusCode)
-                _logger.LogInformation($"Keep-alive successful at {DateTime.Now}");
+                _logger.LogInformation("Keep-alive successful at {Date}", DateTime.Now);
             else
-                _logger.LogWarning($"Failed keep-alive at {DateTime.Now}: {response.StatusCode}");
+                _logger.LogWarning("Failed keep-alive at {Date}: {Response}", DateTime.Now, response.StatusCode);
         }
         catch (Exception ex) {
-            _logger.LogError($"Exception in keep-alive: {ex.Message}");
+            _logger.LogError("Exception in keep-alive: {Message}", ex.Message);
         }
     }
 }

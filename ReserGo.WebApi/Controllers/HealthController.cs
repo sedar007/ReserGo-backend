@@ -10,6 +10,7 @@ public class HealthController : ControllerBase {
     /// </summary>
     /// <returns>A message indicating that the API is online.</returns>
     [HttpGet("health")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public IActionResult GetHealth() {
         return Ok("API is alive");
     }

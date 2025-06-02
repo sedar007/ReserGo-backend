@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared.Exceptions;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -19,10 +20,10 @@ public class HotelOfferDataAccess : IHotelOfferDataAccess {
         return await _context.HotelOffer.Where(x => x.UserId == userId).Include(h => h.Hotel).ToListAsync();
     }
 
-    public async Task<HotelOffer> Create(HotelOffer user) {
-        var newData = _context.HotelOffer.Add(user);
+    public async Task<HotelOffer> Create(HotelOffer hotelOffer) {
+        var newData = _context.HotelOffer.Add(hotelOffer);
         await _context.SaveChangesAsync();
-        return await GetById(newData.Entity.Id) ?? throw new NullReferenceException("Error creating new hotel offer.");
+        return await GetById(newData.Entity.Id) ?? throw new NullDataException("Error creating new hotel offer.");
     }
 
     public async Task<HotelOffer> Update(HotelOffer hotelOffer) {
@@ -31,8 +32,8 @@ public class HotelOfferDataAccess : IHotelOfferDataAccess {
         return hotelOffer;
     }
 
-    public async Task Delete(HotelOffer hotel) {
-        _context.HotelOffer.Remove(hotel);
+    public async Task Delete(HotelOffer hotelOffer) {
+        _context.HotelOffer.Remove(hotelOffer);
         await _context.SaveChangesAsync();
     }
 }

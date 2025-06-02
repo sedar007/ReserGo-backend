@@ -228,7 +228,7 @@ public class ReserGoContext : DbContext {
             .HasOne(b => b.User)
             .WithMany(u => u.BookingsHotel)
             .HasForeignKey(b => b.UserId);
-        
+
         // Config Notification
         modelBuilder.Entity<Notification>()
             .HasKey(n => n.Id);

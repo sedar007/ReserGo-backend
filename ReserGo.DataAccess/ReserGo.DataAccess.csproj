@@ -18,7 +18,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\ReserGo.Common\ReserGo.Common.csproj"/>
-        <ProjectReference Include="..\ReserGo.Shared\ReserGo.Shared.csproj" />
+        <ProjectReference Include="..\ReserGo.Shared\ReserGo.Shared.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

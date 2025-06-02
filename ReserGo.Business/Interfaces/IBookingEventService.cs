@@ -8,6 +8,7 @@ namespace ReserGo.Business.Interfaces;
 public interface IBookingEventService {
     Task<BookingResponses> CreateBooking(BookingEventRequest request, ConnectedUser user);
 
-    //Task<IEnumerable<BookingEventDto>> GetBookingsByUserId(Guid userId);
+    Task<IEnumerable<BookingAllResponses>> GetBookingsByUserId(Guid userId);
+
     Task<IEnumerable<BookingEventDto>> GetBookingsByAdminId(Guid adminId);
 }

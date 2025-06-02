@@ -18,11 +18,11 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
     private readonly IMemoryCache _cache;
     private readonly IHotelService _hotelService;
     private readonly IImageService _imageService;
-    private readonly ILogger<UserService> _logger;
+    private readonly ILogger<RoomAvailabilityService> _logger;
 
     private readonly IRoomDataAccess _roomDataAccess;
 
-    public RoomAvailabilityService(ILogger<UserService> logger, IRoomDataAccess roomDataAccess,
+    public RoomAvailabilityService(ILogger<RoomAvailabilityService> logger, IRoomDataAccess roomDataAccess,
         IRoomAvailabilityDataAccess availabilityDataAccess, IHotelService hotelService, IMemoryCache cache,
         IImageService imageService) {
         _logger = logger;
@@ -36,7 +36,7 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
 
     public async Task<RoomAvailabilityDto> SetAvailability(ConnectedUser connectedUser, Guid roomId,
         RoomAvailabilityRequest request) {
-        IsAuthorized(connectedUser, request.HotelId);
+        await IsAuthorized(connectedUser, request.HotelId);
 
         ValidateRequest(request);
 
@@ -84,7 +84,7 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
 
     public async Task<IEnumerable<RoomAvailabilityDto>> GetAvailabilitiesByHotelId(ConnectedUser connectedUser,
         Guid hotelId, int skip, int take) {
-        IsAuthorized(connectedUser, hotelId);
+        await IsAuthorized(connectedUser, hotelId);
 
         _logger.LogInformation("Fetching room availabilities for HotelId: {HotelId}", hotelId);
         var availabilities = await _availabilityDataAccess.GetAvailabilitiesByHotelId(hotelId, skip, take);
@@ -104,7 +104,6 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
                 return cachedAvailabilities;
             }
 
-        _logger.LogInformation("Fetching hotels for UserId: {UserId}", connectedUser.UserId);
         var hotels = await _hotelService.GetHotelsByUserId(connectedUser.UserId);
         var hotelIds = hotels.Select(h => h.Id);
 
@@ -113,7 +112,6 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
         var availabilityDtos = availabilities.Select(a => a.ToDto()).ToList();
 
         _cache.Set(cacheKey, availabilityDtos, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-        _logger.LogInformation("Availabilities cached for UserId: {UserId}", connectedUser.UserId);
 
         return availabilityDtos;
     }
@@ -143,7 +141,7 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
         return response.Where(r => r.Rooms.Any());
     }
 
-    private async void IsAuthorized(ConnectedUser connectedUser, Guid hotelId) {
+    private async Task IsAuthorized(ConnectedUser connectedUser, Guid hotelId) {
         Utils.IsAuthorized(connectedUser, _logger);
         if (await _hotelService.IsAuthorized(hotelId, connectedUser.UserId)) return;
 

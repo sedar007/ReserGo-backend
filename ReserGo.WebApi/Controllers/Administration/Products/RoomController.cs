@@ -5,6 +5,7 @@ using ReserGo.Common.Models;
 using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.Common.Requests.Products.Hotel.Rooms;
 using ReserGo.Common.Response;
+using ReserGo.Shared;
 using ReserGo.Shared.Interfaces;
 using ReserGo.WebAPI.Attributes;
 
@@ -67,7 +68,7 @@ public class RoomController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while creating the room.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 
@@ -112,7 +113,7 @@ public class RoomController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving the room.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 
@@ -132,7 +133,7 @@ public class RoomController : ControllerBase {
     public async Task<ActionResult<Resource<IEnumerable<RoomDto>>>> GetRoomsByHotelId(Guid hotelId) {
         try {
             var connectedUser = _security.GetCurrentUser();
-            if (connectedUser == null) return Unauthorized("User not authenticated");
+            if (connectedUser == null) return Unauthorized(Consts.UnauthorizedAccess);
 
             var rooms = await _roomService.GetRoomsByHotelId(hotelId);
 
@@ -151,7 +152,7 @@ public class RoomController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving rooms for the connected user.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 
@@ -218,7 +219,7 @@ public class RoomController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving the room.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 
@@ -242,7 +243,7 @@ public class RoomController : ControllerBase {
         RoomAvailabilityRequest request) {
         try {
             var connectedUser = _security.GetCurrentUser();
-            if (connectedUser == null) return Unauthorized("User not authenticated");
+            if (connectedUser == null) return Unauthorized(Consts.UnauthorizedAccess);
 
             var availability = await _roomAvailabilityService.SetAvailability(connectedUser, roomId, request);
 
@@ -264,7 +265,7 @@ public class RoomController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while setting room availability.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 
@@ -285,7 +286,7 @@ public class RoomController : ControllerBase {
         Guid hotelId, int skip = 0, int take = 10) {
         try {
             var connectedUser = _security.GetCurrentUser();
-            if (connectedUser == null) return Unauthorized("User not authenticated");
+            if (connectedUser == null) return Unauthorized(Consts.UnauthorizedAccess);
 
             var availabilities =
                 await _roomAvailabilityService.GetAvailabilitiesByHotelId(connectedUser, hotelId, skip, take);
@@ -305,7 +306,7 @@ public class RoomController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving room availabilities.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 
@@ -327,7 +328,7 @@ public class RoomController : ControllerBase {
         int skip = 0, int take = 10) {
         try {
             var connectedUser = _security.GetCurrentUser();
-            if (connectedUser == null) return Unauthorized("User not authenticated");
+            if (connectedUser == null) return Unauthorized(Consts.UnauthorizedAccess);
 
             var availabilities =
                 await _roomAvailabilityService.GetAvailabilitiesForAllHotels(connectedUser, skip, take);
@@ -347,7 +348,7 @@ public class RoomController : ControllerBase {
         }
         catch (Exception ex) {
             _logger.LogError(ex, "An error occurred while retrieving availabilities for all hotels.");
-            return StatusCode(StatusCodes.Status500InternalServerError, "An unexpected error occurred.");
+            return StatusCode(StatusCodes.Status500InternalServerError, Consts.UnexpectedError);
         }
     }
 
