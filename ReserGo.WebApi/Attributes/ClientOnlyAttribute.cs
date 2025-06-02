@@ -4,6 +4,7 @@ using ReserGo.Common.Enum;
 using ReserGo.Shared.Interfaces;
 
 namespace ReserGo.WebAPI.Attributes;
+
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
 public class ClientOnlyAttribute : Attribute, IAuthorizationFilter {
     public void OnAuthorization(AuthorizationFilterContext context) {

@@ -28,9 +28,12 @@ public class BookingEventDataAccess : IBookingEventDataAccess {
     }
 
 
-    public async Task<IEnumerable<BookingEvent>> GetBookingsByUserId(Guid userId) {
+    public async Task<IEnumerable<BookingEvent>> GetBookingsByUserId(Guid userId, int pageSize) {
         return await _context.BookingEvent
+            .Include(b => b.Event)
+            .OrderByDescending(b => b.StartDate)
             .Where(b => b.UserId == userId)
+            .Take(pageSize)
             .ToListAsync();
     }
 

@@ -35,9 +35,12 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<BookingHotel>> GetBookingsByUserId(Guid userId) {
+    public async Task<IEnumerable<BookingHotel>> GetBookingsByUserId(Guid userId, int pageSize) {
         return await _context.BookingHotel
+            .Include(b => b.Hotel)
+            .OrderByDescending(b => b.StartDate)
             .Where(b => b.UserId == userId)
+            .Take(pageSize)
             .ToListAsync();
     }
 

@@ -11,7 +11,6 @@ public static class Consts {
     public const string UnexpectedError = "An unexpected error occurred.";
     public const string UserNotExist = "This user does not exist.";
     public const string UnauthorizedAccess = "Unauthorized access.";
-    
 
 
     // User Message

@@ -30,64 +30,60 @@ public class UserService : IUserService {
     }
 
     public async Task<UserDto> Create(UserCreationRequest request, UserRole role) {
-       
-            var userByUsername = await _userDataAccess.GetByUsername(request.Username);
-            if (userByUsername is not null) {
-                var errorMessage = "This username is already in use.";
-                _logger.LogError(errorMessage);
-                throw new InvalidDataException(errorMessage);
-            }
+        var userByUsername = await _userDataAccess.GetByUsername(request.Username);
+        if (userByUsername is not null) {
+            var errorMessage = "This username is already in use.";
+            _logger.LogError(errorMessage);
+            throw new InvalidDataException(errorMessage);
+        }
 
-            var userByEmail = await _userDataAccess.GetByEmail(request.Email);
-            if (userByEmail is not null) {
-                var errorMessage = "This email address is already in use.";
-                _logger.LogError(errorMessage);
-                throw new InvalidDataException(errorMessage);
-            }
+        var userByEmail = await _userDataAccess.GetByEmail(request.Email);
+        if (userByEmail is not null) {
+            var errorMessage = "This email address is already in use.";
+            _logger.LogError(errorMessage);
+            throw new InvalidDataException(errorMessage);
+        }
 
-            var error = UserValidator.GetErrorCreationRequest(request);
-            if (!string.IsNullOrEmpty(error)) {
-                _logger.LogError(error);
-                throw new InvalidDataException(error);
-            }
+        var error = UserValidator.GetErrorCreationRequest(request);
+        if (!string.IsNullOrEmpty(error)) {
+            _logger.LogError(error);
+            throw new InvalidDataException(error);
+        }
 
-            var newUser = new User {
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                Email = request.Email,
-                Username = request.Username,
-                Role = role
-            };
+        var newUser = new User {
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+            Username = request.Username,
+            Role = role
+        };
 
-            newUser = await _userDataAccess.Create(newUser);
-            await _loginService.Create(request.Password, newUser);
+        newUser = await _userDataAccess.Create(newUser);
+        await _loginService.Create(request.Password, newUser);
 
-            _logger.LogInformation("User {Id} created", newUser.Id);
-            return newUser.ToDto();
-        
+        _logger.LogInformation("User {Id} created", newUser.Id);
+        return newUser.ToDto();
     }
 
     public async Task<UserDto?> GetById(Guid id) {
-       
-            var cacheKey = $"GetById_{id}";
+        var cacheKey = $"GetById_{id}";
 
-            if (_cache.TryGetValue(cacheKey, out UserDto? cachedUser)) {
-                _logger.LogInformation("Returning cached user for ID: {Id}", id);
-                return cachedUser;
-            }
+        if (_cache.TryGetValue(cacheKey, out UserDto? cachedUser)) {
+            _logger.LogInformation("Returning cached user for ID: {Id}", id);
+            return cachedUser;
+        }
 
-            var user = await _userDataAccess.GetById(id);
-            if (user is null) {
-                var errorMessage = Consts.UserNotExist;
-                _logger.LogError(errorMessage);
-                throw new InvalidDataException(errorMessage);
-            }
+        var user = await _userDataAccess.GetById(id);
+        if (user is null) {
+            var errorMessage = Consts.UserNotExist;
+            _logger.LogError(errorMessage);
+            throw new InvalidDataException(errorMessage);
+        }
 
-            _logger.LogInformation("User {Id} retrieved successfully", user.Id);
-            var userDto = user.ToDto();
-            _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-            return userDto;
-        
+        _logger.LogInformation("User {Id} retrieved successfully", user.Id);
+        var userDto = user.ToDto();
+        _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+        return userDto;
     }
 
     public async Task<string> GetProfilePicture(Guid userId) {
@@ -108,130 +104,123 @@ public class UserService : IUserService {
 
 
     public async Task<UserDto?> GetByEmail(string email) {
-       
-            var cacheKey = $"GetByEmail_{email}";
+        var cacheKey = $"GetByEmail_{email}";
 
-            if (_cache.TryGetValue(cacheKey, out UserDto? cachedUser)) {
-                _logger.LogInformation("Returning cached user for email: {Email}", email);
-                return cachedUser;
-            }
+        if (_cache.TryGetValue(cacheKey, out UserDto? cachedUser)) {
+            _logger.LogInformation("Returning cached user for email: {Email}", email);
+            return cachedUser;
+        }
 
-            var user = await _userDataAccess.GetByEmail(email);
-            if (user is null) {
-                var errorMessage = Consts.UserNotExist;
-                _logger.LogError(errorMessage);
-                throw new InvalidDataException(errorMessage);
-            }
+        var user = await _userDataAccess.GetByEmail(email);
+        if (user is null) {
+            var errorMessage = Consts.UserNotExist;
+            _logger.LogError(errorMessage);
+            throw new InvalidDataException(errorMessage);
+        }
 
-            _logger.LogInformation("User {Id} retrieved successfully", user.Id);
-            var userDto = user.ToDto();
-            _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+        _logger.LogInformation("User {Id} retrieved successfully", user.Id);
+        var userDto = user.ToDto();
+        _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
-            return userDto;
-        
+        return userDto;
     }
 
     public async Task<UserDto?> GetByUsername(string username) {
-       
-            var cacheKey = $"GetByUsername_{username}";
+        var cacheKey = $"GetByUsername_{username}";
 
-            if (_cache.TryGetValue(cacheKey, out UserDto? cachedUser)) {
-                _logger.LogInformation("Returning cached user for username: {Username}", username);
-                return cachedUser;
-            }
+        if (_cache.TryGetValue(cacheKey, out UserDto? cachedUser)) {
+            _logger.LogInformation("Returning cached user for username: {Username}", username);
+            return cachedUser;
+        }
 
-            var user = await _userDataAccess.GetByUsername(username);
-            if (user is null) {
-                var errorMessage = Consts.UserNotExist;
-                _logger.LogError(errorMessage);
-                throw new InvalidDataException(errorMessage);
-            }
+        var user = await _userDataAccess.GetByUsername(username);
+        if (user is null) {
+            var errorMessage = Consts.UserNotExist;
+            _logger.LogError(errorMessage);
+            throw new InvalidDataException(errorMessage);
+        }
 
-            _logger.LogInformation("User {Id} retrieved successfully", user.Id);
+        _logger.LogInformation("User {Id} retrieved successfully", user.Id);
 
-            var userDto = user.ToDto();
-            _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+        var userDto = user.ToDto();
+        _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
-            return userDto;
-       
+        return userDto;
     }
 
     public async Task Delete(Guid id) {
-       
-            var user = await _userDataAccess.GetById(id);
-            if (user is null) {
-                var errorMessage = "User not found";
-                _logger.LogError(errorMessage);
-                throw new InvalidDataException(errorMessage);
-            }
+        var user = await _userDataAccess.GetById(id);
+        if (user is null) {
+            var errorMessage = "User not found";
+            _logger.LogError(errorMessage);
+            throw new InvalidDataException(errorMessage);
+        }
 
-            var userId = user.Id;
-            var email = user.Email;
-            var username = user.Username;
-            var publicId = user.ProfilePicture;
-            await _userDataAccess.Delete(user);
-            if (publicId is not null) {
-                var deleteResult = await _imageService.DeleteImage(publicId);
-                if (!deleteResult) _logger.LogWarning("Failed to delete image with publicId: {PublicId}", publicId);
-            }
+        var userId = user.Id;
+        var email = user.Email;
+        var username = user.Username;
+        var publicId = user.ProfilePicture;
+        await _userDataAccess.Delete(user);
+        if (publicId is not null) {
+            var deleteResult = await _imageService.DeleteImage(publicId);
+            if (!deleteResult) _logger.LogWarning("Failed to delete image with publicId: {PublicId}", publicId);
+        }
 
-            RemoveCache(id, email, username);
-            _logger.LogInformation("User {Id} deleted successfully", userId);
-        
+        RemoveCache(id, email, username);
+        _logger.LogInformation("User {Id} deleted successfully", userId);
     }
 
     public async Task<UserDto> UpdateUser(Guid id, UserUpdateRequest request) {
-        
-            var user = await _userDataAccess.GetById(id);
-            if (user is null) throw new InvalidDataException("User not found");
+        var user = await _userDataAccess.GetById(id);
+        if (user is null) throw new InvalidDataException("User not found");
 
-            var existingEmailUser = await _userDataAccess.GetByEmail(request.Email);
-            if (existingEmailUser is not null && existingEmailUser.Id != id) {
-                var errorMessage = "This email address is already in use.";
-                _logger.LogError(errorMessage);
-                throw new InvalidDataException(errorMessage);
-            }
+        var existingEmailUser = await _userDataAccess.GetByEmail(request.Email);
+        if (existingEmailUser is not null && existingEmailUser.Id != id) {
+            var errorMessage = "This email address is already in use.";
+            _logger.LogError(errorMessage);
+            throw new InvalidDataException(errorMessage);
+        }
 
-            var existingUsernameUser = await _userDataAccess.GetByUsername(request.Username);
-            if (existingUsernameUser is not null && existingUsernameUser.Id != id) {
-                var errorMessage = "This username is already in use.";
-                _logger.LogError(errorMessage);
-                throw new InvalidDataException(errorMessage);
-            }
+        var existingUsernameUser = await _userDataAccess.GetByUsername(request.Username);
+        if (existingUsernameUser is not null && existingUsernameUser.Id != id) {
+            var errorMessage = "This username is already in use.";
+            _logger.LogError(errorMessage);
+            throw new InvalidDataException(errorMessage);
+        }
 
-            var error = UserValidator.GetErrorUpdateRequest(request);
-            if (!string.IsNullOrEmpty(error)) {
-                _logger.LogError(error);
-                throw new InvalidDataException(error);
-            }
+        var error = UserValidator.GetErrorUpdateRequest(request);
+        if (!string.IsNullOrEmpty(error)) {
+            _logger.LogError(error);
+            throw new InvalidDataException(error);
+        }
 
-            user.FirstName = request.FirstName;
-            user.LastName = request.LastName;
-            user.Email = request.Email;
-            user.Username = request.Username;
-            user.Bio = request.Bio;
-            user.PhoneNumber = request.PhoneNumber;
-            if (user.Address == null) {
-                user.Address = new Address {
-                    Street = request.Address?.Street,
-                    City = request.Address?.City,
-                    State = request.Address?.State,
-                    PostalCode = request.Address?.PostalCode,
-                    Country = request.Address?.Country
-                };
-            }
-            else {
-                user.Address.Street = request.Address?.Street;
-                user.Address.City = request.Address?.City;
-                user.Address.State = request.Address?.State;
-                user.Address.PostalCode = request.Address?.PostalCode;
-                user.Address.Country = request.Address?.Country;
-            }
+        user.FirstName = request.FirstName;
+        user.LastName = request.LastName;
+        user.Email = request.Email;
+        user.Username = request.Username;
+        user.Bio = request.Bio;
+        user.PhoneNumber = request.PhoneNumber;
+        if (user.Address == null) {
+            user.Address = new Address {
+                Street = request.Address?.Street,
+                City = request.Address?.City,
+                State = request.Address?.State,
+                PostalCode = request.Address?.PostalCode,
+                Country = request.Address?.Country
+            };
+        }
+        else {
+            user.Address.Street = request.Address?.Street;
+            user.Address.City = request.Address?.City;
+            user.Address.State = request.Address?.State;
+            user.Address.PostalCode = request.Address?.PostalCode;
+            user.Address.Country = request.Address?.Country;
+        }
 
-            _logger.LogInformation("User {Id} updated successfully", user.Id);
-            await _userDataAccess.Update(user);
-            RemoveCache(user.Id, user.Email, user.Username);
-            return user.ToDto();
+        _logger.LogInformation("User {Id} updated successfully", user.Id);
+        await _userDataAccess.Update(user);
+        RemoveCache(user.Id, user.Email, user.Username);
+        return user.ToDto();
     }
 
     public async Task<string> UpdateProfilePicture(Guid userId, IFormFile file) {

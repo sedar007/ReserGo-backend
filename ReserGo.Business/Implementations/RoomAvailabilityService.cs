@@ -98,12 +98,11 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
         Utils.IsAuthorized(connectedUser, _logger);
 
         var cacheKey = string.Format(Consts.CacheKeyAvailabilitiesRoom, connectedUser.UserId, skip, take);
-        if (_cache.TryGetValue(cacheKey, out IEnumerable<RoomAvailabilityDto>? cachedAvailabilities)){
+        if (_cache.TryGetValue(cacheKey, out IEnumerable<RoomAvailabilityDto>? cachedAvailabilities))
             if (cachedAvailabilities != null) {
                 _logger.LogInformation("Returning cached availabilities for UserId: {UserId}", connectedUser.UserId);
                 return cachedAvailabilities;
             }
-        }
 
         var hotels = await _hotelService.GetHotelsByUserId(connectedUser.UserId);
         var hotelIds = hotels.Select(h => h.Id);

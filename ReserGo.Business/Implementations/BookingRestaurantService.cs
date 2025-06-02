@@ -17,14 +17,17 @@ public class BookingRestaurantService : IBookingRestaurantService {
     private readonly ILogger<BookingRestaurantService> _logger;
     private readonly INotificationService _notificationService;
     private readonly IRestaurantOfferService _restaurantOfferService;
+    private readonly IImageService _imageService;
 
     public BookingRestaurantService(ILogger<BookingRestaurantService> logger,
         IRestaurantOfferService restaurantOfferService,
-        IBookingRestaurantDataAccess bookingRestaurantDataAccess, INotificationService notificationService) {
+        IBookingRestaurantDataAccess bookingRestaurantDataAccess, INotificationService notificationService,
+        IImageService imageService) {
         _logger = logger;
         _restaurantOfferService = restaurantOfferService;
         _bookingRestaurantDataAccess = bookingRestaurantDataAccess;
         _notificationService = notificationService;
+        _imageService = imageService;
     }
 
     public async Task<BookingResponses> CreateBooking(BookingRestaurantRequest request, ConnectedUser user) {
@@ -101,17 +104,19 @@ public class BookingRestaurantService : IBookingRestaurantService {
         }
     }
 
-    public async Task<IEnumerable<BookingRestaurantDto>> GetBookingsByUserId(Guid userId) {
+    public async Task<IEnumerable<BookingAllResponses>> GetBookingsByUserId(Guid userId) {
         var bookings = await _bookingRestaurantDataAccess.GetBookingsByUserId(userId);
-        return bookings.Select(b => new BookingRestaurantDto {
-            Id = b.Id,
-            RestaurantId = b.RestaurantId,
-            UserId = b.UserId,
-            Date = b.Date,
-            NumberOfGuests = b.NumberOfGuests,
-            IsConfirmed = b.IsConfirmed,
-            BookingDate = b.BookingDate
-        });
+        return await Task.WhenAll(bookings
+            .GroupBy(b => new { b.RestaurantId, b.Date })
+            .Select(async group => new BookingAllResponses {
+                Name = group.First().Restaurant.Name,
+                Type = "Restaurant",
+                ImageSrc = await _imageService.GetPicture(group.First().Restaurant.Picture ?? "default-event.png"),
+                NbGuest = group.Sum(b => b.NumberOfGuests),
+                TotalPrice = group.Sum(b => b.PriceTotal),
+                StartDate = group.Key.Date,
+                EndDate = group.Key.Date
+            }));
     }
 
     public async Task<IEnumerable<BookingRestaurantDto>> GetBookingsByAdminId(Guid adminId) {

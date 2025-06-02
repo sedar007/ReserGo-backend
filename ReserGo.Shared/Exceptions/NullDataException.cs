@@ -1,5 +1,6 @@
 namespace ReserGo.Shared.Exceptions;
 
 public class NullDataException : Exception {
-    public NullDataException(string message) : base(message) { }
+    public NullDataException(string message) : base(message) {
+    }
 }

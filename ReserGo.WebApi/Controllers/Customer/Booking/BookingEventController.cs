@@ -126,19 +126,19 @@ public class BookingEventController : ControllerBase {
         }
     } */
 
-/// <summary>
-///     Searches for event availability based on the provided criteria.
-/// </summary>
-/// <param name="eventSearchAvailabilityRequest">The search criteria including date and number of guests.</param>
-/// <returns>
-///     - **200 OK**: If availability is found.
-///     - **400 Bad Request**: If the request is invalid.
-///     - **500 Internal Server Error**: If an unexpected error occurs.
-/// </returns>
-/// <response code="200">Availability found and returned.</response>
-/// <response code="400">Invalid search criteria.</response>
-/// <response code="500">An unexpected error occurred.</response>
-[HttpGet("search-availability")]
+    /// <summary>
+    ///     Searches for event availability based on the provided criteria.
+    /// </summary>
+    /// <param name="eventSearchAvailabilityRequest">The search criteria including date and number of guests.</param>
+    /// <returns>
+    ///     - **200 OK**: If availability is found.
+    ///     - **400 Bad Request**: If the request is invalid.
+    ///     - **500 Internal Server Error**: If an unexpected error occurs.
+    /// </returns>
+    /// <response code="200">Availability found and returned.</response>
+    /// <response code="400">Invalid search criteria.</response>
+    /// <response code="500">An unexpected error occurred.</response>
+    [HttpGet("search-availability")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

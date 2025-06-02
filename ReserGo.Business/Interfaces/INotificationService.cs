@@ -7,5 +7,4 @@ public interface INotificationService {
     Task<NotificationDto> CreateNotification(NotificationCreationRequest request);
     Task<IEnumerable<NotificationDto>> GetLatestNotifications(Guid userId, int count);
     Task<NotificationDto> ReadNotification(Guid notificationId);
-
 }

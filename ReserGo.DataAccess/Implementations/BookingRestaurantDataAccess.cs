@@ -35,9 +35,13 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
             .Where(b => b.BookingDate >= startDate && b.BookingDate <= endDate)
             .CountAsync();
     }
-    public async Task<IEnumerable<BookingRestaurant>> GetBookingsByUserId(Guid userId) {
+
+    public async Task<IEnumerable<BookingRestaurant>> GetBookingsByUserId(Guid userId, int pageSize) {
         return await _context.BookingRestaurant
+            .Include(b => b.Restaurant)
+            .OrderByDescending(b => b.Date)
             .Where(b => b.UserId == userId)
+            .Take(pageSize)
             .ToListAsync();
     }
 
