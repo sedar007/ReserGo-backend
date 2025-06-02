@@ -121,7 +121,6 @@ public class Program {
             builder.Services.AddScoped<IBookingEventService, BookingEventService>();
 
             // Metrics
-            builder.Services.AddScoped<IMetricsDataAccess, MetricsDataAccess>();
             builder.Services.AddScoped<IMetricsService, MetricsService>();
 
             // Add services to the cache memory.

@@ -15,11 +15,11 @@ namespace ReserGo.Business.Implementations;
 public class EventService : IEventService {
     private readonly IMemoryCache _cache;
     private readonly IImageService _imageService;
-    private readonly ILogger<UserService> _logger;
+    private readonly ILogger<EventService> _logger;
     private readonly IEventDataAccess _occasionDataAccess;
     private readonly ISecurity _security;
 
-    public EventService(IMemoryCache cache, ILogger<UserService> logger, IEventDataAccess occasionDataAccess,
+    public EventService(IMemoryCache cache, ILogger<EventService> logger, IEventDataAccess occasionDataAccess,
         ISecurity security, IImageService imageService) {
         _cache = cache;
         _logger = logger;
@@ -29,7 +29,7 @@ public class EventService : IEventService {
     }
 
     public async Task<EventDto> Create(EventCreationRequest request) {
-        try {
+        
             var occasion = await _occasionDataAccess.GetByStayId(request.StayId);
             if (occasion is not null) {
                 var errorMessage = "This @event already exists.";
@@ -60,7 +60,7 @@ public class EventService : IEventService {
 
             newEvent = await _occasionDataAccess.Create(newEvent);
 
-            _logger.LogInformation("Event { id } created", newEvent.Id);
+            _logger.LogInformation("Event {Id} created", newEvent.Id);
 
             // Set cache
             _cache.Set($"Event_GetById_{newEvent.Id}", newEvent.ToDto(),
@@ -69,15 +69,11 @@ public class EventService : IEventService {
                 TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
             return newEvent.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<EventDto?> GetById(Guid id) {
-        try {
+       
             var cacheKey = $"Event_GetById_{id}";
 
             if (_cache.TryGetValue(cacheKey, out EventDto? cachedEvent)) {
@@ -92,19 +88,15 @@ public class EventService : IEventService {
                 throw new InvalidDataException(errorMessage);
             }
 
-            _logger.LogInformation("Event { Id } retrieved successfully", occasion.Id);
+            _logger.LogInformation("Event {Id} retrieved successfully", occasion.Id);
             var occasionDto = occasion.ToDto();
             _cache.Set(cacheKey, occasionDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
             return occasionDto;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<EventDto?> GetByStayId(long stayId) {
-        try {
+       
             var cacheKey = $"Event_GetByStayId_{stayId}";
 
             if (_cache.TryGetValue(cacheKey, out EventDto? cachedEvent)) {
@@ -119,32 +111,24 @@ public class EventService : IEventService {
                 throw new InvalidDataException(errorMessage);
             }
 
-            _logger.LogInformation("Event { StayId } retrieved successfully", occasion.StayId);
+            _logger.LogInformation("Event {StayId} retrieved successfully", occasion.StayId);
             var occasionDto = occasion.ToDto();
             _cache.Set(cacheKey, occasionDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
             return occasionDto;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<IEnumerable<EventDto>> GetEventsByUserId(Guid userId) {
-        try {
+       
             var occasions = await _occasionDataAccess.GetEventsByUserId(userId);
             return occasions.Select(occasion => occasion.ToDto());
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<EventDto> Update(long stayId, EventUpdateRequest request) {
-        try {
+       
             var occasion = await _occasionDataAccess.GetByStayId(stayId);
-            if (occasion is null) throw new Exception("Event not found");
+            if (occasion is null) throw new InvalidDataException("Event not found");
 
             var error = EventValidator.GetError(request);
             if (!string.IsNullOrEmpty(error)) {
@@ -175,22 +159,18 @@ public class EventService : IEventService {
                 occasion.Picture = publicId;
             }
 
-            _logger.LogInformation("Event { stayId } updated successfully", occasion.StayId);
+            _logger.LogInformation("Event {StayId} updated successfully", occasion.StayId);
             await _occasionDataAccess.Update(occasion);
 
             // Invalidate cache
             RemoveCache(occasion.Id, occasion.StayId);
 
             return occasion.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task Delete(Guid id) {
-        try {
+        
             var occasion = await _occasionDataAccess.GetById(id);
             if (occasion is null) {
                 var errorMessage = "Event not found";
@@ -208,12 +188,8 @@ public class EventService : IEventService {
             // Invalidate cache
             RemoveCache(occasion.Id, occasion.StayId);
 
-            _logger.LogInformation("Event { id } deleted successfully", occasion.Id);
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+            _logger.LogInformation("Event {Id} deleted successfully", occasion.Id);
+        
     }
 
     private void RemoveCache(Guid id, long stayId) {

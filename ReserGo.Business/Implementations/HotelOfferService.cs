@@ -16,24 +16,22 @@ public class HotelOfferService : IHotelOfferService {
     private readonly IMemoryCache _cache;
     private readonly IHotelOfferDataAccess _hotelOfferDataAccess;
     private readonly IHotelService _hotelService;
-    private readonly IImageService _imageService;
-    private readonly ILogger<UserService> _logger;
+    private readonly ILogger<HotelOfferService> _logger;
     private readonly ISecurity _security;
 
-    public HotelOfferService(ILogger<UserService> logger, IHotelOfferDataAccess hotelOfferDataAccess,
-        IHotelService hotelService, ISecurity security, IImageService imageService, IMemoryCache cache) {
+    public HotelOfferService(ILogger<HotelOfferService> logger, IHotelOfferDataAccess hotelOfferDataAccess,
+        IHotelService hotelService, ISecurity security, IMemoryCache cache) {
         _logger = logger;
         _security = security;
-        _imageService = imageService;
         _hotelOfferDataAccess = hotelOfferDataAccess;
         _hotelService = hotelService;
         _cache = cache;
     }
 
     public async Task<HotelOfferDto> Create(HotelOfferCreationRequest request) {
-        try {
+       
             var error = HotelOfferValidator.GetError(request);
-            if (string.IsNullOrEmpty(error) == false) {
+            if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
@@ -76,17 +74,13 @@ public class HotelOfferService : IHotelOfferService {
             }
 
 
-            _logger.LogInformation("Hotel Offer { id } created", newHotelOffer.Id);
+            _logger.LogInformation("Hotel Offer {Id} created", newHotelOffer.Id);
             return newHotelOffer.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<HotelOfferDto?> GetById(Guid id) {
-        try {
+       
             if (_cache.TryGetValue($"hotelOffer_{id}", out HotelOffer? cachedHotelOffer))
                 if (cachedHotelOffer != null)
                     return cachedHotelOffer.ToDto();
@@ -100,17 +94,13 @@ public class HotelOfferService : IHotelOfferService {
 
             _cache.Set($"hotelOffer_{id}", hotelOffer, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
-            _logger.LogInformation("Hotel Offer { id } retrieved successfully", hotelOffer.Id);
+            _logger.LogInformation("Hotel Offer {Id} retrieved successfully", hotelOffer.Id);
             return hotelOffer.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<IEnumerable<HotelOfferDto>> GetHotelsByUserId(Guid userId) {
-        try {
+       
             var cacheKey = string.Format(Consts.CacheKeyHotelOffers, userId);
 
             if (_cache.TryGetValue(cacheKey, out List<HotelOfferDto>? cachedHotelOffers))
@@ -123,20 +113,16 @@ public class HotelOfferService : IHotelOfferService {
             _cache.Set(cacheKey, hotelOfferDtos, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
             return hotelOfferDtos;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<HotelOfferDto> Update(Guid id, HotelOfferUpdateRequest request) {
-        try {
+       
             var hotelOffer = await _hotelOfferDataAccess.GetById(id);
-            if (hotelOffer is null) throw new Exception("Hotel offer not found");
+            if (hotelOffer is null) throw new InvalidDataException("Hotel offer not found");
 
             var error = HotelOfferValidator.GetError(request);
-            if (string.IsNullOrEmpty(error) == false) {
+            if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
@@ -155,17 +141,13 @@ public class HotelOfferService : IHotelOfferService {
             // Update cache
             _cache.Set($"hotel_offer_{hotelOffer.Id}", hotelOffer, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
-            _logger.LogInformation("Hotel Offer { stayId } updated successfully", hotelOffer.Id);
+            _logger.LogInformation("Hotel Offer {StayId} updated successfully", hotelOffer.Id);
             return hotelOffer.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task Delete(Guid id) {
-        try {
+        
             var hotelOffer = await _hotelOfferDataAccess.GetById(id);
             if (hotelOffer is null) {
                 var errorMessage = "Hotel offer not found";
@@ -178,11 +160,7 @@ public class HotelOfferService : IHotelOfferService {
             // Remove from cache
             _cache.Remove($"hotel_offer_{hotelOffer.Id}");
 
-            _logger.LogInformation("Hotel Offer { id } deleted successfully", hotelOffer.Id);
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+            _logger.LogInformation("Hotel Offer {Id} deleted successfully", hotelOffer.Id);
+       
     }
 }

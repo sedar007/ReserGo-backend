@@ -46,7 +46,7 @@ public class UserService : IUserService {
             }
 
             var error = UserValidator.GetErrorCreationRequest(request);
-            if (string.IsNullOrEmpty(error) == false) {
+            if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
@@ -62,7 +62,7 @@ public class UserService : IUserService {
             newUser = await _userDataAccess.Create(newUser);
             await _loginService.Create(request.Password, newUser);
 
-            _logger.LogInformation("User { id } created", newUser.Id);
+            _logger.LogInformation("User {Id} created", newUser.Id);
             return newUser.ToDto();
         
     }
@@ -83,7 +83,7 @@ public class UserService : IUserService {
                 throw new InvalidDataException(errorMessage);
             }
 
-            _logger.LogInformation("User { id } retrieved successfully", user.Id);
+            _logger.LogInformation("User {Id} retrieved successfully", user.Id);
             var userDto = user.ToDto();
             _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
             return userDto;
@@ -147,7 +147,7 @@ public class UserService : IUserService {
                 throw new InvalidDataException(errorMessage);
             }
 
-            _logger.LogInformation("User { id } retrieved successfully", user.Id);
+            _logger.LogInformation("User {Id} retrieved successfully", user.Id);
 
             var userDto = user.ToDto();
             _cache.Set(cacheKey, userDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
@@ -176,14 +176,14 @@ public class UserService : IUserService {
             }
 
             RemoveCache(id, email, username);
-            _logger.LogInformation("User { id } deleted successfully", userId);
+            _logger.LogInformation("User {Id} deleted successfully", userId);
         
     }
 
     public async Task<UserDto> UpdateUser(Guid id, UserUpdateRequest request) {
         
             var user = await _userDataAccess.GetById(id);
-            if (user is null) throw new Exception("User not found");
+            if (user is null) throw new InvalidDataException("User not found");
 
             var existingEmailUser = await _userDataAccess.GetByEmail(request.Email);
             if (existingEmailUser is not null && existingEmailUser.Id != id) {
@@ -200,7 +200,7 @@ public class UserService : IUserService {
             }
 
             var error = UserValidator.GetErrorUpdateRequest(request);
-            if (string.IsNullOrEmpty(error) == false) {
+            if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
@@ -228,7 +228,7 @@ public class UserService : IUserService {
                 user.Address.Country = request.Address?.Country;
             }
 
-            _logger.LogInformation("User { id } updated successfully", user.Id);
+            _logger.LogInformation("User {Id} updated successfully", user.Id);
             await _userDataAccess.Update(user);
             RemoveCache(user.Id, user.Email, user.Username);
             return user.ToDto();

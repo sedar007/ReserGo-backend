@@ -10,6 +10,7 @@ using ReserGo.Common.Response;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared;
 using ReserGo.Shared.Interfaces;
+using InvalidDataException = System.IO.InvalidDataException;
 
 namespace ReserGo.Business.Implementations;
 
@@ -36,7 +37,6 @@ public class RestaurantOfferService : IRestaurantOfferService {
     }
 
     public async Task<RestaurantOfferDto> Create(RestaurantOfferCreationRequest request) {
-        try {
             var error = RestaurantOfferValidator.GetError(request);
             if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
@@ -59,7 +59,7 @@ public class RestaurantOfferService : IRestaurantOfferService {
                 throw new InvalidDataException(errorMessage);
             }
 
-            if (request.PricePerPerson != null && request.PricePerPerson < 0) {
+            if (request.PricePerPerson < 0) {
                 var errorMessage = "Price per person must be greater than or equal to 0";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
@@ -109,26 +109,21 @@ public class RestaurantOfferService : IRestaurantOfferService {
             newRestaurantOffer = await _restaurantOfferDataAccess.Create(newRestaurantOffer);
             var cacheKey = Consts.RestaurantOffersCacheKey.Concat(newRestaurantOffer.Id.ToString());
 
-            RemoveCache(newRestaurantOffer.Id, connectedUser.UserId);
+            DeleteCache(newRestaurantOffer.Id, connectedUser.UserId);
             // Cache the created restaurant offer
             _cache.Set(cacheKey, newRestaurantOffer,
                 TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
 
-            _logger.LogInformation("Restaurant Offer { id } created", newRestaurantOffer.Id);
+            _logger.LogInformation("Restaurant Offer {Id} created", newRestaurantOffer.Id);
             return newRestaurantOffer.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<IEnumerable<RestaurantAvailabilityResponse>> SearchAvailability(
         RestaurantSearchAvailabilityRequest request) {
-        try {
-            var result = await _restaurantOfferDataAccess.SearchAvailability(request);
-            if (result == null || !result.Any()) {
+            var result = (await _restaurantOfferDataAccess.SearchAvailability(request)).ToList();
+            if (!result.Any()) {
                 _logger.LogWarning("No restaurant offers found for the given search criteria.");
                 return new List<RestaurantAvailabilityResponse>();
             }
@@ -145,24 +140,21 @@ public class RestaurantOfferService : IRestaurantOfferService {
                 });
 
             return availableOffers;
-        }
-        catch (Exception ex) {
-            _logger.LogError(ex, "An error occurred while searching restaurant availability.");
-            throw;
-        }
+        
     }
 
     public async Task<RestaurantOfferDto?> GetById(Guid id) {
-        try {
             if (id == Guid.Empty) {
                 var errorMessage = "Invalid restaurant offer id";
                 _logger.LogError(errorMessage);
                 throw new InvalidDataException(errorMessage);
             }
 
-            var cacheKey = Consts.RestaurantOffersCacheKey.Concat(id.ToString());
-            if (_cache.TryGetValue(cacheKey, out RestaurantOffer cachedRestaurantOffer))
-                return cachedRestaurantOffer.ToDto();
+            var cacheKey = string.Format(Consts.RestaurantOffersCacheKey, id);
+
+            if (_cache.TryGetValue(cacheKey, out RestaurantOfferDto? cachedRestaurantOffer))
+                if (cachedRestaurantOffer != null)
+                    return cachedRestaurantOffer;
 
             var restaurantOffer = await _restaurantOfferDataAccess.GetById(id);
             if (restaurantOffer is null) {
@@ -171,42 +163,39 @@ public class RestaurantOfferService : IRestaurantOfferService {
                 throw new InvalidDataException(errorMessage);
             }
 
-            _cache.Set(cacheKey, restaurantOffer, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+            var response = restaurantOffer.ToDto();
+            _cache.Set(cacheKey, response, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
-            _logger.LogInformation("Restaurant Offer { id } retrieved successfully", restaurantOffer.Id);
-            return restaurantOffer.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+            _logger.LogInformation("Restaurant Offer {Id} retrieved successfully", restaurantOffer.Id);
+            return response;
+        
     }
 
     public async Task<IEnumerable<RestaurantOfferDto>> GetRestaurantsByUserId(Guid userId) {
-        try {
-            var cacheKey = Consts.RestaurantOffersUserIdCacheKey.Concat(userId.ToString());
+            var cacheKey = string.Format(Consts.RestaurantOffersUserIdCacheKey, userId);
 
-            if (_cache.TryGetValue(cacheKey, out IEnumerable<RestaurantOfferDto> cachedRestaurantOffers))
-                return cachedRestaurantOffers;
+            if (_cache.TryGetValue(cacheKey, out IEnumerable<RestaurantOfferDto>? cachedRestaurantOffers))
+                if (cachedRestaurantOffers != null)
+                    return cachedRestaurantOffers;
 
-            var restaurantOffers = await _restaurantOfferDataAccess.GetRestaurantsOfferByUserId(userId);
+            var restaurantOffers = (await _restaurantOfferDataAccess.GetRestaurantsOfferByUserId(userId)).ToList();
+            if (!restaurantOffers.Any()) {
+                _logger.LogWarning("No restaurant offers found for user {UserId}", userId);
+                return Enumerable.Empty<RestaurantOfferDto>();
+            }
+
             var restaurantOfferDtos =
-                restaurantOffers.Select(restaurantOffer => restaurantOffer.ToDto());
+                restaurantOffers.Select(restaurantOffer => restaurantOffer.ToDto()).ToList();
 
-            _cache.Set(cacheKey, restaurantOfferDtos, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+            _cache.Set(cacheKey, restaurantOfferDtos.ToList(), TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
             return restaurantOfferDtos;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<RestaurantOfferDto> Update(Guid id, RestaurantOfferUpdateRequest request) {
-        try {
             var restaurantOffer = await _restaurantOfferDataAccess.GetById(id);
-            if (restaurantOffer is null) throw new Exception("Restaurant offer not found");
+            if (restaurantOffer is null) throw new InvalidDataException("Restaurant offer not found");
 
             var error = RestaurantOfferValidator.GetError(request);
             if (!string.IsNullOrEmpty(error)) {
@@ -228,17 +217,12 @@ public class RestaurantOfferService : IRestaurantOfferService {
             _cache.Set(cacheKey, restaurantOffer,
                 TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
-            _logger.LogInformation("Restaurant Offer { stayId } updated successfully", restaurantOffer.Id);
+            _logger.LogInformation("Restaurant Offer {StayId} updated successfully", restaurantOffer.Id);
             return restaurantOffer.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<RestaurantOfferDto> Update(RestaurantOfferDto restaurantOfferDto) {
-        try {
             var restaurantOffer = await _restaurantOfferDataAccess.GetById(restaurantOfferDto.Id);
             if (restaurantOffer is null) throw new InvalidDataException("restaurantOffer not found");
 
@@ -252,17 +236,13 @@ public class RestaurantOfferService : IRestaurantOfferService {
 
             restaurantOffer = await _restaurantOfferDataAccess.Update(restaurantOffer);
 
-            _logger.LogInformation("Restaurant Offer { stayId } updated successfully", restaurantOffer.Id);
+            _logger.LogInformation("Restaurant Offer {StayId} updated successfully", restaurantOffer.Id);
             return restaurantOffer.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task Delete(Guid id) {
-        try {
+       
             var restaurantOffer = await _restaurantOfferDataAccess.GetById(id);
             if (restaurantOffer is null) {
                 var errorMessage = "Restaurant offer not found";
@@ -273,23 +253,21 @@ public class RestaurantOfferService : IRestaurantOfferService {
             await _restaurantOfferDataAccess.Delete(restaurantOffer);
 
             // Remove from cache
-            RemoveCache(restaurantOffer.Id, restaurantOffer.UserId);
+            DeleteCache(restaurantOffer.Id, restaurantOffer.UserId);
 
-            _logger.LogInformation("Restaurant Offer { id } deleted successfully", restaurantOffer.Id);
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+            _logger.LogInformation("Restaurant Offer {Id} deleted successfully", restaurantOffer.Id);
+        
     }
 
-    private void RemoveCache(Guid restaurantOfferId, Guid userId) {
-        // Remove from cache
-        var cacheKey = Consts.RestaurantOffersCacheKey.Concat(restaurantOfferId.ToString());
-        if (_cache.TryGetValue(cacheKey, out RestaurantOffer cachedRestaurantOffer)) _cache.Remove(cacheKey);
-        // Remove from cache
-        var userCacheKey = Consts.RestaurantOffersUserIdCacheKey.Concat(userId.ToString());
-        if (_cache.TryGetValue(userCacheKey, out IEnumerable<RestaurantOfferDto> cachedRestaurantOffers))
-            _cache.Remove(userCacheKey);
+    private void DeleteCache(Guid restaurantOfferId, Guid userId) {
+        var cacheKeys = new[] {
+            string.Format(Consts.RestaurantOffersCacheKey, restaurantOfferId),
+            string.Format(Consts.RestaurantOffersUserIdCacheKey, userId)
+        };
+
+        foreach (var cacheKey in cacheKeys) {
+            _cache.Remove(cacheKey);
+            _logger.LogInformation("Cache removed for key: {CacheKey}", cacheKey);
+        }
     }
 }

@@ -15,11 +15,11 @@ public class HotelService : IHotelService {
     private readonly IMemoryCache _cache;
     private readonly IHotelDataAccess _hotelDataAccess;
     private readonly IImageService _imageService;
-    private readonly ILogger<UserService> _logger;
+    private readonly ILogger<HotelService> _logger;
     private readonly IRoomDataAccess _roomDataAccess;
     private readonly ISecurity _security;
 
-    public HotelService(ILogger<UserService> logger, IHotelDataAccess hotelDataAccess, ISecurity security,
+    public HotelService(ILogger<HotelService> logger, IHotelDataAccess hotelDataAccess, ISecurity security,
         IImageService imageService, IMemoryCache cache, IRoomDataAccess roomDataAccess) {
         _logger = logger;
         _security = security;
@@ -30,7 +30,7 @@ public class HotelService : IHotelService {
     }
 
     public async Task<HotelDto> Create(HotelCreationRequest request) {
-        try {
+      
             var hotel = await _hotelDataAccess.GetByStayId(request.StayId);
             if (hotel is not null) {
                 var errorMessage = "This hotel already exists.";
@@ -39,7 +39,7 @@ public class HotelService : IHotelService {
             }
 
             var error = HotelValidator.GetError(request);
-            if (string.IsNullOrEmpty(error) == false) {
+            if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
@@ -90,17 +90,13 @@ public class HotelService : IHotelService {
             _cache.Set($"hotel_{newHotel.Id}", newHotel, TimeSpan.FromMinutes(10));
             _cache.Set($"hotel_stay_{newHotel.StayId}", newHotel, TimeSpan.FromMinutes(10));
 
-            _logger.LogInformation("Hotel { id } created", newHotel.Id);
+            _logger.LogInformation("Hotel {Id} created", newHotel.Id);
             return newHotel.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<HotelDto?> GetById(Guid id) {
-        try {
+       
             if (_cache.TryGetValue($"hotel_{id}", out Hotel cachedHotel)) return cachedHotel.ToDto();
 
             var hotel = await _hotelDataAccess.GetById(id);
@@ -112,17 +108,13 @@ public class HotelService : IHotelService {
 
             _cache.Set($"hotel_{id}", hotel, TimeSpan.FromMinutes(10));
 
-            _logger.LogInformation("Hotel { Id } retrieved successfully", hotel.Id);
+            _logger.LogInformation("Hotel {Id} retrieved successfully", hotel.Id);
             return hotel.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<IEnumerable<HotelDto>> GetHotelsByUserId(Guid userId) {
-        try {
+       
             var hotels = await _hotelDataAccess.GetHotelsByUserId(userId);
             if (hotels is null || !hotels.Any()) {
                 var errorMessage = "This user has no hotels.";
@@ -131,15 +123,11 @@ public class HotelService : IHotelService {
             }
 
             return hotels.Select(hotel => hotel.ToDto());
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<HotelDto?> GetByStayId(long stayId) {
-        try {
+        
             if (_cache.TryGetValue($"hotel_stay_{stayId}", out Hotel cachedHotel)) return cachedHotel.ToDto();
 
             var hotel = await _hotelDataAccess.GetByStayId(stayId);
@@ -151,29 +139,24 @@ public class HotelService : IHotelService {
 
             _cache.Set($"hotel_stay_{stayId}", hotel, TimeSpan.FromMinutes(10));
 
-            _logger.LogInformation("Hotel { stayId } retrieved successfully", hotel.StayId);
+            _logger.LogInformation("Hotel {StayId} retrieved successfully", hotel.StayId);
             return hotel.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<HotelDto> Update(long stayId, HotelUpdateRequest request) {
-        try {
+      
             var hotel = await _hotelDataAccess.GetByStayId(stayId);
-            if (hotel is null) throw new Exception("Hotel not found");
+            if (hotel is null) throw new InvalidDataException("Hotel not found");
 
             var error = HotelValidator.GetError(request);
-            if (string.IsNullOrEmpty(error) == false) {
+            if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
 
             hotel.Name = request.Name;
             hotel.Location = request.Location;
-            //hotel.Capacity = request.Capacity;
             hotel.LastUpdated = DateTime.UtcNow;
 
             if (request.Picture != null) {
@@ -200,17 +183,13 @@ public class HotelService : IHotelService {
             _cache.Set($"hotel_{hotel.Id}", hotel, TimeSpan.FromMinutes(10));
             _cache.Set($"hotel_stay_{hotel.StayId}", hotel, TimeSpan.FromMinutes(10));
 
-            _logger.LogInformation("Hotel { stayId } updated successfully", hotel.StayId);
+            _logger.LogInformation("Hotel {StayId} updated successfully", hotel.StayId);
             return hotel.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task Delete(Guid id) {
-        try {
+      
             var hotel = await _hotelDataAccess.GetById(id);
             if (hotel is null) {
                 var errorMessage = "Hotel not found";
@@ -230,16 +209,12 @@ public class HotelService : IHotelService {
             _cache.Remove($"hotel_{hotel.Id}");
             _cache.Remove($"hotel_stay_{hotel.StayId}");
 
-            _logger.LogInformation("Hotel { id } deleted successfully", hotel.Id);
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+            _logger.LogInformation("Hotel {Id} deleted successfully", hotel.Id);
+        
     }
 
     public async Task<bool> IsAuthorized(Guid hotelId, Guid userId) {
-        try {
+        
             var isAuthorized = await _hotelDataAccess.IsAuthorized(hotelId, userId);
             if (!isAuthorized) {
                 var errorMessage = "User is not authorized to access this hotel.";
@@ -248,10 +223,6 @@ public class HotelService : IHotelService {
             }
 
             return true;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 }

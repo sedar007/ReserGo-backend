@@ -16,7 +16,7 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
         var data = await _context.BookingRestaurant.AddAsync(bookingRestaurant);
         await _context.SaveChangesAsync();
         return await GetById(data.Entity.Id) ??
-               throw new CreateException("Error creating new booking restaurant.");
+               throw new NullDataException("Error creating new booking restaurant.");
     }
 
     public async Task<BookingRestaurant?> GetById(Guid id) {
@@ -35,18 +35,6 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
             .Where(b => b.BookingDate >= startDate && b.BookingDate <= endDate)
             .CountAsync();
     }
-
-    /* public async Task<int> GetNbBookingsLast30Days(Guid adminId) {
-         var today = DateTime.UtcNow;
-         var days30Before = today.AddDays(-30);
-
-         return await _context.BookingRestaurant
-             .Include(b => b.RestaurantOffer)
-             .Where(b => b.RestaurantOffer.UserId == adminId)
-             .Where(b => b.BookingDate >= days30Before || b.BookingDate > today)
-             .CountAsync();
-     } */
-
     public async Task<IEnumerable<BookingRestaurant>> GetBookingsByUserId(Guid userId) {
         return await _context.BookingRestaurant
             .Where(b => b.UserId == userId)

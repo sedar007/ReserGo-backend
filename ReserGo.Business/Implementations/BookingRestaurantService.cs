@@ -36,13 +36,13 @@ public class BookingRestaurantService : IBookingRestaurantService {
 
             var restaurantOffer = await _restaurantOfferService.GetById(request.RestaurantOfferId);
             if (restaurantOffer == null) {
-                _logger.LogError("Restaurant offer not found for id { id }", request.RestaurantOfferId);
+                _logger.LogError("Restaurant offer not found for id {Id}", request.RestaurantOfferId);
                 throw new InvalidDataException("Restaurant offer not found");
             }
 
             var remainingCapacity = restaurantOffer.GuestLimit - restaurantOffer.GuestNumber;
             if (request.NumberOfGuests > remainingCapacity) {
-                _logger.LogError("Booking exceeds the remaining capacity for offer { id }", restaurantOffer.Id);
+                _logger.LogError("Booking exceeds the remaining capacity for offer {Id}", restaurantOffer.Id);
                 throw new InvalidDataException(
                     $"Cannot book {request.NumberOfGuests} guests. Only {remainingCapacity} spots are available.");
             }
@@ -61,20 +61,20 @@ public class BookingRestaurantService : IBookingRestaurantService {
                 BookingDate = DateOnly.FromDateTime(DateTime.UtcNow)
             };
 
-            _logger.LogInformation("Creating booking restaurant for user { id }", user.UserId);
+            _logger.LogInformation("Creating booking restaurant for user {Id}", user.UserId);
             bookingRestaurant = await _bookingRestaurantDataAccess.Create(bookingRestaurant);
 
             if (bookingRestaurant == null) throw new InvalidDataException("Booking restaurant not created");
             restaurantOffer.GuestNumber += request.NumberOfGuests;
             restaurantOffer = await _restaurantOfferService.Update(restaurantOffer);
             if (restaurantOffer.Restaurant.Name == null) {
-                _logger.LogError("Restaurant name is not available for offer {id}", restaurantOffer.Id);
+                _logger.LogError("Restaurant name is not available for offer {Id}", restaurantOffer.Id);
                 throw new InvalidDataException("Restaurant name is not available.");
             }
 
             var restaurantName = restaurantOffer.Restaurant.Name;
             if (string.IsNullOrEmpty(restaurantName)) {
-                _logger.LogError("Restaurant name is not available for offer {id}", restaurantOffer.Id);
+                _logger.LogError("Restaurant name is not available for offer {Id}", restaurantOffer.Id);
                 throw new InvalidDataException("Restaurant name is not available.");
             }
 

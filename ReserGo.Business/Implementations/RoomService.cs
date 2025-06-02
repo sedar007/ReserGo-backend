@@ -14,21 +14,18 @@ namespace ReserGo.Business.Implementations;
 public class RoomService : IRoomService {
     private readonly IMemoryCache _cache;
     private readonly IHotelService _hotelService;
-    private readonly IImageService _imageService;
-    private readonly ILogger<UserService> _logger;
+    private readonly ILogger<RoomService> _logger;
     private readonly IRoomDataAccess _roomDataAccess;
 
-    public RoomService(ILogger<UserService> logger, IRoomDataAccess roomDataAccess,
-        IImageService imageService, IMemoryCache cache, IHotelService hotelService) {
+    public RoomService(ILogger<RoomService> logger, IRoomDataAccess roomDataAccess,
+        IMemoryCache cache, IHotelService hotelService) {
         _logger = logger;
-        _imageService = imageService;
         _roomDataAccess = roomDataAccess;
         _cache = cache;
         _hotelService = hotelService;
     }
 
     public async Task<RoomDto> Create(RoomCreationRequest request) {
-        try {
             var error = RoomValidator.GetError(request);
             if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
@@ -47,17 +44,12 @@ public class RoomService : IRoomService {
 
             var roomDto = newRoom.ToDto();
             _cache.Set($"GetRoomById_{newRoom.Id}", roomDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
-            _logger.LogInformation("Room { id } created successfully", newRoom.Id);
+            _logger.LogInformation("Room {Id} created successfully", newRoom.Id);
             return roomDto;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+       
     }
 
     public async Task<RoomDto?> GetById(Guid id) {
-        try {
             var cacheKey = $"room_{id}";
 
             if (_cache.TryGetValue(cacheKey, out RoomDto? cachedRoom)) {
@@ -74,17 +66,13 @@ public class RoomService : IRoomService {
 
             var roomDto = room.ToDto();
             _cache.Set(cacheKey, roomDto, TimeSpan.FromMinutes(10));
-            _logger.LogInformation("Room { id } retrieved successfully", room.Id);
+            _logger.LogInformation("Room {Id} retrieved successfully", room.Id);
             return roomDto;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<IEnumerable<RoomDto>> GetRoomsByHotelId(Guid hotelId) {
-        try {
+       
             var cacheKey = $"rooms_user_{hotelId}";
 
             var hotel = await _hotelService.GetById(hotelId);
@@ -103,18 +91,13 @@ public class RoomService : IRoomService {
             var roomDtos = rooms.Select(room => room.ToDto()).ToList();
 
             _cache.Set(cacheKey, roomDtos, TimeSpan.FromMinutes(10));
-            _logger.LogInformation("Rooms for Hotel { hotelId } retrieved successfully", hotelId);
+            _logger.LogInformation("Rooms for Hotel {HotelId} retrieved successfully", hotelId);
             return roomDtos;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
 
     public async Task<RoomDto> Update(Guid id, RoomUpdateRequest request) {
-        try {
             var room = await _roomDataAccess.GetById(id);
             if (room is null) {
                 var errorMessage = "Room not found.";
@@ -139,21 +122,13 @@ public class RoomService : IRoomService {
             var roomDto = room.ToDto();
             _cache.Set($"room_{room.Id}", roomDto, TimeSpan.FromMinutes(10));
 
-            _logger.LogInformation("Room { id } updated successfully", room.Id);
+            _logger.LogInformation("Room {Id} updated successfully", room.Id);
             return roomDto;
-        }
-        catch (InvalidDataException) {
-            throw; // Re-throw validation exceptions
-        }
-        catch (Exception e) {
-            _logger.LogError(e, "An error occurred while updating the room.");
-            throw;
-        }
+        
     }
 
 
     public async Task Delete(Guid id) {
-        try {
             var room = await _roomDataAccess.GetById(id);
             if (room is null) {
                 var errorMessage = "Room not found";
@@ -170,11 +145,7 @@ public class RoomService : IRoomService {
             _cache.Remove($"room_stay_{room.Id}");
             _cache.Remove($"rooms_user_{room.Id}");
 
-            _logger.LogInformation("Room { id } deleted successfully", room.Id);
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+            _logger.LogInformation("Room {Id} deleted successfully", room.Id);
+        
     }
 }

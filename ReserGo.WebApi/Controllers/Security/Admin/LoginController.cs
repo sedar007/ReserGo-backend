@@ -75,22 +75,22 @@ public class LoginController : ControllerBase {
             return Ok(resource);
         }
         catch (UnauthorizedAccessException e) {
-            _logger.LogWarning("User not unauthorized");
+            _logger.LogWarning(Consts.UnauthorizedAccess);
             _logger.LogError(e, e.Message);
             return Unauthorized($"The user: {request.Login} or the password is Incorrect");
         }
         catch (ArgumentNullException e) {
-            _logger.LogWarning("User not unauthorized");
+            _logger.LogWarning(Consts.UnauthorizedAccess);
             _logger.LogError(e, e.Message);
             return BadRequest();
         }
         catch (KeyNotFoundException e) {
-            _logger.LogWarning("User not unauthorized");
+            _logger.LogWarning(Consts.UnauthorizedAccess);
             _logger.LogError(e, e.Message);
             return Unauthorized($"The user: {request.Login} or the password is Incorrect");
         }
         catch (Exception e) {
-            _logger.LogWarning("User not unauthorized");
+            _logger.LogWarning(Consts.UnauthorizedAccess);
             _logger.LogError(e, e.Message);
             return StatusCode(StatusCodes.Status500InternalServerError, "Une erreur interne s'est produite.");
         }

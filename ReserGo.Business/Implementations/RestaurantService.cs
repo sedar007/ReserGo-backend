@@ -15,11 +15,11 @@ namespace ReserGo.Business.Implementations;
 public class RestaurantService : IRestaurantService {
     private readonly IMemoryCache _cache;
     private readonly IImageService _imageService;
-    private readonly ILogger<UserService> _logger;
+    private readonly ILogger<RestaurantService> _logger;
     private readonly IRestaurantDataAccess _restaurantDataAccess;
     private readonly ISecurity _security;
 
-    public RestaurantService(IMemoryCache cache, ILogger<UserService> logger,
+    public RestaurantService(IMemoryCache cache, ILogger<RestaurantService> logger,
         IRestaurantDataAccess restaurantDataAccess, ISecurity security, IImageService imageService) {
         _cache = cache;
         _logger = logger;
@@ -29,7 +29,7 @@ public class RestaurantService : IRestaurantService {
     }
 
     public async Task<RestaurantDto> Create(RestaurantCreationRequest request) {
-        try {
+        
             var restaurant = await _restaurantDataAccess.GetByStayId(request.StayId);
             if (restaurant is not null) {
                 var errorMessage = "This restaurant already exists.";
@@ -60,17 +60,14 @@ public class RestaurantService : IRestaurantService {
             };
 
             newRestaurant = await _restaurantDataAccess.Create(newRestaurant);
-            _logger.LogInformation("Restaurant { id } created", newRestaurant.Id);
+            _logger.LogInformation("Restaurant {Id} created", newRestaurant.Id);
             return newRestaurant.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
+        
     }
 
     public async Task<RestaurantDto?> GetById(Guid id) {
-        try {
+       
             var cacheKey = $"Restaurant_GetById_{id}";
 
             if (_cache.TryGetValue(cacheKey, out RestaurantDto? cachedRestaurant)) {
@@ -89,15 +86,11 @@ public class RestaurantService : IRestaurantService {
             var restaurantDto = restaurant.ToDto();
             _cache.Set(cacheKey, restaurantDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
             return restaurantDto;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+       
     }
 
     public async Task<RestaurantDto?> GetByStayId(long stayId) {
-        try {
+       
             var cacheKey = $"Restaurant_GetByStayId_{stayId}";
 
             if (_cache.TryGetValue(cacheKey, out RestaurantDto? cachedRestaurant)) {
@@ -116,17 +109,13 @@ public class RestaurantService : IRestaurantService {
             var restaurantDto = restaurant.ToDto();
             _cache.Set(cacheKey, restaurantDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
             return restaurantDto;
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+       
     }
 
     public async Task<RestaurantDto> Update(long stayId, RestaurantUpdateRequest request) {
-        try {
+        
             var restaurant = await _restaurantDataAccess.GetByStayId(stayId);
-            if (restaurant is null) throw new Exception("Restaurant not found");
+            if (restaurant is null) throw new InvalidDataException("Restaurant not found");
 
             var error = RestaurantValidator.GetError(request);
             if (!string.IsNullOrEmpty(error)) {
@@ -165,26 +154,18 @@ public class RestaurantService : IRestaurantService {
             RemoveCache(restaurant.Id, restaurant.StayId);
 
             return restaurant.ToDto();
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task<IEnumerable<RestaurantDto>> GetRestaurantsByUserId(Guid userId) {
-        try {
+        
             var restaurants = await _restaurantDataAccess.GetRestaurantsByUserId(userId);
             return restaurants.Select(hotel => hotel.ToDto());
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     public async Task Delete(Guid id) {
-        try {
+       
             var restaurant = await _restaurantDataAccess.GetById(id);
             if (restaurant is null) {
                 var errorMessage = "Restaurant not found";
@@ -203,11 +184,7 @@ public class RestaurantService : IRestaurantService {
             RemoveCache(restaurant.Id, restaurant.StayId);
 
             _logger.LogInformation("Restaurant {Id} deleted successfully", restaurant.Id);
-        }
-        catch (Exception e) {
-            _logger.LogError(e, e.Message);
-            throw;
-        }
+        
     }
 
     private void RemoveCache(Guid id, long stayId) {

@@ -8,8 +8,4 @@ public interface INotificationDataAccess {
     Task<bool> Update(Notification notification);
 
     Task<Notification?> GetById(Guid id);
-    /*Task<IEnumerable<Notification>> GetAll();
-   Task<IEnumerable<Notification>> GetByUserId(Guid userId);
-
-   Task<bool> Delete(Guid id); */
 }

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared.Exceptions;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -15,7 +16,7 @@ public class BookingHotelDataAccess : IBookingHotelDataAccess {
         var newData = _context.BookingHotel.Add(bookingHotel);
         await _context.SaveChangesAsync();
         return await GetById(newData.Entity.Id) ??
-               throw new NullReferenceException("Error creating new booking hotel.");
+               throw new NullDataException("Error creating new booking hotel.");
     }
 
 

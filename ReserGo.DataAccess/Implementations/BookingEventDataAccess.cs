@@ -16,7 +16,7 @@ public class BookingEventDataAccess : IBookingEventDataAccess {
         var newData = await _context.BookingEvent.AddAsync(bookingEvent);
         await _context.SaveChangesAsync();
         return await GetById(newData.Entity.Id) ??
-               throw new CreateException("Error creating new booking event.");
+               throw new NullDataException("Error creating new booking event.");
     }
 
     public async Task<BookingEvent?> GetById(Guid id) {

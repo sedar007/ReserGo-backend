@@ -6,6 +6,6 @@ public interface IRoomDataAccess {
     Task<Room?> GetById(Guid id);
     Task<Room> Create(Room room);
     Task<Room> Update(Room room);
-    Task<IEnumerable<Room>> GetRoomsByHotelId(Guid hotelmId);
+    Task<IEnumerable<Room>> GetRoomsByHotelId(Guid hotelId);
     Task Delete(Room room);
 }

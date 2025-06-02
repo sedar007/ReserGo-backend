@@ -2,6 +2,7 @@
 using ReserGo.Common.Entity;
 using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared.Exceptions;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -16,7 +17,7 @@ public class RoomAvailabilityDataAccess : IRoomAvailabilityDataAccess {
         var newData = _context.RoomAvailability.Add(roomAvailability);
         await _context.SaveChangesAsync();
         return await GetById(newData.Entity.Id) ??
-               throw new NullReferenceException("Error creating new RoomAvailability");
+               throw new NullDataException("Error creating new RoomAvailability");
     }
 
     public async Task<RoomAvailability?> GetByRoomId(Guid roomId) {
@@ -30,7 +31,7 @@ public class RoomAvailabilityDataAccess : IRoomAvailabilityDataAccess {
         var updatedData = _context.RoomAvailability.Update(roomAvailability);
         await _context.SaveChangesAsync();
         return await GetById(updatedData.Entity.Id) ??
-               throw new NullReferenceException("Error updating RoomAvailability");
+               throw new NullDataException("Error updating RoomAvailability");
     }
 
     public async Task<IEnumerable<RoomAvailability>> GetAvailabilitiesByHotelId(Guid hotelId, int skip, int take) {

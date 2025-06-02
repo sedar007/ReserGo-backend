@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared.Exceptions;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -18,7 +19,7 @@ public class LoginDataAccess : ILoginDataAccess {
     public async Task<Login> Create(Login login) {
         var newData = _context.Login.Add(login);
         await _context.SaveChangesAsync();
-        return await GetById(newData.Entity.Id) ?? throw new NullReferenceException("Error creating user login.");
+        return await GetById(newData.Entity.Id) ?? throw new NullDataException("Error creating user login.");
     }
 
     public async Task<Login?> GetByUserId(Guid id) {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared.Exceptions;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -23,11 +24,11 @@ public class EventDataAccess : IEventDataAccess {
         return await _context.Event.Where(x => x.UserId == userId).ToListAsync();
     }
 
-    public async Task<Event> Create(Event user) {
-        var newData = _context.Event.Add(user);
+    public async Task<Event> Create(Event eventData) {
+        var newData = _context.Event.Add(eventData);
         await _context.SaveChangesAsync();
         return await GetByStayId(newData.Entity.StayId) ??
-               throw new NullReferenceException("Error creating new @event.");
+               throw new NullDataException("Error creating new @event.");
     }
 
     public async Task<Event> Update(Event @event) {

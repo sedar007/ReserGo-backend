@@ -12,28 +12,21 @@ public class MetricsService : IMetricsService {
     private readonly IBookingEventDataAccess _bookingEventDataAccess;
     private readonly IBookingHotelDataAccess _bookingHotelDataAccess;
     private readonly IBookingRestaurantDataAccess _bookingRestaurantDataAccess;
-    private readonly ILogger<BookingRestaurantService> _logger;
-    private readonly INotificationService _notificationService;
-    private readonly IRestaurantOfferService _restaurantOfferService;
+    private readonly ILogger<MetricsService> _logger;
 
-    public MetricsService(ILogger<BookingRestaurantService> logger,
-        IRestaurantOfferService restaurantOfferService,
+    public MetricsService(ILogger<MetricsService> logger,
         IBookingRestaurantDataAccess bookingRestaurantDataAccess,
-        INotificationService notificationService,
         IBookingHotelDataAccess bookingHotelDataAccess,
         IBookingEventDataAccess bookingEventDataAccess) {
         _logger = logger;
-        _restaurantOfferService = restaurantOfferService;
         _bookingRestaurantDataAccess = bookingRestaurantDataAccess;
-        _notificationService = notificationService;
         _bookingHotelDataAccess = bookingHotelDataAccess;
         _bookingEventDataAccess = bookingEventDataAccess;
     }
 
 
     public async Task<Dictionary<string, double>> GetMonthlySales(Guid userId) {
-        try {
-            if (userId == null) {
+            if (userId == Guid.Empty) {
                 _logger.LogError("User not found");
                 throw new InvalidDataException(Consts.UserNotFound);
             }
@@ -67,16 +60,12 @@ public class MetricsService : IMetricsService {
 
             var result = allMonths.Keys.ToDictionary(m => m, m => groupedByMonth[m]);
             return result;
-        }
-        catch (Exception e) {
-            Console.WriteLine(e);
-            throw;
-        }
+        
     }
 
     public async Task<Dictionary<string, Dictionary<string, int>>> GetMonthlyBookingsByCategory(Guid userId) {
-        try {
-            if (userId == null) {
+       
+            if (userId == Guid.Empty) {
                 _logger.LogError("User not found");
                 throw new InvalidDataException(Consts.UserNotFound);
             }
@@ -117,11 +106,7 @@ public class MetricsService : IMetricsService {
                 { "Restaurant", allMonths.Keys.ToDictionary(m => m, m => restaurantGrouped[m]) },
                 { "Event", allMonths.Keys.ToDictionary(m => m, m => occasionGrouped[m]) }
             };
-        }
-        catch (Exception e) {
-            Console.WriteLine(e);
-            throw;
-        }
+        
     }
 
     public async Task<MetricsResponse> GetNbBookingsLast30Days(Guid adminId, Product types) {

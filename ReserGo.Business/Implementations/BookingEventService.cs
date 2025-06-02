@@ -36,12 +36,12 @@ public class BookingEventService : IBookingEventService {
 
             var eventOffer = await _eventOfferService.GetById(request.EventOfferId);
             if (eventOffer == null) {
-                _logger.LogError("Event offer not found for id { id }", request.EventOfferId);
+                _logger.LogError("Event offer not found for id {Id}", request.EventOfferId);
                 throw new InvalidDataException("Event offer not found");
             }
 
             if (request.NumberOfGuests > eventOffer.GuestLimit) {
-                _logger.LogError("Booking exceeds the remaining capacity for offer { id }", eventOffer.Id);
+                _logger.LogError("Booking exceeds the remaining capacity for offer {Id}", eventOffer.Id);
                 throw new InvalidDataException($"Cannot book {request.NumberOfGuests} guests.");
             }
 
@@ -62,19 +62,19 @@ public class BookingEventService : IBookingEventService {
                 BookingDate = DateOnly.FromDateTime(DateTime.UtcNow)
             };
 
-            _logger.LogInformation("Creating booking event for user { id }", user.UserId);
+            _logger.LogInformation("Creating booking event for user {Id}", user.UserId);
             bookingEvent = await _bookingEventDataAccess.Create(bookingEvent);
 
             if (bookingEvent == null) throw new InvalidDataException("Booking event not created");
 
             if (eventOffer.Event.Name == null) {
-                _logger.LogError("Event name is not available for offer {id}", eventOffer.Id);
+                _logger.LogError("Event name is not available for offer {Id}", eventOffer.Id);
                 throw new InvalidDataException("Event name is not available.");
             }
 
             var eventName = eventOffer.Event.Name;
             if (string.IsNullOrEmpty(eventName)) {
-                _logger.LogError("Event name is not available for offer {id}", eventOffer.Id);
+                _logger.LogError("Event name is not available for offer {Id}", eventOffer.Id);
                 throw new InvalidDataException("Event name is not available.");
             }
 

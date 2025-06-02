@@ -23,8 +23,8 @@ public class HotelDataAccess : IHotelDataAccess {
         return await _context.Hotel.Include(x => x.Rooms).Where(x => x.UserId == userId).ToListAsync();
     }
 
-    public async Task<Hotel> Create(Hotel user) {
-        var newData = _context.Hotel.Add(user);
+    public async Task<Hotel> Create(Hotel hotel) {
+        var newData = _context.Hotel.Add(hotel);
         await _context.SaveChangesAsync();
         return await GetByStayId(newData.Entity.StayId) ??
                throw new NullReferenceException("Error creating new hotel.");

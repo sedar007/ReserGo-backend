@@ -9,6 +9,7 @@ using ReserGo.Common.Requests.Products.Event;
 using ReserGo.Common.Response;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared;
+using ReserGo.Shared.Exceptions;
 using ReserGo.Shared.Interfaces;
 
 namespace ReserGo.Business.Implementations;
@@ -37,7 +38,7 @@ public class EventOfferService : IEventOfferService {
 
     public async Task<EventOfferDto> Create(EventOfferCreationRequest request) {
             var error = EventOfferValidator.GetError(request);
-            if (string.IsNullOrEmpty(error) == false) {
+            if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
@@ -69,7 +70,7 @@ public class EventOfferService : IEventOfferService {
             _cache.Set($"newEventOffer_{newEventOffer.Id}", newEventOffer,
                 TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
-            _logger.LogInformation("Event Offer { id } created", newEventOffer.Id);
+            _logger.LogInformation("Event Offer {Id} created", newEventOffer.Id);
             return newEventOffer.ToDto();
     }
 
@@ -86,7 +87,7 @@ public class EventOfferService : IEventOfferService {
 
             _cache.Set($"occasionOffer_{id}", occasionOffer, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
-            _logger.LogInformation("Event Offer { id } retrieved successfully", occasionOffer.Id);
+            _logger.LogInformation("Event Offer {Id} retrieved successfully", occasionOffer.Id);
             return occasionOffer.ToDto();
     }
 
@@ -108,10 +109,10 @@ public class EventOfferService : IEventOfferService {
 
     public async Task<EventOfferDto> Update(Guid id, EventOfferUpdateRequest request) {
             var occasionOffer = await _occasionOfferDataAccess.GetById(id);
-            if (occasionOffer is null) throw new Exception("Event offer not found");
+            if (occasionOffer is null) throw new NullDataException("Event offer not found");
 
             var error = EventOfferValidator.GetError(request);
-            if (string.IsNullOrEmpty(error) == false) {
+            if (!string.IsNullOrEmpty(error)) {
                 _logger.LogError(error);
                 throw new InvalidDataException(error);
             }
@@ -129,7 +130,7 @@ public class EventOfferService : IEventOfferService {
             _cache.Set($"occasion_offer_{occasionOffer.Id}", occasionOffer,
                 TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
-            _logger.LogInformation("Event Offer { stayId } updated successfully", occasionOffer.Id);
+            _logger.LogInformation("Event Offer {StayId} updated successfully", occasionOffer.Id);
             return occasionOffer.ToDto();
     }
 
@@ -146,7 +147,7 @@ public class EventOfferService : IEventOfferService {
             // Remove from cache
             _cache.Remove($"occasion_offer_{occasionOffer.Id}");
 
-            _logger.LogInformation("Event Offer { id } deleted successfully", occasionOffer.Id);
+            _logger.LogInformation("Event Offer {Id} deleted successfully", occasionOffer.Id);
     }
 
     public async Task<IEnumerable<EventAvailabilityResponse>>

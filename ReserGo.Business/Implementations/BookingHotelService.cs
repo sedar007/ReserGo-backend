@@ -14,24 +14,20 @@ namespace ReserGo.Business.Implementations;
 
 public class BookingHotelService : IBookingHotelService {
     private readonly IBookingHotelDataAccess _bookingHotelDataAccess;
-    private readonly IHotelOfferService _hotelOfferService;
     private readonly ILogger<BookingHotelService> _logger;
     private readonly INotificationService _notificationService;
     private readonly IRoomAvailabilityService _roomAvailabilityService;
 
     public BookingHotelService(ILogger<BookingHotelService> logger,
-        IHotelOfferService hotelOfferService,
         IBookingHotelDataAccess bookingHotelDataAccess, INotificationService notificationService,
         IRoomAvailabilityService roomAvailabilityService) {
         _logger = logger;
-        _hotelOfferService = hotelOfferService;
         _bookingHotelDataAccess = bookingHotelDataAccess;
         _notificationService = notificationService;
         _roomAvailabilityService = roomAvailabilityService;
     }
 
     public async Task<BookingHotelResponses> CreateBooking(BookingHotelRequest request, ConnectedUser user) {
-        try {
             if (user == null) {
                 _logger.LogError("User not found");
                 throw new InvalidDataException(Consts.UserNotFound);
@@ -70,7 +66,7 @@ public class BookingHotelService : IBookingHotelService {
 
                 var createdReservation = await _bookingHotelDataAccess.Create(reservation);
                 if (createdReservation == null) {
-                    _logger.LogError($"Booking hotel not created for RoomId: {room.RoomId}");
+                    _logger.LogError("Booking hotel not created for RoomId: {RoomId}", room.RoomId);
                     throw new InvalidDataException($"Booking hotel not created for RoomId: {room.RoomId}");
                 }
 
@@ -90,11 +86,7 @@ public class BookingHotelService : IBookingHotelService {
                 Notification = notificationDto,
                 Bookings = reservations.Select(r => r.ToDto())
             };
-        }
-        catch (Exception e) {
-            _logger.LogError(e, "Error creating bookings");
-            throw;
-        }
+        
     }
 
     public async Task<IEnumerable<BookingHotelDto>> GetBookingsByUserId(Guid userId) {
