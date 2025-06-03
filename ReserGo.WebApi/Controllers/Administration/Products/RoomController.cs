@@ -222,34 +222,33 @@ public class RoomController : ControllerBase {
     }
 
     /// <summary>
-    ///     Set the availability for a specific room.
+    ///     Set the availability for multiple hotels/rooms in batch.
     /// </summary>
-    /// <param name="roomId">The ID of the room to set availability for.</param>
-    /// <param name="request">The availability request containing start and end dates, and hotel ID.</param>
-    /// <returns>The created or updated room availability object.</returns>
-    /// <response code="201">Availability set successfully.</response>
+    /// <param name="request">The batch availability request containing hotel IDs, start and end dates.</param>
+    /// <returns>A list of created or updated room availability objects.</returns>
+    /// <response code="201">Availabilities set successfully.</response>
     /// <response code="400">Invalid request data or validation error.</response>
     /// <response code="401">User not authenticated.</response>
     /// <response code="500">An unexpected error occurred.</response>
     [AdminOnly]
-    [HttpPost("{roomId}/availability")]
+    [HttpPost("availability")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-    public async Task<ActionResult<Resource<RoomAvailabilityDto>>> SetAvailability(Guid roomId,
-        RoomAvailabilityRequest request) {
+    public async Task<ActionResult<Resource<IEnumerable<RoomAvailabilityDto>>>> SetAvailability(
+        RoomAvailabilitiesRequest request) {
         try {
             var connectedUser = _security.GetCurrentUser();
             if (connectedUser == null) return Unauthorized(Consts.UnauthorizedAccess);
 
-            var availability = await _roomAvailabilityService.SetAvailability(connectedUser, roomId, request);
+            var availabilities = await _roomAvailabilityService.SetAvailability(connectedUser, request);
 
-            var resource = new Resource<RoomAvailabilityDto> {
-                Data = availability,
+            var resource = new Resource<IEnumerable<RoomAvailabilityDto>> {
+                Data = availabilities,
                 Links = new List<Link> {
                     new() {
-                        Href = Url.Action(nameof(SetAvailability), new { availability.Room.Id }) ?? string.Empty,
+                        Href = Url.Action(nameof(SetAvailability)) ?? string.Empty,
                         Rel = "self",
                         Method = "POST"
                     }
