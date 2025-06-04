@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ReserGo.Common.Entity;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared.Exceptions;
+using ReserGo.Shared;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -36,10 +37,10 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
             .CountAsync();
     }
 
-    public async Task<IEnumerable<BookingRestaurant>> GetBookingsByUserId(Guid userId, int pageSize = 10) {
+    public async Task<IEnumerable<BookingRestaurant>> GetBookingsByUserId(Guid userId, int pageSize = Consts.DefaultPageSize) {
         return await _context.BookingRestaurant
             .Include(b => b.Restaurant)
-            .OrderByDescending(b => b.Date)
+            .OrderByDescending(b => b.BookingDate)
             .Where(b => b.UserId == userId)
             .Take(pageSize)
             .ToListAsync();
@@ -51,7 +52,7 @@ public class BookingRestaurantDataAccess : IBookingRestaurantDataAccess {
             .Include(b => b.User)
             .Include(b => b.RestaurantOffer)
             .Where(b => b.Restaurant.UserId == adminId)
-            .OrderByDescending(b => b.Date)
+            .OrderByDescending(b => b.BookingDate)
             .ToListAsync();
     }
 

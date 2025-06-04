@@ -33,29 +33,48 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
         _cache = cache;
     }
 
+    public async Task<IEnumerable<RoomAvailabilityDto>> SetAvailability(ConnectedUser connectedUser,
+        RoomAvailabilitiesRequest request) {
+        if(request == null)
+            throw new InvalidDataException("Request cannot be null.");
+        
+        var roomAvailabilityDtos = new List<RoomAvailabilityDto>();
+        
+        foreach (var roomId in request.RoomIds) {
+            var result = await SetAvailability(connectedUser, new RoomAvailabilityRequest {
+                RoomId = roomId,
+                HotelId = request.HotelId,
+                StartDate = request.StartDate,
+                EndDate = request.EndDate
+            });
+            roomAvailabilityDtos.Add(result);
+        }
+        
+        return roomAvailabilityDtos;
+    }
 
-    public async Task<RoomAvailabilityDto> SetAvailability(ConnectedUser connectedUser, Guid roomId,
+    private async Task<RoomAvailabilityDto> SetAvailability(ConnectedUser connectedUser,
         RoomAvailabilityRequest request) {
         await IsAuthorized(connectedUser, request.HotelId);
 
         ValidateRequest(request);
 
-        var room = await _roomDataAccess.GetById(roomId);
+        var room = await _roomDataAccess.GetById(request.RoomId);
         if (room == null) {
-            _logger.LogWarning("Room not found for RoomId: {RoomId}", roomId);
+            _logger.LogWarning("Room not found for RoomId: {RoomId}", request.RoomId);
             throw new InvalidDataException("Room not found.");
         }
 
-        var existingAvailability = await _availabilityDataAccess.GetByRoomId(roomId);
+        var existingAvailability = await _availabilityDataAccess.GetByRoomId(request.RoomId);
         RoomAvailability availabilityResponse;
 
         if (existingAvailability == null || existingAvailability.EndDate < DateOnly.FromDateTime(DateTime.UtcNow))
-            availabilityResponse = await CreateNewAvailability(roomId, request);
+            availabilityResponse = await CreateNewAvailability(request.RoomId, request);
         else
             availabilityResponse = await ExtendExistingAvailability(existingAvailability, request);
 
         DeleteCache(connectedUser.UserId);
-        _logger.LogInformation("Availability successfully processed for RoomId: {RoomId}", roomId);
+        _logger.LogInformation("Availability successfully processed for RoomId: {RoomId}", request.RoomId);
         return availabilityResponse.ToDto();
     }
 
@@ -218,3 +237,4 @@ public class RoomAvailabilityService : IRoomAvailabilityService {
         }
     }
 }
+

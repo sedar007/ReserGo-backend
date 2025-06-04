@@ -41,11 +41,7 @@ public class BookingEventService : IBookingEventService {
                 _logger.LogError("Event offer not found for id {Id}", request.EventOfferId);
                 throw new InvalidDataException("Event offer not found");
             }
-
-            if (request.NumberOfGuests > eventOffer.GuestLimit) {
-                _logger.LogError("Booking exceeds the remaining capacity for offer {Id}", eventOffer.Id);
-                throw new InvalidDataException($"Cannot book {request.NumberOfGuests} guests.");
-            }
+            
 
             var numberDays = (request.EndDate.ToDateTime(TimeOnly.MinValue) -
                               request.StartDate.ToDateTime(TimeOnly.MinValue)).TotalDays;
@@ -59,7 +55,7 @@ public class BookingEventService : IBookingEventService {
                 EndDate = request.EndDate,
                 PricePerDay = eventOffer.PricePerDay,
                 PriceTotal = priceTotal,
-                NumberOfGuests = request.NumberOfGuests,
+                NumberOfGuests = eventOffer.Event.Capacity,
                 IsConfirmed = true,
                 BookingDate = DateOnly.FromDateTime(DateTime.UtcNow)
             };
@@ -84,8 +80,7 @@ public class BookingEventService : IBookingEventService {
             var notification = new NotificationCreationRequest {
                 Title = "New Reservation",
                 Message =
-                    $"New reservation made by {user.Username}  at {eventOffer.Event.Name} " +
-                    $"number of guests: {request.NumberOfGuests}",
+                    $"New reservation made by {user.Username}  at {eventOffer.Event.Name} ",
                 Type = "Event",
                 Name = eventName,
                 UserId = eventOffer.UserId

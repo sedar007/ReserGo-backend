@@ -3,6 +3,8 @@ using ReserGo.Common.Entity;
 using ReserGo.Common.Requests.Products.Restaurant;
 using ReserGo.DataAccess.Interfaces;
 using ReserGo.Shared.Exceptions;
+using System.Globalization;
+using System.Text;
 
 namespace ReserGo.DataAccess.Implementations;
 
@@ -43,14 +45,30 @@ public class RestaurantOfferDataAccess : IRestaurantOfferDataAccess {
     }
 
     public async Task<IEnumerable<RestaurantOffer>> SearchAvailability(RestaurantSearchAvailabilityRequest request) {
-        return await _context.RestaurantOffer
+        string Normalize(string input) => string.IsNullOrEmpty(input)
+            ? string.Empty
+            : new string(input.Normalize(NormalizationForm.FormD)
+                .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark)
+                .ToArray())
+                .ToLower();
+
+        var normalizedRequestCuisine = Normalize(request.CuisineType ?? string.Empty);
+
+        var query = _context.RestaurantOffer
             .Include(o => o.Restaurant)
             .Where(o => o.OfferStartDate <= request.Date &&
                         o.OfferEndDate >= request.Date &&
-                        o.GuestLimit - o.GuestNumber >= request.NumberOfGuests &&
-                        (string.IsNullOrEmpty(request.CuisineType) ||
-                         (o.Restaurant.CuisineType != null &&
-                          o.Restaurant.CuisineType.ToLower().Contains(request.CuisineType.ToLower()))))
-            .ToListAsync();
+                        o.GuestLimit - o.GuestNumber >= request.NumberOfGuests);
+
+        var result = await query.ToListAsync();
+
+        if (!string.IsNullOrEmpty(request.CuisineType))
+        {
+            result = result.Where(o => !string.IsNullOrEmpty(o.Restaurant.CuisineType) &&
+                (Normalize(o.Restaurant.CuisineType).Contains(normalizedRequestCuisine) ||
+                 normalizedRequestCuisine.Contains(Normalize(o.Restaurant.CuisineType)))).ToList();
+        }
+
+        return result;
     }
 }

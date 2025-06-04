@@ -7,8 +7,8 @@ using ReserGo.Common.Security;
 namespace ReserGo.Business.Interfaces;
 
 public interface IRoomAvailabilityService {
-    Task<RoomAvailabilityDto> SetAvailability(ConnectedUser connectedUser, Guid roomId,
-        RoomAvailabilityRequest request);
+    Task<IEnumerable<RoomAvailabilityDto>> SetAvailability(ConnectedUser connectedUser,
+        RoomAvailabilitiesRequest request);
 
     Task<IEnumerable<RoomAvailabilityDto>> GetAvailabilitiesByHotelId(ConnectedUser connectedUser,
         Guid hotelId, int skip, int take);
