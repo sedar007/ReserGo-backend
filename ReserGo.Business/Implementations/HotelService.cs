@@ -119,8 +119,8 @@ public class HotelService : IHotelService {
     }
 
     public async Task<IEnumerable<HotelDto>> GetHotelsByUserId(Guid userId) {
-        var hotels = await _hotelDataAccess.GetHotelsByUserId(userId);
-        if (hotels is null || !hotels.Any()) {
+        var hotels = (await _hotelDataAccess.GetHotelsByUserId(userId)).ToList();
+        if (!hotels.Any()) {
             var errorMessage = "This user has no hotels.";
             _logger.LogError(errorMessage);
             return Enumerable.Empty<HotelDto>();
