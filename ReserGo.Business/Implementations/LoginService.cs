@@ -49,7 +49,7 @@ public class LoginService : ILoginService {
 
         if (!_security.VerifyPassword(login.Password, request.Password)) {
             login.FailedAttempts++;
-            if (login.FailedAttempts >= 3) {
+            if (login.FailedAttempts >= 10) {
                 login.IsLocked = true;
                 _logger.LogWarning("Account locked due to multiple failed login attempts for user: {Username}",
                     login.Username);
