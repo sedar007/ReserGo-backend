@@ -34,4 +34,7 @@ public static class Consts {
     public const string CacheKeyAvailabilitiesHotel = "availabilities_hotel_{0}_{1}_{2}";
     public const string CacheKeyHotelOffers = "hotelOffers_{0}";
     public const string CacheKeyAvailabilitiesRoom = "availabilities_room_{0}_{1}_{2}";
+    
+    public const string CacheKeyHotel = "hotel_{0}";
+    public const string CacheKeyHotelStayId = "hotel_stayid_{0}";
 }

@@ -6,6 +6,6 @@ public class EventDto {
     public string Location { get; set; } = null!;
     public long StayId { get; set; }
     public int Capacity { get; set; }
-    public string? Picture { get; set; }
+    public string? Picture { get; set; } = "system/a3bfhmv9txtzdbyxsqki";
     public DateTime LastUpdated { get; set; }
 }

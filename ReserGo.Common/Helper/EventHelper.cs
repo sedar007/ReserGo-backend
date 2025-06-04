@@ -11,7 +11,7 @@ public static class EventHelper {
             Capacity = occasion.Capacity,
             Location = occasion.Location,
             StayId = occasion.StayId,
-            Picture = occasion.Picture,
+            Picture = occasion.Picture ?? "system/a3bfhmv9txtzdbyxsqki",
             LastUpdated = occasion.LastUpdated
         };
     }
