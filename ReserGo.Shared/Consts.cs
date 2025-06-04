@@ -11,6 +11,12 @@ public static class Consts {
     public const string UnexpectedError = "An unexpected error occurred.";
     public const string UserNotExist = "This user does not exist.";
     public const string UnauthorizedAccess = "Unauthorized access.";
+    public const string Key = "Key";
+    public const string Issuer = "Issuer";
+    public const string Audience = "Audience";
+    public const string ExpireMinutes = "ExpireMinutes";
+    public const string NotificationHubPath = "/hubs/notifications";
+    
     
     public const int DefaultPageSize = 50;
 
