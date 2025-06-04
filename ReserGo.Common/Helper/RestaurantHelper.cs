@@ -12,7 +12,7 @@ public static class RestaurantHelper {
             CuisineType = restaurant.CuisineType,
             Capacity = restaurant.Capacity,
             StayId = restaurant.StayId,
-            Picture = restaurant.Picture,
+            Picture = restaurant.Picture ?? "system/a1mxr4wsr490cdf3gthn",
             LastUpdated = restaurant.LastUpdated
         };
     }

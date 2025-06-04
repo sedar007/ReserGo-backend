@@ -13,7 +13,7 @@ public static class HotelHelper {
             Location = hotel.Location,
             NumberOfRooms = hotel.NumberOfRooms,
             Description = hotel.Description,
-            Picture = hotel.Picture,
+            Picture = hotel.Picture ?? "system/fscb7gz4a5kfaxnrzp02",
             LastUpdated = hotel.LastUpdated,
             Rooms = hotel.Rooms?.Select(room => room.ToDto())
         };

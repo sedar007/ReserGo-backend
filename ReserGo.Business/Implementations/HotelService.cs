@@ -7,6 +7,7 @@ using ReserGo.Common.Entity;
 using ReserGo.Common.Helper;
 using ReserGo.Common.Requests.Products.Hotel;
 using ReserGo.DataAccess.Interfaces;
+using ReserGo.Shared;
 using ReserGo.Shared.Interfaces;
 
 namespace ReserGo.Business.Implementations;
@@ -85,16 +86,23 @@ public class HotelService : IHotelService {
         newHotel.NumberOfRooms = rooms.Count;
         newHotel = await _hotelDataAccess.Update(newHotel);
 
+        var hotelDto = newHotel.ToDto();
+        var cacheKey = string.Format(Consts.CacheKeyHotel, hotelDto.Id);
+        var cacheKeyStayId = string.Format(Consts.CacheKeyHotelStayId, hotelDto.StayId);
+    
         // Cache the created hotel
-        _cache.Set($"hotel_{newHotel.Id}", newHotel, TimeSpan.FromMinutes(10));
-        _cache.Set($"hotel_stay_{newHotel.StayId}", newHotel, TimeSpan.FromMinutes(10));
+        _cache.Set(cacheKey, hotelDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+        _cache.Set(cacheKeyStayId, hotelDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
         _logger.LogInformation("Hotel {Id} created", newHotel.Id);
-        return newHotel.ToDto();
+        return hotelDto;
     }
 
     public async Task<HotelDto?> GetById(Guid id) {
-        if (_cache.TryGetValue($"hotel_{id}", out Hotel cachedHotel)) return cachedHotel.ToDto();
+        var cacheKey = string.Format(Consts.CacheKeyHotel, id);
+        if (_cache.TryGetValue(cacheKey, out HotelDto? cachedHotel))
+            if (cachedHotel != null)
+                return cachedHotel;
 
         var hotel = await _hotelDataAccess.GetById(id);
         if (hotel is null) {
@@ -102,11 +110,12 @@ public class HotelService : IHotelService {
             _logger.LogError(errorMessage);
             throw new InvalidDataException(errorMessage);
         }
+        
+        var hotelDto = hotel.ToDto();
 
-        _cache.Set($"hotel_{id}", hotel, TimeSpan.FromMinutes(10));
-
+        _cache.Set(cacheKey, hotelDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
         _logger.LogInformation("Hotel {Id} retrieved successfully", hotel.Id);
-        return hotel.ToDto();
+        return hotelDto;
     }
 
     public async Task<IEnumerable<HotelDto>> GetHotelsByUserId(Guid userId) {
@@ -121,7 +130,11 @@ public class HotelService : IHotelService {
     }
 
     public async Task<HotelDto?> GetByStayId(long stayId) {
-        if (_cache.TryGetValue($"hotel_stay_{stayId}", out Hotel cachedHotel)) return cachedHotel.ToDto();
+        var cacheKey = string.Format(Consts.CacheKeyHotelStayId, stayId);
+
+        if (_cache.TryGetValue(cacheKey, out HotelDto? cachedHotel))
+            if (cachedHotel != null)
+                return cachedHotel;
 
         var hotel = await _hotelDataAccess.GetByStayId(stayId);
         if (hotel is null) {
@@ -129,11 +142,11 @@ public class HotelService : IHotelService {
             _logger.LogError(errorMessage);
             throw new InvalidDataException(errorMessage);
         }
-
-        _cache.Set($"hotel_stay_{stayId}", hotel, TimeSpan.FromMinutes(10));
+        var hotelDto = hotel.ToDto();
+        _cache.Set(cacheKey, hotelDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
         _logger.LogInformation("Hotel {StayId} retrieved successfully", hotel.StayId);
-        return hotel.ToDto();
+        return hotelDto;
     }
 
     public async Task<HotelDto> Update(long stayId, HotelUpdateRequest request) {
@@ -170,12 +183,16 @@ public class HotelService : IHotelService {
 
         await _hotelDataAccess.Update(hotel);
 
+        var hotelDto = hotel.ToDto();
         // Update cache
-        _cache.Set($"hotel_{hotel.Id}", hotel, TimeSpan.FromMinutes(10));
-        _cache.Set($"hotel_stay_{hotel.StayId}", hotel, TimeSpan.FromMinutes(10));
+        var cacheKey = string.Format(Consts.CacheKeyHotel, hotelDto.Id);
+        var cacheKeyStayId = string.Format(Consts.CacheKeyHotelStayId, hotelDto.StayId);
+        
+        _cache.Set(cacheKey, hotelDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
+        _cache.Set(cacheKeyStayId, hotelDto, TimeSpan.FromMinutes(Consts.CacheDurationMinutes));
 
-        _logger.LogInformation("Hotel {StayId} updated successfully", hotel.StayId);
-        return hotel.ToDto();
+        _logger.LogInformation("Hotel {StayId} updated successfully", hotelDto.StayId);
+        return hotelDto;
     }
 
     public async Task Delete(Guid id) {
@@ -194,9 +211,12 @@ public class HotelService : IHotelService {
             if (!deleteResult) _logger.LogWarning("Failed to delete image with publicId: {PublicId}", publicId);
         }
 
+        var cacheKey = string.Format(Consts.CacheKeyHotel, hotel.Id);
+        var cacheKeyStayId = string.Format(Consts.CacheKeyHotelStayId, hotel.StayId);
+
         // Remove from cache
-        _cache.Remove($"hotel_{hotel.Id}");
-        _cache.Remove($"hotel_stay_{hotel.StayId}");
+        _cache.Remove(cacheKey);
+        _cache.Remove(cacheKeyStayId);
 
         _logger.LogInformation("Hotel {Id} deleted successfully", hotel.Id);
     }
