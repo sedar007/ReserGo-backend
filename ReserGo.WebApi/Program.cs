@@ -137,7 +137,7 @@ public class Program {
                 options.AddPolicy(Consts.CorsPolicy,
                     policy =>
                     {
-                        policy.WithOrigins("http://localhost:5173", "http://localhost:4173",
+                        policy.WithOrigins("http://localhost:5173", "http://localhost:4173","http://localhost:5174",
                                 "https://resergo-admin.adjysedar.fr",
                                 "resergo-admin.adjysedar.fr", "adjysedar.fr", "https://resergo.adjysedar.fr",
                                 "resergo.adjysedar.fr")
@@ -151,7 +151,7 @@ public class Program {
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(opt =>
             {
-                opt.SwaggerDoc("v1", new OpenApiInfo { Title = "ReserGo", Version = "v1.0.0" });
+                opt.SwaggerDoc("v1", new OpenApiInfo { Title = Consts.ApplicationName, Version = "v1.0.0" });
                 // Add configuration here to include XML comments
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
@@ -164,10 +164,10 @@ public class Program {
             builder.Host.UseNLog();
 
             var jwtSettings = new JwtSettings {
-                Key = builder.Configuration.GetSection("Key")?.Get<string>() ?? string.Empty,
-                Issuer = builder.Configuration.GetSection("Issuer")?.Value ?? string.Empty,
-                Audience = builder.Configuration.GetSection("Audience")?.Get<string>() ?? string.Empty,
-                ExpireMinutes = builder.Configuration.GetSection("ExpireMinutes")?.Get<int>() ?? 0
+                Key = builder.Configuration.GetSection(Consts.Key)?.Get<string>() ?? string.Empty,
+                Issuer = builder.Configuration.GetSection(Consts.Issuer)?.Value ?? string.Empty,
+                Audience = builder.Configuration.GetSection(Consts.Audience)?.Get<string>() ?? string.Empty,
+                ExpireMinutes = builder.Configuration.GetSection(Consts.ExpireMinutes)?.Get<int>() ?? 0
             };
 
             var key = Encoding.ASCII.GetBytes(jwtSettings.Key);
@@ -197,9 +197,9 @@ public class Program {
                                 context.Token = context.Request.Cookies[Consts.AuthToken];
 
                             // Check for token in SignalR query string
-                            var accessToken = context.Request.Query["access_token"];
+                            var accessToken = context.Request.Query[Consts.AuthToken];
                             var path = context.HttpContext.Request.Path;
-                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs/notifications"))
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments(Consts.NotificationHubPath))
                                 context.Token = accessToken;
 
                             return Task.CompletedTask;
@@ -239,7 +239,7 @@ public class Program {
             app.UseCors(Consts.CorsPolicy);
             app.UseAuthentication();
             app.UseAuthorization();
-            app.MapHub<NotificationHub>("/hubs/notifications");
+            app.MapHub<NotificationHub>(Consts.NotificationHubPath);
             app.MapControllers();
             app.Run();
         }
